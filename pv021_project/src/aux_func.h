@@ -21,3 +21,5 @@ class aux_func {
         // Function to write predictions to a CSV file
         void write_predictions(const std::string& filename, const std::vector<int>& predictions);
 };
+
+#endif // AUX_FUNC_H
