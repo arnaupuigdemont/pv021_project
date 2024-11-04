@@ -11,16 +11,16 @@ public:
         layers.emplace_back(num_outputs, num_hidden);
     }
 
-    std::vector<double> feedforward(const std::vector<double>& inputs) {
+    std::vector<double> feedForward(const std::vector<double>& inputs) {
         std::vector<double> activations = inputs;
         for (auto& layer : layers) {
-            activations = layer.feedforward(activations);
+            activations = layer.feedForward(activations);
         }
         return activations;
     }
 
     // Backpropagation (to be implemented later)
-    void backpropagation(const std::vector<double>& inputs, const std::vector<double>& target, double learning_rate) {
+    void backPropagation(const std::vector<double>& inputs, const std::vector<double>& target, double learning_rate) {
         // Here, implement backpropagation, adjusting weights and biases
     }
 };

@@ -12,10 +12,10 @@ public:
     Neural_net(int num_inputs, int num_hidden, int num_outputs);
 
     // Feedforward: passes inputs through the network
-    std::vector<double> feedforward(const std::vector<double>& inputs);
+    std::vector<double> feedForward(const std::vector<double>& inputs);
 
     // Backpropagation: adjusts weights and biases based on the error
-    void backpropagation(const std::vector<double>& inputs, const std::vector<double>& target, double learning_rate);
+    void backPropagation(const std::vector<double>& inputs, const std::vector<double>& target, double learning_rate);
 
     // Train the network
     void train(const std::vector<std::vector<double>>& inputs, const std::vector<int>& labels, int epochs, double learning_rate);

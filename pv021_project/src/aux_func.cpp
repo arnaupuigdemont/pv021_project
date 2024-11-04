@@ -8,7 +8,7 @@ public:
     aux_func() {}
 
     // Function to read CSV data
-    std::vector<std::vector<double>> read_csv(const std::string& filename) {
+    std::vector<std::vector<double>> readCsv(const std::string& filename) {
         std::ifstream file(filename);
         std::string line;
         std::vector<std::vector<double>> data;
@@ -28,7 +28,7 @@ public:
     }
 
     // Function to load labels from a CSV file
-    std::vector<int> load_labels(const std::string& filename) {
+    std::vector<int> loadLabels(const std::string& filename) {
         std::ifstream file(filename);
         std::string line;
         std::vector<int> labels;
@@ -41,7 +41,7 @@ public:
     }
 
     // Function to write predictions to a CSV file
-    void write_predictions(const std::string& filename, const std::vector<int>& predictions) {
+    void writePredictions(const std::string& filename, const std::vector<int>& predictions) {
         std::ofstream file(filename);
         for (const int& pred : predictions) {
             file << pred << "\n";

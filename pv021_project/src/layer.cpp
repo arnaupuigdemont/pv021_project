@@ -10,7 +10,7 @@ public:
         }
     }
 
-    std::vector<double> feedforward(const std::vector<double>& inputs) {
+    std::vector<double> feedForward(const std::vector<double>& inputs) {
         std::vector<double> outputs;
         for (auto& neuron : neurons) {
             outputs.push_back(neuron.activate(inputs));

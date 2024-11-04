@@ -12,7 +12,7 @@ public:
     Layer(int num_neurons, int num_inputs);
 
     // Feedforward: passes inputs through the layer
-    std::vector<double> feedforward(const std::vector<double>& inputs);
+    std::vector<double> feedForward(const std::vector<double>& inputs);
 };
 
 #endif // LAYER_H

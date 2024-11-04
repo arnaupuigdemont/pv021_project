@@ -7,6 +7,8 @@
 #include "neural_net.h"  
 #include "aux_func.h"
 
+using namespace std;
+
 int main() {
     // Load training data
     auto train_vectors = read_csv("data/fashion_mnist_train_vectors.csv");
@@ -18,35 +20,48 @@ int main() {
 
     //min max normalization (to implement)
 
-    // Initialize the neural network
-    NeuralNetwork nn(784, 64, 10);  // 784 input nodes (28x28), 128 hidden neurons, 10 output nodes
+    //validation split (to implement)
 
-    // Train the neural network
-    int epochs = 10;  // Number of epochs
-    double learning_rate = 0.01;  // Learning rate
-    nn.train(train_vectors, train_labels, epochs, learning_rate);
+    //hiddden and output vectors
+    vector<double> hidden1(HIDDEN_SIZE1);
+    vector<double> hidden2(HIDDEN_SIZE2);
+    vector<double> output(OUTPUT_SIZE);
 
-    // Make predictions on training set
-    std::vector<int> train_predictions;
-    for (const auto& input : train_vectors) {
-        auto output = nn.feedforward(input);
-        train_predictions.push_back(std::distance(output.begin(), std::max_element(output.begin(), output.end())));
-    }
+    // weights and biases
+    random_device rd;
+    mt19937 gen(42);
+    uniform_real_distribution<> dis(-0.1, 0.1);
+    vector<double> hidden_weights1(INPUT_SIZE * HIDDEN_SIZE1);
+    vector<double> hidden_weights2(HIDDEN_SIZE1 * HIDDEN_SIZE2);
+    vector<double> output_weights(HIDDEN_SIZE2 * OUTPUT_SIZE);
+    vector<double> hidden_bias1(HIDDEN_SIZE1);
+    vector<double> hidden_bias2(HIDDEN_SIZE2);
+    vector<double> output_bias(OUTPUT_SIZE);
+    for (auto &w : hidden_weights1) w = dis(gen);
+    for (auto &w : hidden_weights2) w = dis(gen);
+    for (auto &w : output_weights) w = dis(gen);
+    for (auto &b : hidden_bias1) b = dis(gen);
+    for (auto &b : hidden_bias2) b = dis(gen);
+    for (auto &b : output_bias) b = dis(gen);
 
-    // Write training predictions to CSV
-    write_predictions("train_predictions.csv", train_predictions);
+    // adam weights
+    vector<double> m_hidden_weights1(INPUT_SIZE * HIDDEN_SIZE1, 0.0);
+    vector<double> v_hidden_weights1(INPUT_SIZE * HIDDEN_SIZE1, 0.0);
+    vector<double> m_hidden_weights2(HIDDEN_SIZE1 * HIDDEN_SIZE2, 0.0);
+    vector<double> v_hidden_weights2(HIDDEN_SIZE1 * HIDDEN_SIZE2, 0.0);
+    vector<double> m_output_weights(HIDDEN_SIZE2 * OUTPUT_SIZE, 0.0);
+    vector<double> v_output_weights(HIDDEN_SIZE2 * OUTPUT_SIZE, 0.0);
 
-    // Make predictions on test set
-    std::vector<int> test_predictions;
-    for (const auto& input : test_vectors) {
-        auto output = nn.feedforward(input);
-        test_predictions.push_back(std::distance(output.begin(), std::max_element(output.begin(), output.end())));
-    }
+     // indices for shuffling
+    vector<int> indices(train_vectors.size());
+    iota(indices.begin(), indices.end(), 0);
 
-    // Write test predictions to CSV
-    write_predictions("test_predictions.csv", test_predictions);
+    // TRAINING
 
-    std::cout << "Training and testing completed. Predictions saved." << std::endl;
+    // TESTING
+
+    writePredictions("train_predictions.csv", train_predictions);
+    writePredictions("test_predictions.csv", test_predictions);
 
     return 0;
 }
