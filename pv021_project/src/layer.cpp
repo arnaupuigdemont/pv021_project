@@ -1,3 +1,5 @@
+#include "layer.h"
+
 class Layer {
 public:
     std::vector<Neuron> neurons;

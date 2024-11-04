@@ -1,3 +1,5 @@
+#include "neuron.h"
+
 class Neuron {
 public:
     std::vector<double> weights;  // Neuron weights
@@ -12,7 +14,7 @@ public:
 
     double activate(const std::vector<double>& inputs) {
         double activation = bias;
-        for (size_t i = 0; i < inputs.size(); ++i) {
+        for (int i = 0; i < inputs.size(); ++i) {
             activation += weights[i] * inputs[i];
         }
         return sigmoid(activation);

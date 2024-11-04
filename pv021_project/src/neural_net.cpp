@@ -1,8 +1,10 @@
-class NeuralNet {
+#include "neural_net.h"
+
+class Neural_net {
 public:
     std::vector<Layer> layers;
 
-    NeuralNetwork(int num_inputs, int num_hidden, int num_outputs) {
+    Neural_net(int num_inputs, int num_hidden, int num_outputs) {
         // Hidden layer
         layers.emplace_back(num_hidden, num_inputs);
         // Output layer

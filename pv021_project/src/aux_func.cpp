@@ -1,3 +1,5 @@
+#include "aux_func.h"
+
 class aux_func {
 
 public:

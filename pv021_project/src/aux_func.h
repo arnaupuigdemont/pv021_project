@@ -7,10 +7,10 @@
 #include <sstream>
 
 class aux_func {
-    public
+    public:
 
         //contructor
-        aux_func() {}
+        aux_func() {};
         
         // Function to read CSV data
         std::vector<std::vector<double>> read_csv(const std::string& filename);

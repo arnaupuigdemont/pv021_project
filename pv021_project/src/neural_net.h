@@ -4,12 +4,12 @@
 #include <vector>
 #include "layer.h" // Include the Layer class
 
-class NeuralNetwork {
+class Neural_net {
 public:
     std::vector<Layer> layers;
 
     //constructor
-    NeuralNetwork(int num_inputs, int num_hidden, int num_outputs);
+    Neural_net(int num_inputs, int num_hidden, int num_outputs);
 
     // Feedforward: passes inputs through the network
     std::vector<double> feedforward(const std::vector<double>& inputs);
