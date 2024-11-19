@@ -3,7 +3,9 @@
 using namespace std;
 
 pair<vector<double>, vector<double>> find_min_max(const vector<vector<double>> &data) {
+    cout << "2" << endl;
     vector<double> minValues = data[0];
+    cout << "3" << endl;
     vector<double> maxValues = data[0];
     cout << "1 " << data.size() << " " << data[0].size() << endl;
     for (long unsigned int i = 1; i < data.size(); ++i) {
