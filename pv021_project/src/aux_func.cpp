@@ -1,12 +1,5 @@
 #include "aux_func.h"
 
-class aux_func {
-
-public:
-
-    //contructor
-    aux_func() {}
-
     // Function to read CSV data
     vector<vector<double>> read_csv(const string& filename) {
         ifstream file(filename);
@@ -47,4 +40,3 @@ public:
             file << pred << "\n";
         }
     }
-};

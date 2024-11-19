@@ -99,7 +99,7 @@ int main() {
 
      // indices for shuffling
     std::vector<int> indices(train_vectors.size());
-    for (auto i = 0; i < train_vectors.size(); ++i) {
+    for (std::vector<std::vector<double>>::size_type i = 0; i < train_vectors.size(); ++i) {
         indices[i] = i;
     }
 

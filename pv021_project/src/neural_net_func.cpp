@@ -34,7 +34,7 @@ void pass_output(const vector<vector<double>>& batch_prev,
     }
 }
 
-void backpropagation_Hidden(const vector<vector<double>>& batch, 
+void backpropagation_hidden(const vector<vector<double>>& batch, 
                            vector<vector<double>>& batch_d,
                            const vector<vector<double>>& batch_d_next, 
                            const vector<double> &next_layer_weights,
