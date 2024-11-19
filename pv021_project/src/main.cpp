@@ -22,19 +22,24 @@ const int BATCH_SIZE = 32;
 
 int main() {
     // Load training data
+    cout << "1" << endl;
     vector<vector<double>> train_vectors = read_csv("data/fashion_mnist_train_vectors.csv");
+    cout << "2" << endl;
     vector<int> train_labels = load_labels("data/fashion_mnist_train_labels.csv");
-
+cout << "3" << endl;
     // Load test data
     vector<vector<double>> test_vectors = read_csv("data/fashion_mnist_test_vectors.csv");
+    cout << "4" << endl;
     vector<int> test_labels = load_labels("data/fashion_mnist_test_labels.csv");
 
     //min max normalization
-
+cout << "5" << endl;
     pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
+    cout << "6" << endl;
     normalize(train_vectors, min_max.first, min_max.second);
+    cout << "7" << endl;
     normalize(test_vectors, min_max.first, min_max.second);
-
+cout << "8" << endl;
     //validation split 
 
     int total_training = train_vectors.size();
@@ -50,43 +55,43 @@ int main() {
     random_device rd;
     mt19937 gen(18);
     uniform_real_distribution<> dis(-0.1, 0.1);
-
+cout << "9" << endl;
     // Weights for the first hidden layer
     vector<double> hidden_weights_layer1(INPUT_SIZE * HIDDEN_SIZE_LAYER_1);
     for (auto& weight : hidden_weights_layer1) {
         weight = dis(gen);
     }
-
+cout << "10" << endl;
     // Weights for the second hidden layer
     vector<double> hidden_weights_layer2(HIDDEN_SIZE_LAYER_1 * HIDDEN_SIZE_LAYER_2);
     for (auto& weight : hidden_weights_layer2) {
         weight = dis(gen);
     }
-
+cout << "11" << endl;
     // Weights for the output layer
     vector<double> output_weights(HIDDEN_SIZE_LAYER_2 * OUTPUT_SIZE);
     for (auto& weight : output_weights) {
         weight = dis(gen);
     }
-
+cout << "12" << endl;
     // Biases for the first hidden layer
     vector<double> hidden_bias_layer1(HIDDEN_SIZE_LAYER_1);
     for (auto& bias : hidden_bias_layer1) {
         bias = dis(gen);
     }
-
+cout << "13" << endl;
     // Biases for the second hidden layer
     vector<double> hidden_bias_layer2(HIDDEN_SIZE_LAYER_2);
     for (auto& bias : hidden_bias_layer2) {
         bias = dis(gen);
     }
-
+cout << "14" << endl;
     // Biases for the output layer
     vector<double> output_bias(OUTPUT_SIZE);
     for (auto& bias : output_bias) {
         bias = dis(gen);
     }
-
+cout << "15" << endl;
     // adam weights
     vector<double> m_hidden_weights1(INPUT_SIZE * HIDDEN_SIZE_LAYER_1, 0.0);
     vector<double> v_hidden_weights1(INPUT_SIZE * HIDDEN_SIZE_LAYER_1, 0.0);
@@ -96,13 +101,13 @@ int main() {
     vector<double> v_output_weights(HIDDEN_SIZE_LAYER_2 * OUTPUT_SIZE, 0.0);
 
     map<int, int> train_predictions_map;
-
+cout << "16" << endl;
      // indices for shuffling
     std::vector<int> indices(train_vectors.size());
     for (std::vector<std::vector<double>>::size_type i = 0; i < train_vectors.size(); ++i) {
         indices[i] = i;
     }
-
+cout << "17" << endl;
     // TRAINING
     for (int epoch = 1; epoch <= EPOCHS; ++epoch) {
         shuffle(indices.begin(), indices.end(), gen);
