@@ -8,18 +8,18 @@ public:
     aux_func() {}
 
     // Function to read CSV data
-    std::vector<std::vector<double>> readCsv(const std::string& filename) {
-        std::ifstream file(filename);
-        std::string line;
-        std::vector<std::vector<double>> data;
+    vector<vector<double>> read_csv(const string& filename) {
+        ifstream file(filename);
+        string line;
+        vector<vector<double>> data;
 
-        while (std::getline(file, line)) {
-            std::vector<double> row;
-            std::stringstream ss(line);
-            std::string value;
+        while (getline(file, line)) {
+            vector<double> row;
+            stringstream ss(line);
+            string value;
 
-            while (std::getline(ss, value, ',')) {
-                row.push_back(std::stod(value));
+            while (getline(ss, value, ',')) {
+                row.push_back(stod(value));
             }
             data.push_back(row);
         }
@@ -28,21 +28,21 @@ public:
     }
 
     // Function to load labels from a CSV file
-    std::vector<int> loadLabels(const std::string& filename) {
-        std::ifstream file(filename);
-        std::string line;
-        std::vector<int> labels;
+    vector<int> load_labels(const string& filename) {
+        ifstream file(filename);
+        string line;
+        vector<int> labels;
 
-        while (std::getline(file, line)) {
-            labels.push_back(std::stoi(line));
+        while (getline(file, line)) {
+            labels.push_back(stoi(line));
         }
 
         return labels;
     }
 
     // Function to write predictions to a CSV file
-    void writePredictions(const std::string& filename, const std::vector<int>& predictions) {
-        std::ofstream file(filename);
+    void write_predictions(const string& filename, const vector<int>& predictions) {
+        ofstream file(filename);
         for (const int& pred : predictions) {
             file << pred << "\n";
         }
