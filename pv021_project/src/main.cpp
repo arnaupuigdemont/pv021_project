@@ -5,7 +5,7 @@
 #include <random>
 #include <string>
 #include <map>
- 
+
 #include "aux_func.h"
 #include "normalization_func.h"
 #include "neural_net_func.h"
@@ -99,7 +99,7 @@ int main() {
 
      // indices for shuffling
     std::vector<int> indices(train_vectors.size());
-    for (int i = 0; i < train_vectors.size(); ++i) {
+    for (auto i = 0; i < train_vectors.size(); ++i) {
         indices[i] = i;
     }
 
