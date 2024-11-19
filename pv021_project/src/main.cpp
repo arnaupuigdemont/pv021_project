@@ -22,14 +22,11 @@ const int BATCH_SIZE = 32;
 
 int main() {
     // Load training data
-    cout << "1" << endl;
     vector<vector<double>> train_vectors = read_csv("data/fashion_mnist_train_vectors.csv");
-    cout << "2" << endl;
     vector<int> train_labels = load_labels("data/fashion_mnist_train_labels.csv");
-cout << "3" << endl;
+
     // Load test data
     vector<vector<double>> test_vectors = read_csv("data/fashion_mnist_test_vectors.csv");
-    cout << "4" << endl;
     vector<int> test_labels = load_labels("data/fashion_mnist_test_labels.csv");
 
     //min max normalization
