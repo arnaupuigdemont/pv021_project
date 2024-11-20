@@ -102,7 +102,10 @@ int main() {
     }
 
     // TRAINING
-    for (int epoch = 1; epoch <= EPOCHS; ++epoch) {
+    int epoch = 0;
+    int correct_count = 0;
+    
+    while ((double)correct_count / validation_size < 90) {
         shuffle(indices.begin(), indices.end(), gen);
         
         for (int idx = 0; idx < training_size; idx += BATCH_SIZE) {
@@ -156,7 +159,7 @@ int main() {
         }
 
         // VALIDATION
-        int correct_count = 0;
+        
         for (int i = training_size; i < total_training; i += BATCH_SIZE) {
             // size of the current batch 
             int current_batch_size = min(BATCH_SIZE, total_training - i);
@@ -184,6 +187,7 @@ int main() {
                 correct_count += (predicted_label == train_labels[i + b]) ? 1 : 0;
             }
         }
+        ++epoch;
         cout << "Epoch: " << epoch << ", accuracy on validation data: " << (double)correct_count / validation_size << endl;
     }
 
