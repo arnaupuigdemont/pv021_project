@@ -17,7 +17,7 @@ const int INPUT_SIZE = 784;
 const int HIDDEN_SIZE_LAYER_1 = 64;
 const int HIDDEN_SIZE_LAYER_2 = 64;
 const int OUTPUT_SIZE = 12;
-const int EPOCHS = 10;
+const int EPOCHS = 12;
 const int BATCH_SIZE = 32;
 
 int main() {
