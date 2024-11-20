@@ -141,12 +141,9 @@ int main() {
             backpropagation_hidden(batch_hidden1, batch_d_hidden1, batch_d_hidden2, hidden_weights_layer2, reluDerivative);
 
             // update weights
-            update_weights_Adam(hidden_weights_layer1, hidden_bias_layer1, batch_d_hidden1, batch_input, 
-                                  m_hidden_weights1, v_hidden_weights1, epoch);
-            update_weights_Adam(hidden_weights_layer2, hidden_bias_layer2, batch_d_hidden2, batch_hidden1, 
-                                  m_hidden_weights2, v_hidden_weights2, epoch);
-            update_weights_Adam(output_weights, output_bias, batch_error_output, batch_hidden2, 
-                                  m_output_weights, v_output_weights, epoch);
+            update_weights_Adam(hidden_weights_layer1, hidden_bias_layer1, batch_d_hidden1, batch_input,  m_hidden_weights1, v_hidden_weights1, epoch);
+            update_weights_Adam(hidden_weights_layer2, hidden_bias_layer2, batch_d_hidden2, batch_hidden1,  m_hidden_weights2, v_hidden_weights2, epoch);
+            update_weights_Adam(output_weights, output_bias, batch_error_output, batch_hidden2, m_output_weights, v_output_weights, epoch);
 
             // push label to predictions
             if (epoch == EPOCHS) {
@@ -161,7 +158,7 @@ int main() {
         // VALIDATION
         int correct_count = 0;
         for (int i = training_size; i < total_training; i += BATCH_SIZE) {
-            // size of the current batch (can be smaller)
+            // size of the current batch 
             int current_batch_size = min(BATCH_SIZE, total_training - i);
 
             // batch vectors
@@ -194,7 +191,7 @@ int main() {
     int test_correct_count = 0;
     vector<int> test_predictions;
     for (long unsigned int i = 0; i < test_vectors.size(); i += BATCH_SIZE) {
-        // size of the current batch (can be smaller)
+        // size of the current batch 
         int current_batch_size = min(BATCH_SIZE, static_cast<int>(test_vectors.size() - i));
 
         // batch vectors

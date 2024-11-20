@@ -9,6 +9,7 @@ using namespace std;
 
 // Function to read CSV data
 vector<vector<double>> read_csv(const string& filename) {
+    
     cout << "Reading vectors from " << filename << " ..." << endl;
     ifstream file(filename);
     if (!file.is_open()) {
@@ -47,6 +48,7 @@ vector<vector<double>> read_csv(const string& filename) {
 
 // Function to load labels from a CSV file
 vector<int> load_labels(const string& filename) {
+    
     cout << "Reading labels from " << filename << " ..." << endl;
     ifstream file(filename);
     if (!file.is_open()) {
@@ -79,6 +81,7 @@ vector<int> load_labels(const string& filename) {
 
 // Function to write predictions to a CSV file
 void write_predictions(const string& filename, const vector<int>& predictions) {
+    
     cout << "Writing predictions to " << filename << " ..." << endl;
     ofstream file(filename);
     for (int val : predictions) {

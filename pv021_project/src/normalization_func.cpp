@@ -2,8 +2,9 @@
 
 using namespace std;
 
+// Function to find the minimum and maximum values for each feature in the dataset
 pair<vector<double>, vector<double>> find_min_max(const vector<vector<double>> &data) {
-    
+
     cout << "data size: " << data.size() << endl;
     vector<double> minValues = data[0];
     vector<double> maxValues = data[0];
@@ -23,7 +24,9 @@ pair<vector<double>, vector<double>> find_min_max(const vector<vector<double>> &
     return {minValues, maxValues};
 }
 
+// Function to normalize the dataset using min-max normalization
 void normalize(vector<vector<double>> &data, const vector<double> &minValues,  const vector<double> &maxValues) {
+    
     for (auto& vector : data) {
         for (size_t i = 0; i < vector.size(); ++i) {
             vector[i] = (vector[i] - minValues[i]) / (maxValues[i] - minValues[i]);

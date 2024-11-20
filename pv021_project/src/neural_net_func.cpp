@@ -5,8 +5,11 @@
 
 using namespace std;
 
+// Function to pass data through a hidden layer
 void pass_hidden(const vector<vector<double>>& batch_prev, vector<vector<double>>& batch, const vector<double> &weights, const vector<double> &bias, function<double(double)> activation) {
+    
     for (size_t batch_idx = 0; batch_idx < batch_prev.size(); ++batch_idx) {
+        // Iterate over each neuron in the current layer
         for (size_t i = 0; i < batch[0].size(); ++i) {
             batch[batch_idx][i] = 0.0;
             for (size_t j = 0; j < batch_prev[0].size(); ++j) {
@@ -18,11 +21,11 @@ void pass_hidden(const vector<vector<double>>& batch_prev, vector<vector<double>
     }
 }
 
-void pass_output(const vector<vector<double>>& batch_prev, 
-                vector<vector<double>>& batch,
-                const vector<double> &weights, const vector<double> &bias,
-                function<void(vector<double> &x)> activation) {
+// Function to pass data through the output layer
+void pass_output(const vector<vector<double>>& batch_prev, vector<vector<double>>& batch, const vector<double> &weights, const vector<double> &bias, function<void(vector<double> &x)> activation) {
+    
     for (size_t batch_idx = 0; batch_idx < batch_prev.size(); ++batch_idx) {
+        // Iterate over each neuron in the output layer
         for (size_t i = 0; i < batch[0].size(); ++i) {
             batch[batch_idx][i] = 0.0;
             for (size_t j = 0; j < batch_prev[0].size(); ++j) {
@@ -34,12 +37,11 @@ void pass_output(const vector<vector<double>>& batch_prev,
     }
 }
 
-void backpropagation_hidden(const vector<vector<double>>& batch, 
-                           vector<vector<double>>& batch_d,
-                           const vector<vector<double>>& batch_d_next, 
-                           const vector<double> &next_layer_weights,
-                           function<double(double)> activationDerivative) {
+// Function to perform backpropagation through a hidden layer
+void backpropagation_hidden(const vector<vector<double>>& batch, vector<vector<double>>& batch_d, const vector<vector<double>>& batch_d_next,  const vector<double> &next_layer_weights, function<double(double)> activationDerivative) {
+    
     for (size_t batch_idx = 0; batch_idx < batch.size(); ++batch_idx) {
+        // Iterate over each neuron in the current layer
         for (size_t i = 0; i < batch_d[0].size(); ++i) {
             double error = 0.0;
             for (size_t j = 0; j < batch_d_next[0].size(); ++j) {
@@ -50,10 +52,9 @@ void backpropagation_hidden(const vector<vector<double>>& batch,
     }
 }
 
-void update_weights_Adam(vector<double> &weights, vector<double> &bias,
-                           const vector<vector<double>>& batch_gradients, 
-                           const vector<vector<double>>& batch_inputs,
-                           vector<double> &m_weights, vector<double> &v_weights, const int epoch) {
+// Function to update weights using the Adam optimizer
+void update_weights_Adam(vector<double> &weights, vector<double> &bias, const vector<vector<double>>& batch_gradients,  const vector<vector<double>>& batch_inputs, vector<double> &m_weights, vector<double> &v_weights, const int epoch) {
+    
     vector<double> gradients_accumulate(weights.size(), 0.0);
     vector<double> bias_gradients_accumulate(bias.size(), 0.0);
 
