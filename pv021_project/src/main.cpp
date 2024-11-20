@@ -103,7 +103,7 @@ int main() {
 
     // TRAINING
     for (int epoch = 1; epoch <= EPOCHS; ++epoch) {
-       // shuffle(indices.begin(), indices.end(), gen);
+        shuffle(indices.begin(), indices.end(), gen);
         
         for (int idx = 0; idx < training_size; idx += BATCH_SIZE) {
     
