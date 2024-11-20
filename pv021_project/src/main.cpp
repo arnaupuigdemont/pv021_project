@@ -16,7 +16,7 @@ using namespace std;
 const int INPUT_SIZE = 784;
 const int HIDDEN_SIZE_LAYER_1 = 64;
 const int HIDDEN_SIZE_LAYER_2 = 64;
-const int OUTPUT_SIZE = 10;
+const int OUTPUT_SIZE = 12;
 const int EPOCHS = 10;
 const int BATCH_SIZE = 32;
 
@@ -30,13 +30,11 @@ int main() {
     vector<int> test_labels = load_labels("data/fashion_mnist_test_labels.csv");
 
     //min max normalization
-
     pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
     normalize(train_vectors, min_max.first, min_max.second);
     normalize(test_vectors, min_max.first, min_max.second);
 
     //validation split 
-
     int total_training = train_vectors.size();
     int validation_size = total_training / 10;
     int training_size = total_training - validation_size;
