@@ -1,4 +1,4 @@
-561022
+561022 Arnau Puigdemont Monllor
 ## PV021 project -- Deep Learning from Scratch
 
 ### DEADLINE
