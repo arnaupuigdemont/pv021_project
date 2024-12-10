@@ -20,4 +20,6 @@ void backpropagation_hidden(const vector<vector<double>>& batch,  vector<vector<
 
 void update_weights_Adam(vector<double> &weights, vector<double> &bias, const vector<vector<double>>& batch_gradients, const vector<vector<double>>& batch_inputs, vector<double> &m_weights, vector<double> &v_weights, const int epoch);
 
+void apply_dropout(vector<vector<double>>& batch, double dropout_rate);
+
 #endif // NEURAL_NET_FUNC_H

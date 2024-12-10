@@ -2,6 +2,7 @@
 #include <functional>
 #include <vector>
 #include <cmath>
+#include <random>
 
 using namespace std;
 
@@ -80,5 +81,18 @@ void update_weights_Adam(vector<double> &weights, vector<double> &bias, const ve
             weights[idx] += LEARNING_RATE * (m_corr / (sqrt(v_corr) + EPSILON) + LAMBDA * weights[idx]);
         }
         bias[i] += LEARNING_RATE * bias_gradients_accumulate[i] / batch_gradients.size();
+    }
+}
+
+// Function to apply dropout to a layer
+void apply_dropout(vector<double>& layer, double keep_prob) {
+    random_device rd;
+    mt19937 gen(3);
+    uniform_real_distribution<> dis(0.0, 1.0);
+
+    for (auto& neuron : layer) {
+        if (dis(gen) > keep_prob) {
+            neuron = 0.0; // Desactivar la neurona
+        }
     }
 }

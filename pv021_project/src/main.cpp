@@ -125,8 +125,10 @@ int main() {
             }
 
             // forward pass
-            pass_hidden(batch_input, batch_hidden1, hidden_weights_layer1, hidden_bias_layer1, leaky_relu);
-            pass_hidden(batch_hidden1, batch_hidden2, hidden_weights_layer2, hidden_bias_layer2, leaky_relu);
+            pass_hidden(batch_input, batch_hidden1, hidden_weights_layer1, hidden_bias_layer1, relu);
+            apply_dropout(batch_hidden1, 0.5);
+            pass_hidden(batch_hidden1, batch_hidden2, hidden_weights_layer2, hidden_bias_layer2, relu);
+            apply_dropout(batch_hidden2, 0.5);
             pass_output(batch_hidden2, batch_output, output_weights, output_bias, softmax);
 
             // compute error and b
@@ -174,8 +176,8 @@ int main() {
             }
 
             // forward pass
-            pass_hidden(batch_input, batch_hidden1, hidden_weights_layer1, hidden_bias_layer1, leaky_relu);
-            pass_hidden(batch_hidden1, batch_hidden2, hidden_weights_layer2, hidden_bias_layer2, leaky_relu);
+            pass_hidden(batch_input, batch_hidden1, hidden_weights_layer1, hidden_bias_layer1, relu);
+            pass_hidden(batch_hidden1, batch_hidden2, hidden_weights_layer2, hidden_bias_layer2, relu);
             pass_output(batch_hidden2, batch_output, output_weights, output_bias, softmax);
 
             // push label to predictions
@@ -207,8 +209,8 @@ int main() {
         }
 
         // forward pass
-        pass_hidden(batch_input, batch_hidden1, hidden_weights_layer1, hidden_bias_layer1, leaky_relu);
-        pass_hidden(batch_hidden1, batch_hidden2, hidden_weights_layer2, hidden_bias_layer2, leaky_relu);
+        pass_hidden(batch_input, batch_hidden1, hidden_weights_layer1, hidden_bias_layer1, relu);
+        pass_hidden(batch_hidden1, batch_hidden2, hidden_weights_layer2, hidden_bias_layer2, relu);
         pass_output(batch_hidden2, batch_output, output_weights, output_bias, softmax);
 
         // push label to predictions
