@@ -138,8 +138,8 @@ int main() {
                 }
             }
 
-            backpropagation_hidden(batch_hidden2, batch_d_hidden2, batch_error_output, output_weights, leaky_relu);
-            backpropagation_hidden(batch_hidden1, batch_d_hidden1, batch_d_hidden2, hidden_weights_layer2, leaky_relu);
+            backpropagation_hidden(batch_hidden2, batch_d_hidden2, batch_error_output, output_weights, reluDerivative);
+            backpropagation_hidden(batch_hidden1, batch_d_hidden1, batch_d_hidden2, hidden_weights_layer2, reluDerivative);
 
             // update weights
             update_weights_Adam(hidden_weights_layer1, hidden_bias_layer1, batch_d_hidden1, batch_input,  m_hidden_weights1, v_hidden_weights1, epoch);
