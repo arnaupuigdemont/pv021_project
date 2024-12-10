@@ -30,10 +30,11 @@ int main() {
     vector<int> test_labels = load_labels("data/fashion_mnist_test_labels.csv");
 
     //min max normalization
-    pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
+    pair<vector<double>, vector<double>> min_max_train = find_min_max(train_vectors);
+    pair<vector<double>, vector<double>> min_max_test = find_min_max(test_vectors);
 
-    normalize(train_vectors, min_max.first, min_max.second);
-    normalize(test_vectors, min_max.first, min_max.second);
+    normalize(train_vectors, min_max_train.first, min_max_train.second);
+    normalize(test_vectors, min_max_test.first, min_max_test.second);
 
     //validation split 
     int total_training = train_vectors.size();
