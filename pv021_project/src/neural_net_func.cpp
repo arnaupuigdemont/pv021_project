@@ -85,14 +85,16 @@ void update_weights_Adam(vector<double> &weights, vector<double> &bias, const ve
 }
 
 // Function to apply dropout to a layer
-void apply_dropout(vector<double>& layer, double keep_prob) {
+void apply_dropout(vector<vector<double>>& batch, double keep_prob) {
     random_device rd;
     mt19937 gen(3);
     uniform_real_distribution<> dis(0.0, 1.0);
 
-    for (auto& neuron : layer) {
-        if (dis(gen) > keep_prob) {
-            neuron = 0.0; // Desactivar la neurona
+    for (auto& neurons : batch) { // Itera sobre cada fila (vector) de la matriz
+        for (auto& neuron : neurons) { // Itera sobre cada neurona en la fila
+            if (dis(gen) > keep_prob) {
+                neuron = 0.0; // Desactiva la neurona
+            }
         }
     }
 }
