@@ -32,21 +32,16 @@ int main() {
     //min max normalization
     pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
 
-    // Imprimir los valores mínimos y máximos
-    cout << "Min values: ";
-    for (const auto& val : min_max.first) {
-        cout << val << " ";
-    }
-    cout << endl;
-
-    cout << "Max values: ";
-    for (const auto& val : min_max.second) {
-        cout << val << " ";
-    }
-    cout << endl;
-
     normalize(train_vectors, min_max.first, min_max.second);
     normalize(test_vectors, min_max.first, min_max.second);
+
+    cout << "normalized data" << endl;
+    for (int i = 0; i < train_vectors.size()-1; ++i) {
+        for (int j = 0; j < train_vectors[0].size()-1; ++j) {
+            cout << train_vectors[i][j] << " ";
+        }
+        cout << endl;
+    }
 
     //validation split 
     int total_training = train_vectors.size();

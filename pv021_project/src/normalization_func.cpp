@@ -27,9 +27,9 @@ pair<vector<double>, vector<double>> find_min_max(const vector<vector<double>> &
 // Function to normalize the dataset using min-max normalization
 void normalize(vector<vector<double>> &data, const vector<double> &minValues,  const vector<double> &maxValues) {
     
-    for (auto& vector : data) {
-        for (size_t i = 0; i < vector.size(); ++i) {
-            vector[i] = (vector[i] - minValues[i]) / (maxValues[i] - minValues[i]);
+        for (auto& vector : data) {
+        for (auto& val : vector) {
+            val /= 255.0;
         }
     }
 }
