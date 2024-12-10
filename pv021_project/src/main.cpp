@@ -19,7 +19,6 @@ const int HIDDEN_SIZE_LAYER_2 = 64;
 const int OUTPUT_SIZE = 12;
 const int EPOCHS = 12;
 const int BATCH_SIZE = 32;
-const double LEARNING_RATE = 0.001;
 
 int main() {
     // Load training data
@@ -31,7 +30,6 @@ int main() {
     vector<int> test_labels = load_labels("data/fashion_mnist_test_labels.csv");
 
     //min max normalization
-    pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
     pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
 
     // Imprimir los valores mínimos y máximos
