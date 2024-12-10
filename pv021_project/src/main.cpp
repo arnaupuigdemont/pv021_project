@@ -126,9 +126,7 @@ int main() {
 
             // forward pass
             pass_hidden(batch_input, batch_hidden1, hidden_weights_layer1, hidden_bias_layer1, relu);
-            apply_dropout(batch_hidden1, 0.5);
             pass_hidden(batch_hidden1, batch_hidden2, hidden_weights_layer2, hidden_bias_layer2, relu);
-            apply_dropout(batch_hidden2, 0.5);
             pass_output(batch_hidden2, batch_output, output_weights, output_bias, softmax);
 
             // compute error and b
@@ -140,8 +138,8 @@ int main() {
                 }
             }
 
-            backpropagation_hidden(batch_hidden2, batch_d_hidden2, batch_error_output, output_weights, reluDerivative);
-            backpropagation_hidden(batch_hidden1, batch_d_hidden1, batch_d_hidden2, hidden_weights_layer2, reluDerivative);
+            backpropagation_hidden(batch_hidden2, batch_d_hidden2, batch_error_output, output_weights, leaky_relu);
+            backpropagation_hidden(batch_hidden1, batch_d_hidden1, batch_d_hidden2, hidden_weights_layer2, leaky_relu);
 
             // update weights
             update_weights_Adam(hidden_weights_layer1, hidden_bias_layer1, batch_d_hidden1, batch_input,  m_hidden_weights1, v_hidden_weights1, epoch);
