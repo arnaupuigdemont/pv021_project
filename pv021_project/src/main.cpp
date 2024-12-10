@@ -19,6 +19,7 @@ const int HIDDEN_SIZE_LAYER_2 = 64;
 const int OUTPUT_SIZE = 12;
 const int EPOCHS = 12;
 const int BATCH_SIZE = 32;
+const double LEARNING_RATE = 0.001;
 
 int main() {
     // Load training data
@@ -31,6 +32,21 @@ int main() {
 
     //min max normalization
     pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
+    pair<vector<double>, vector<double>> min_max = find_min_max(train_vectors);
+
+    // Imprimir los valores mínimos y máximos
+    cout << "Min values: ";
+    for (const auto& val : min_max.first) {
+        cout << val << " ";
+    }
+    cout << endl;
+
+    cout << "Max values: ";
+    for (const auto& val : min_max.second) {
+        cout << val << " ";
+    }
+    cout << endl;
+
     normalize(train_vectors, min_max.first, min_max.second);
     normalize(test_vectors, min_max.first, min_max.second);
 
@@ -96,8 +112,8 @@ int main() {
     map<int, int> train_predictions_map;
 
      // indices for shuffling
-    std::vector<int> indices(train_vectors.size());
-    for (std::vector<std::vector<double>>::size_type i = 0; i < train_vectors.size(); ++i) {
+    vector<int> indices(train_vectors.size());
+    for (vector<vector<double>>::size_type i = 0; i < train_vectors.size(); ++i) {
         indices[i] = i;
     }
 
