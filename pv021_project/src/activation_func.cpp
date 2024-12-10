@@ -4,7 +4,12 @@ using namespace std;
 
 // Returns the maximum of 0 and x
 double relu(double x) {
-    return std::max(0.0, x);
+    return max(0.0, x);
+}
+
+// Returns x if x is greater than 0, otherwise returns 0.01 * x
+double leaky_relu(double x) {
+    return (x > 0) ? x : 0.01 * x;
 }
 
 // Returns 1 if x is greater than 0, otherwise returns 0
