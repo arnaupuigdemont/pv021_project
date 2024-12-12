@@ -10,6 +10,6 @@ using namespace std;
 pair<vector<double>, vector<double>> find_min_max(const vector<vector<double>> &data);
 
 // Function to normalize a dataset with min-max normalization
-void normalize(vector<vector<double>> &data, const vector<double> &minValues, const vector<double> &maxValues);
+void normalize(vector<vector<double>> &data);
 
 #endif // NORMALIZATION_FUNC_H
