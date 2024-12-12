@@ -23,7 +23,7 @@ const int BATCH_SIZE = 32;
 int main() {
     // Load training data
     vector<vector<double>> train_vectors = read_csv("data/number_mnist_train_vectors.csv");
-    vector<int> train_labels = load_labels("data/fashion_mnist_train_labels.csv");
+    vector<int> train_labels = load_labels("data/number_mnist_train_labels.csv");
 
     // Load test data
     vector<vector<double>> test_vectors = read_csv("data/number_mnist_test_vectors.csv");
