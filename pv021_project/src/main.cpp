@@ -85,8 +85,9 @@ int main() {
                 Matrix hidden1 = input_layer.forward_relu(input);
                 Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
                 Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
+                cout << "hidden3 " << endl;
                 Matrix output = output_layer.forward_softmax(hidden3);
-
+                cout << "output " << endl;
                 // Índice de la predicción más probable
                 int predicted_class = std::distance(output.data[0].begin(),
                                                     std::max_element(output.data[0].begin(), output.data[0].end()));
