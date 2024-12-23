@@ -62,10 +62,10 @@ int main() {
                     label.data[0][static_cast<int>(batch_labels.data[i][0])] = 1.0;
 
                     // Forward pass
-                    Matrix hidden1 = input_layer.forward(input);
-                    Matrix hidden2 = hidden_layer2.forward(hidden1);
-                    Matrix hidden3 = hidden_layer3.forward(hidden2);
-                    Matrix output = output_layer.forward(hidden3);
+                    Matrix hidden1 = input_layer.forward_relu(input);
+                    Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
+                    Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
+                    Matrix output = output_layer.forward_softmax(hidden3); // Apply softmax
 
                     // Loss
                     Matrix loss = loss.cross_entropy_loss(output, label);
@@ -82,10 +82,10 @@ int main() {
             int correct_predictions = 0;
             for (int i = 0; i < train_data.getRows(); ++i) {
                 Matrix input = Matrix({train_data.data[i]});
-                Matrix hidden1 = input_layer.forward(input);
-                Matrix hidden2 = hidden_layer2.forward(hidden1);
-                Matrix hidden3 = hidden_layer3.forward(hidden2);
-                Matrix output = output_layer.forward(hidden3);
+                Matrix hidden1 = input_layer.forward_relu(input);
+                Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
+                Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
+                Matrix output = output_layer.forward_softmax(hidden3);
 
                 // Índice de la predicción más probable
                 int predicted_class = std::distance(output.data[0].begin(),
@@ -108,10 +108,10 @@ int main() {
         Matrix predictions(test_data.getRows(), 10);
         for (int i = 0; i < test_data.getRows(); ++i) {
             Matrix input = Matrix({test_data.data[i]});
-            Matrix hidden1 = input_layer.forward(input);
-            Matrix hidden2 = hidden_layer2.forward(hidden1);
-            Matrix hidden3 = hidden_layer3.forward(hidden2);
-            predictions.data[i] = output_layer.forward(hidden3).data[0];
+            Matrix hidden1 = input_layer.forward_relu(input);
+            Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
+            Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
+            predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
 
         double accuracy = dataset.calculate_accuracy(predictions, test_labels);

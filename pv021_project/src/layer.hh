@@ -15,7 +15,9 @@ class Layer {
 
         Layer(int input_size, int output_size);
 
-        Matrix forward(const Matrix &input);
+        Matrix forward_relu(const Matrix &input);
+
+        Matrix forward_softmax(const Matrix &input);
 
         Matrix backward(const Matrix &grad_output, double learning_rate);
 
@@ -24,6 +26,8 @@ class Layer {
         Matrix cached_input;
 
         Matrix relu(const Matrix &input); 
+
+        Matrix softmax(const Matrix &input);
 
 };
 #endif

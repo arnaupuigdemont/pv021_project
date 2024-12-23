@@ -7,9 +7,13 @@
               biases(Matrix::Random(1, output_size)), 
               cached_input(Matrix(0, 0)) {}
 
-        Matrix Layer::forward(const Matrix &input) {
+        Matrix Layer::forward_relu(const Matrix &input) {
             cached_input = input;
             return relu((input * weights) + biases);
+        }
+
+        Matrix Layer::forward_softmax(const Matrix &input) {
+            return softmax((input * weights) + biases);
         }
 
         Matrix Layer::backward(const Matrix &grad_output, double learning_rate) {
@@ -32,5 +36,17 @@
             for (int i = 0; i < input.getRows(); ++i)
                 for (int j = 0; j < input.getCols(); ++j)
                     result.data[i][j] = max(0.0, input.data[i][j]);
+            return result;
+        }
+
+        Matrix Layer::softmax(const Matrix &input) {
+            Matrix result(input.getRows(), input.getCols());
+            for (int i = 0; i < input.getRows(); ++i) {
+                double sum = 0.0;
+                for (int j = 0; j < input.getCols(); ++j)
+                    sum += exp(input.data[i][j]);
+                for (int j = 0; j < input.getCols(); ++j)
+                    result.data[i][j] = exp(input.data[i][j]) / sum;
+            }
             return result;
         }
