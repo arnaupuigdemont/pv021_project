@@ -14,7 +14,7 @@ using namespace std;
 
 const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 10;
+const int EPOCHS = 1;
 const double LEARNING_RATE = 0.001;
 const int BATCH_SIZE = 32;
 
@@ -78,6 +78,29 @@ int main() {
                 }
                 e++;
             }
+            // Calcular precisión después de procesar todos los batches
+            int correct_predictions = 0;
+            for (int i = 0; i < train_data.getRows(); ++i) {
+                Matrix input = Matrix({train_data.data[i]});
+                Matrix hidden1 = input_layer.forward(input);
+                Matrix hidden2 = hidden_layer2.forward(hidden1);
+                Matrix hidden3 = hidden_layer3.forward(hidden2);
+                Matrix output = output_layer.forward(hidden3);
+
+                // Índice de la predicción más probable
+                int predicted_class = std::distance(output.data[0].begin(),
+                                                    std::max_element(output.data[0].begin(), output.data[0].end()));
+
+                // Clase real
+                int true_class = static_cast<int>(train_labels.data[i][0]);
+
+                if (predicted_class == true_class) {
+                    correct_predictions++;
+                }
+            }
+
+            double accuracy = static_cast<double>(correct_predictions) / train_data.getRows() * 100.0;
+            cout << "Accuracy after epoch " << epoch + 1 << ": " << accuracy << "%" << endl;
         }
 
     //TESTING
