@@ -5,7 +5,7 @@
             data.resize(rows, vector<double>(cols, 0.0));
         }
 
-        static Matrix Random(int rows, int cols) {
+        Matrix Matrix::Random(int rows, int cols) {
             Matrix mat(rows, cols);
             random_device rd;
             mt19937 gen(rd());
@@ -43,7 +43,7 @@
 
         Matrix Matrix::operator*(const Matrix &other) const {
             int r1 = getRows(), c1 = getCols();
-            int r2 = other.getRows(), c2 = other.getCols();
+            int c2 = other.getCols();
             Matrix result(r1, c2);
             for (int i = 0; i < r1; ++i)
                 for (int j = 0; j < c2; ++j)
