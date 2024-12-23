@@ -50,13 +50,16 @@ int main() {
                 Matrix input = Matrix({train_data.data[i]});
                 Matrix label = Matrix(1, 10);
                 label.data[0][train_labels.data[i][0]] = 1.0;
-
+cout << 1 << endl;
                 // Forward pass
                 Matrix hidden1 = input_layer.forward(input);
+                cout << 2 << endl;
                 Matrix hidden2 = hidden_layer2.forward(hidden1);
+                cout << 3 << endl;
                 Matrix hidden3 = hidden_layer3.forward(hidden2);
+                cout << 4 << endl;
                 Matrix output = output_layer.forward(hidden3);
-
+                cout << 5 << endl;
                 // Loss
                 Matrix loss = loss.cross_entropy_loss(output, label);
 
