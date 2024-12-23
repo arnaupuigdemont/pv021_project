@@ -1,4 +1,4 @@
-#include "layer.h"
+#include "layer.hh"
 
 class Layer {
         
@@ -7,7 +7,7 @@ class Layer {
         Matrix weights;
         Matrix biases;
 
-        Layer(int input_size, int output_size) 
+        Layer::Layer(int input_size, int output_size) 
             : weights(Matrix::Random(input_size, output_size)), 
               biases(Matrix::Random(1, output_size)), 
               cached_input(Matrix(0, 0)) {}

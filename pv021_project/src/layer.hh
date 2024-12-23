@@ -1,5 +1,5 @@
-#ifndef LAYER_H
-#define LAYER_H
+#ifndef LAYER_HH
+#define LAYER_HH
 
 #include "matrix.h"
 #include <random>

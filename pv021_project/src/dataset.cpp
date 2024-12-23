@@ -1,11 +1,7 @@
-#include "dataset.h"
-
-class Dataset {
-
-    public:
+#include "dataset.hh"
 
         //CONSTRUCTOR
-        Dataset() {}
+        Dataset::Dataset() {}
 
         Matrix read_csv(const std::string &filename) {
             std::cout << "Reading vectors from " << filename << " ..." << std::endl;
@@ -97,6 +93,3 @@ class Dataset {
             return static_cast<double>(correct) / predictions.getRows();
         }
 
-    private:
-
-};

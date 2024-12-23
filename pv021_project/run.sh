@@ -11,7 +11,7 @@ echo "    COMPILING    "
 echo "#################"
 
 ## dont forget to use comiler optimizations (e.g. -O3 or -Ofast)
-g++ -Wall -std=c++17 -O3 src/main.cpp src/activation_func.cpp src/aux_func.cpp src/neural_net_func.cpp src/normalization_func.cpp -o network
+g++ -Wall -std=c++17 -O3 src/main.cpp src/dataset.cpp src/layer.cpp src/matrix.cpp -o network
 
 
 echo "#################"

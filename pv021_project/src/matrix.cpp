@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "matrix.hh"
 
 class Matrix {
     
@@ -8,7 +8,7 @@ class Matrix {
         vector<vector<double>> data;
 
         //CONSTRUCTOR
-        Matrix(int rows, int cols) {
+        Matrix::Matrix(int rows, int cols) {
             data.resize(rows, vector<double>(cols, 0.0));
         }
 
