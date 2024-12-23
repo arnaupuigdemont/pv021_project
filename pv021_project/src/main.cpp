@@ -16,7 +16,7 @@ const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10;
 const double LEARNING_RATE = 0.001;
-const int BATCH_SIZE = 64;
+const int BATCH_SIZE = 32;
 
 int main() {
 
@@ -47,9 +47,9 @@ int main() {
 
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
             cout << "Epoch " << epoch + 1 << endl;
-
+            int e = 0;
             for (const auto &batch : batches) {
-                cout << "Batch" << endl;
+                cout << e << endl;
                 const Matrix &batch_data = batch.first;
                 const Matrix &batch_labels = batch.second;
 
@@ -74,6 +74,7 @@ int main() {
                     grad = hidden_layer2.backward(grad, LEARNING_RATE);
                     grad = input_layer.backward(grad, LEARNING_RATE);
                 }
+                e++;
             }
         }
 
