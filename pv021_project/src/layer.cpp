@@ -48,24 +48,19 @@
         Matrix Layer::softmax(const Matrix &input) {
             Matrix result(input.getRows(), input.getCols());
             for (int i = 0; i < input.getRows(); ++i) {
-                // Valor máximo para estabilidad numérica
-                double max_val = *std::max_element(input.data[i].begin(), input.data[i].end());
-                std::cout << "Row " << i << " max_val: " << max_val << std::endl;
+                double max_val = *std::max_element(input.data[i].begin(), input.data[i].end()); 
 
-                // Calcular la suma de exponenciales
                 double sum = 0.0;
                 for (int j = 0; j < input.getCols(); ++j) {
-                    sum += exp(input.data[i][j] - max_val);
+                    
+                    double exp_val = exp(std::max(-20.0, std::min(input.data[i][j] - max_val, 20.0)));
+                    sum += exp_val;
+                    result.data[i][j] = exp_val;
                 }
-                std::cout << "Row " << i << " sum of exp: " << sum << std::endl;
 
-                // Calcular el resultado de softmax
-                std::cout << "Row " << i << " softmax values: ";
                 for (int j = 0; j < input.getCols(); ++j) {
-                    result.data[i][j] = exp(input.data[i][j] - max_val) / sum;
-                    std::cout << result.data[i][j] << " ";
+                    result.data[i][j] /= sum; 
                 }
-                std::cout << std::endl;
             }
             return result;
         }
