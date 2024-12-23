@@ -13,6 +13,7 @@
         }
 
         Matrix Layer::forward_softmax(const Matrix &input) {
+            cached_input = input;
             return softmax((input * weights) + biases);
         }
 
