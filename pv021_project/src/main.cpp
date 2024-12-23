@@ -72,12 +72,16 @@ int main() {
                     cout << 5 << endl;
                     // Loss
                     Matrix loss = loss.cross_entropy_loss(output, label);
-
+                    cout << 6 << endl;
                     // Backward pass
                     Matrix grad = output_layer.backward(loss, LEARNING_RATE);
+                    cout << 7 << endl;
                     grad = hidden_layer3.backward(grad, LEARNING_RATE);
+                    cout << 8 << endl;
                     grad = hidden_layer2.backward(grad, LEARNING_RATE);
+                    cout << 9 << endl;
                     grad = input_layer.backward(grad, LEARNING_RATE);
+                    cout << 10 << endl;
                 }
                 e++;
             }
