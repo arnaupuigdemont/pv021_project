@@ -69,7 +69,7 @@ int main() {
                     Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
                     cout << 4 << endl;
                     Matrix output = output_layer.forward_softmax(hidden3); // Apply softmax
-
+                    cout << 5 << endl;
                     // Loss
                     Matrix loss = loss.cross_entropy_loss(output, label);
 
