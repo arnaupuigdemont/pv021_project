@@ -26,7 +26,6 @@
         }
 
     //PRIVATE
-        Matrix cached_input;
 
         Matrix Layer::relu(const Matrix &input) {
             Matrix result(input.getRows(), input.getCols());
