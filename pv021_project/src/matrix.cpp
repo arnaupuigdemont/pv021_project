@@ -1,7 +1,5 @@
 #include "matrix.hh"
 
-        vector<vector<double>> data;
-
         //CONSTRUCTOR
         Matrix::Matrix(int rows, int cols) {
             data.resize(rows, vector<double>(cols, 0.0));

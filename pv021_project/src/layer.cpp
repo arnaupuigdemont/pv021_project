@@ -2,9 +2,6 @@
       
     //PUBLIC
 
-        Matrix weights;
-        Matrix biases;
-
         Layer::Layer(int input_size, int output_size) 
             : weights(Matrix::Random(input_size, output_size)), 
               biases(Matrix::Random(1, output_size)), 
