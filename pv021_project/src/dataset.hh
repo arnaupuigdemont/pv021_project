@@ -26,6 +26,8 @@ class Dataset {
 
         double calculate_accuracy(const Matrix &predictions, const Matrix &labels);
 
+        vector<pair<Matrix, Matrix>> create_batches(const Matrix &data, const Matrix &labels, int batch_size);
+
     private:
 
 };

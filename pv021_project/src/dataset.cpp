@@ -93,3 +93,24 @@
             return static_cast<double>(correct) / predictions.getRows();
         }
 
+        vector<pair<Matrix, Matrix>> Dataset::create_batches(const Matrix &data, const Matrix &labels, int batch_size) {
+            vector<pair<Matrix, Matrix>> batches;
+            int total_samples = data.getRows();
+
+            for (int i = 0; i < total_samples; i += batch_size) {
+                int end = std::min(i + batch_size, total_samples);
+                
+                // Extraer las filas correspondientes para el batch
+                Matrix batch_data(end - i, data.getCols());
+                Matrix batch_labels(end - i, labels.getCols());
+                
+                for (int j = i; j < end; ++j) {
+                    batch_data.data[j - i] = data.data[j];
+                    batch_labels.data[j - i] = labels.data[j];
+                }
+                
+                batches.push_back({batch_data, batch_labels});
+            }
+            return batches;
+        }
+
