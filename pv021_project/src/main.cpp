@@ -44,7 +44,7 @@ int main() {
     //TRAINING 
 
         vector<pair<Matrix, Matrix>> batches = dataset.create_batches(train_data, train_labels, BATCH_SIZE);
-
+        cout << "number batches = " << batches.size() << endl;
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
             cout << "Epoch " << epoch + 1 << endl;
             int e = 0;

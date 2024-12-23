@@ -3,7 +3,7 @@
         //CONSTRUCTOR
         Dataset::Dataset() {}
 
-        Matrix Dataset::read_csv(const std::string &filename) {
+        Matrix Dataset::read_csv(const string &filename) {
             std::cout << "Reading vectors from " << filename << " ..." << std::endl;
             std::ifstream file(filename);
             if (!file.is_open()) {
@@ -38,7 +38,7 @@
             return Matrix(data);
         }
 
-        Matrix Dataset::read_labels(const std::string &filename) {
+        Matrix Dataset::read_labels(const string &filename) {
             std::cout << "Reading labels from " << filename << " ..." << std::endl;
             std::ifstream file(filename);
             if (!file.is_open()) {
@@ -98,7 +98,7 @@
             int total_samples = data.getRows();
 
             for (int i = 0; i < total_samples; i += batch_size) {
-                int end = std::min(i + batch_size, total_samples);
+                int end = min(i + batch_size, total_samples);
                 
                 // Extraer las filas correspondientes para el batch
                 Matrix batch_data(end - i, data.getCols());
