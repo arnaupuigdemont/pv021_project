@@ -3,9 +3,10 @@
     //PUBLIC
 
         Layer::Layer(int input_size, int output_size) 
-            : weights(Matrix::Random(input_size, output_size)), 
-              biases(Matrix::Random(1, output_size)), 
-              cached_input(Matrix(0, 0)) {}
+            : weights(Matrix::Xavier(input_size, output_size, input_size)), 
+            biases(Matrix(1, output_size)),                              
+            cached_input(Matrix(0, 0)) {}
+
 
         Matrix Layer::forward_relu(const Matrix &input) {
             cached_input = input;
@@ -21,11 +22,15 @@
             Matrix grad_input = grad_output * weights.transpose();
             Matrix grad_weights = cached_input.transpose() * grad_output;
 
-            // Update weights and biases
+            Matrix grad_biases(1, grad_output.getCols());
+            for (int j = 0; j < grad_output.getCols(); ++j) {
+                for (int i = 0; i < grad_output.getRows(); ++i) {
+                    grad_biases.data[0][j] += grad_output.data[i][j];
+                }
+            }
+
             weights = weights - grad_weights.scalar_mul(learning_rate);
-            for (int i = 0; i < biases.getRows(); ++i)
-                for (int j = 0; j < biases.getCols(); ++j)
-                    biases.data[i][j] -= learning_rate * grad_output.data[i][j];
+            biases = biases - grad_biases.scalar_mul(learning_rate);
 
             return grad_input;
         }

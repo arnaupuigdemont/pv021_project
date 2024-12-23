@@ -15,7 +15,7 @@ using namespace std;
 const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 1;
-const double LEARNING_RATE = 0.001;
+const double LEARNING_RATE = 0.01;
 const int BATCH_SIZE = 64;
 
 int main() {
@@ -60,28 +60,22 @@ int main() {
                     Matrix input = Matrix({batch_data.data[i]});
                     Matrix label = Matrix(1, 10);
                     label.data[0][static_cast<int>(batch_labels.data[i][0])] = 1.0;
-                    cout << 1 << endl;
+
                     // Forward pass
                     Matrix hidden1 = input_layer.forward_relu(input);
-                    cout << 2 << endl;
                     Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
-                    cout << 3 << endl;
                     Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
-                    cout << 4 << endl;
                     Matrix output = output_layer.forward_softmax(hidden3); // Apply softmax
-                    cout << 5 << endl;
+
                     // Loss
                     Matrix loss = loss.cross_entropy_loss(output, label);
-                    cout << 6 << endl;
+
                     // Backward pass
                     Matrix grad = output_layer.backward(loss, LEARNING_RATE);
-                    cout << 7 << endl;
                     grad = hidden_layer3.backward(grad, LEARNING_RATE);
-                    cout << 8 << endl;
                     grad = hidden_layer2.backward(grad, LEARNING_RATE);
-                    cout << 9 << endl;
                     grad = input_layer.backward(grad, LEARNING_RATE);
-                    cout << 10 << endl;
+                    
                 }
                 e++;
             }
@@ -92,9 +86,7 @@ int main() {
                 Matrix hidden1 = input_layer.forward_relu(input);
                 Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
                 Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
-                cout << "hidden3 " << endl;
                 Matrix output = output_layer.forward_softmax(hidden3);
-                cout << "output " << endl;
                 // Índice de la predicción más probable
                 int predicted_class = std::distance(output.data[0].begin(),
                                                     std::max_element(output.data[0].begin(), output.data[0].end()));

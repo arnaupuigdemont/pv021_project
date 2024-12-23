@@ -30,6 +30,8 @@ class Matrix {
         Matrix transpose() const;
         Matrix scalar_mul(double scalar) const;
 
+        static Matrix Xavier(int rows, int cols, int input_size);
+
         void normalize();
 
         Matrix cross_entropy_loss(const Matrix &output, const Matrix &label);
