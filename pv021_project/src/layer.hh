@@ -27,6 +27,8 @@ class Layer {
 
         Matrix relu(const Matrix &input); 
 
+        Matrix leaky_relu(const Matrix &input);
+
         Matrix softmax(const Matrix &input);
 
 };

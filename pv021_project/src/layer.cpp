@@ -48,11 +48,32 @@
         Matrix Layer::softmax(const Matrix &input) {
             Matrix result(input.getRows(), input.getCols());
             for (int i = 0; i < input.getRows(); ++i) {
+                // Valor máximo para estabilidad numérica
+                double max_val = *std::max_element(input.data[i].begin(), input.data[i].end());
+                std::cout << "Row " << i << " max_val: " << max_val << std::endl;
+
+                // Calcular la suma de exponenciales
                 double sum = 0.0;
-                for (int j = 0; j < input.getCols(); ++j)
-                    sum += exp(input.data[i][j]);
-                for (int j = 0; j < input.getCols(); ++j)
-                    result.data[i][j] = exp(input.data[i][j]) / sum;
+                for (int j = 0; j < input.getCols(); ++j) {
+                    sum += exp(input.data[i][j] - max_val);
+                }
+                std::cout << "Row " << i << " sum of exp: " << sum << std::endl;
+
+                // Calcular el resultado de softmax
+                std::cout << "Row " << i << " softmax values: ";
+                for (int j = 0; j < input.getCols(); ++j) {
+                    result.data[i][j] = exp(input.data[i][j] - max_val) / sum;
+                    std::cout << result.data[i][j] << " ";
+                }
+                std::cout << std::endl;
             }
+            return result;
+        }
+
+        Matrix Layer::leaky_relu(const Matrix &input) {
+            Matrix result(input.getRows(), input.getCols());
+            for (int i = 0; i < input.getRows(); ++i)
+                for (int j = 0; j < input.getCols(); ++j)
+                    result.data[i][j] = (input.data[i][j] > 0) ? input.data[i][j] : 0.01 * input.data[i][j];
             return result;
         }

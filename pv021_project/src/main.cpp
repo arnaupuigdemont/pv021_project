@@ -34,6 +34,16 @@ int main() {
         train_data.normalize();
         test_data.normalize();
 
+        cout << "First 5 rows of train_data: ";
+for (int i = 0; i < 5; ++i) {
+    for (double val : train_data.data[i]) cout << val << " ";
+    cout << endl;
+}
+
+cout << "First 5 labels of train_labels: ";
+for (int i = 0; i < 5; ++i) cout << train_labels.data[i][0] << " ";
+cout << endl;
+
     //CREATE LAYERS
 
         Layer input_layer(784, 256);
@@ -51,7 +61,7 @@ int main() {
             cout << "Epoch " << epoch + 1 << endl;
             int e = 0;
             for (const auto &batch : batches) {
-                cout << "batch = " << e << endl;
+                //cout << "batch = " << e << endl;
                 const Matrix &batch_data = batch.first;
                 const Matrix &batch_labels = batch.second;
 
