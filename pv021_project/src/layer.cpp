@@ -1,7 +1,5 @@
 #include "layer.hh"
-
-class Layer {
-        
+      
     //PUBLIC
 
         Matrix weights;
@@ -12,12 +10,12 @@ class Layer {
               biases(Matrix::Random(1, output_size)), 
               cached_input(Matrix(0, 0)) {}
 
-        Matrix forward(const Matrix &input) {
+        Matrix Layer::forward(const Matrix &input) {
             cached_input = input;
-        return relu((input * weights) + biases);
+            return relu((input * weights) + biases);
         }
 
-        Matrix backward(const Matrix &grad_output, double learning_rate) {
+        Matrix Layer::backward(const Matrix &grad_output, double learning_rate) {
             Matrix grad_input = grad_output * weights.transpose();
             Matrix grad_weights = cached_input.transpose() * grad_output;
 
@@ -33,11 +31,10 @@ class Layer {
     //PRIVATE
         Matrix cached_input;
 
-        Matrix relu(const Matrix &input) {
+        Matrix Layer::relu(const Matrix &input) {
             Matrix result(input.getRows(), input.getCols());
             for (int i = 0; i < input.getRows(); ++i)
                 for (int j = 0; j < input.getCols(); ++j)
                     result.data[i][j] = max(0.0, input.data[i][j]);
             return result;
         }
-};

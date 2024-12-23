@@ -1,10 +1,5 @@
 #include "matrix.hh"
 
-class Matrix {
-    
-    
-    public:
-
         vector<vector<double>> data;
 
         //CONSTRUCTOR
@@ -24,13 +19,13 @@ class Matrix {
             return mat;
         }
 
-        Matrix(const std::vector<std::vector<double>> &data) : data(data) {}
+        Matrix::Matrix(const std::vector<std::vector<double>> &data) : data(data) {}
 
-        int getRows() const { return data.size(); }
-        int getCols() const { return data[0].size(); }
+        int Matrix::getRows() const { return data.size(); }
+        int Matrix::getCols() const { return data[0].size(); }
 
         //OPERATORS
-        Matrix operator+(const Matrix &other) const {
+        Matrix Matrix::operator+(const Matrix &other) const {
             int r = getRows(), c = getCols();
             Matrix result(r, c);
             for (int i = 0; i < r; ++i)
@@ -39,7 +34,7 @@ class Matrix {
             return result;
         }
 
-        Matrix operator-(const Matrix &other) const {
+        Matrix Matrix::operator-(const Matrix &other) const {
             int r = getRows(), c = getCols();
             Matrix result(r, c);
             for (int i = 0; i < r; ++i)
@@ -48,7 +43,7 @@ class Matrix {
             return result;
         }
 
-        Matrix operator*(const Matrix &other) const {
+        Matrix Matrix::operator*(const Matrix &other) const {
             int r1 = getRows(), c1 = getCols();
             int r2 = other.getRows(), c2 = other.getCols();
             Matrix result(r1, c2);
@@ -59,7 +54,7 @@ class Matrix {
             return result;
         }
 
-        Matrix transpose() const {
+        Matrix Matrix::transpose() const {
             int r = getRows(), c = getCols();
             Matrix result(c, r);
             for (int i = 0; i < r; ++i)
@@ -68,7 +63,7 @@ class Matrix {
             return result;
         }
 
-        Matrix scalar_mul(double scalar) const {
+        Matrix Matrix::scalar_mul(double scalar) const {
             int r = getRows(), c = getCols();
             Matrix result(r, c);
             for (int i = 0; i < r; ++i)
@@ -77,7 +72,7 @@ class Matrix {
             return result;
         }
 
-        void normalize() {
+        void Matrix::normalize() {
             int r = getRows(), c = getCols();
 
             for (int i = 0; i < r; ++i)
@@ -87,11 +82,10 @@ class Matrix {
             
         }
 
-        Matrix cross_entropy_loss(const Matrix &output, const Matrix &label) {
+        Matrix Matrix::cross_entropy_loss(const Matrix &output, const Matrix &label) {
             Matrix loss(1, output.getCols());
             for (int i = 0; i < output.getCols(); ++i) {
                 loss.data[0][i] = -label.data[0][i] * log(output.data[0][i] + 1e-9);
             }
             return loss;
         }
-};

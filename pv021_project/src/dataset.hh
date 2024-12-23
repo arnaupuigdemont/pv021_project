@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-#include "matrix.h"
+#include "matrix.hh"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ class Dataset {
 
         Matrix read_csv(const string& filename);
 
-        Matrix load_labels(const string& filename);
+        Matrix read_labels(const string& filename);
 
         void write_predictions(const string& filename, const vector<int>& predictions);
 

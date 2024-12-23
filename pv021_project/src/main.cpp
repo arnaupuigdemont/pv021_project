@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <random>
 
-#include "matrix.h"
-#include "dataset.h"
-#include "layer.h"
+#include "matrix.hh"
+#include "dataset.hh"
+#include "layer.hh"
 
 using namespace std;
 
@@ -23,10 +23,10 @@ int main() {
         Dataset dataset;
       
         Matrix train_data = dataset.read_csv("data/fashion_mnist_train_vectors.csv");
-        Matrix train_labels = dataset.load_labels("data/fashion_mnist_train_labels.csv");
+        Matrix train_labels = dataset.read_labels("data/fashion_mnist_train_labels.csv");
 
         Matrix test_data = dataset.read_csv("data/fashion_mnist_test_vectors.csv");
-        Matrix test_labels = dataset.load_labels("data/fashion_mnist_test_labels.csv");
+        Matrix test_labels = dataset.read_labels("data/fashion_mnist_test_labels.csv");
 
     //NORMALIZE DATA MIN MAX
 

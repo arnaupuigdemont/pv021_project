@@ -1,7 +1,7 @@
 #ifndef LAYER_HH
 #define LAYER_HH
 
-#include "matrix.h"
+#include "matrix.hh"
 #include <random>
 
 using namespace std;

@@ -3,7 +3,7 @@
         //CONSTRUCTOR
         Dataset::Dataset() {}
 
-        Matrix read_csv(const std::string &filename) {
+        Matrix Dataset::read_csv(const std::string &filename) {
             std::cout << "Reading vectors from " << filename << " ..." << std::endl;
             std::ifstream file(filename);
             if (!file.is_open()) {
@@ -38,7 +38,7 @@
             return Matrix(data);
         }
 
-        Matrix read_labels(const std::string &filename) {
+        Matrix Dataset::read_labels(const std::string &filename) {
             std::cout << "Reading labels from " << filename << " ..." << std::endl;
             std::ifstream file(filename);
             if (!file.is_open()) {
@@ -68,7 +68,7 @@
             return Matrix(data);
         }
 
-        void write_predictions(const string& filename, const vector<int>& predictions) {
+        void Dataset::write_predictions(const string& filename, const vector<int>& predictions) {
 
         
         cout << "Writing predictions to " << filename << " ..." << endl;
@@ -79,7 +79,7 @@
         file.close();
     }
 
-        double calculate_accuracy(const Matrix &predictions, const Matrix &labels) {
+        double Dataset::calculate_accuracy(const Matrix &predictions, const Matrix &labels) {
             int correct = 0;
             for (int i = 0; i < predictions.getRows(); ++i) {
 
