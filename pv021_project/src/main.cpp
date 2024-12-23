@@ -16,7 +16,7 @@ const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 1;
 const double LEARNING_RATE = 0.001;
-const int BATCH_SIZE = 32;
+const int BATCH_SIZE = 64;
 
 int main() {
 
