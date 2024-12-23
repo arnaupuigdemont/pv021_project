@@ -49,10 +49,12 @@ int main() {
             cout << "Epoch " << epoch + 1 << endl;
 
             for (const auto &batch : batches) {
+                cout << "Batch" << endl;
                 const Matrix &batch_data = batch.first;
                 const Matrix &batch_labels = batch.second;
 
                 for (int i = 0; i < batch_data.getRows(); ++i) {
+                    cout << "Batch data" << endl;
                     Matrix input = Matrix({batch_data.data[i]});
                     Matrix label = Matrix(1, 10);
                     label.data[0][static_cast<int>(batch_labels.data[i][0])] = 1.0;
