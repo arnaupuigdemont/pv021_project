@@ -43,18 +43,20 @@ int main() {
 
     //TRAINING 
 
+        cout << "Train data rows: " << train_data.getRows() << ", Train labels rows: " << train_labels.getRows() << endl;
+
         vector<pair<Matrix, Matrix>> batches = dataset.create_batches(train_data, train_labels, BATCH_SIZE);
         cout << "number batches = " << batches.size() << endl;
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
             cout << "Epoch " << epoch + 1 << endl;
             int e = 0;
             for (const auto &batch : batches) {
-                cout << e << endl;
+                cout << "batch = " << e << endl;
                 const Matrix &batch_data = batch.first;
                 const Matrix &batch_labels = batch.second;
 
                 for (int i = 0; i < batch_data.getRows(); ++i) {
-                    cout << "Batch data" << endl;
+                    
                     Matrix input = Matrix({batch_data.data[i]});
                     Matrix label = Matrix(1, 10);
                     label.data[0][static_cast<int>(batch_labels.data[i][0])] = 1.0;

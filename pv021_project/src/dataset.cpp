@@ -98,19 +98,23 @@
             int total_samples = data.getRows();
 
             for (int i = 0; i < total_samples; i += batch_size) {
-                int end = min(i + batch_size, total_samples);
+                int end = min(i + batch_size, total_samples); // Asegura que no exceda el tamaño total
                 
-                // Extraer las filas correspondientes para el batch
-                Matrix batch_data(end - i, data.getCols());
-                Matrix batch_labels(end - i, labels.getCols());
+                // Crear matrices para el batch actual
+                int current_batch_size = end - i;
+                Matrix batch_data(current_batch_size, data.getCols());
+                Matrix batch_labels(current_batch_size, labels.getCols());
                 
-                for (int j = i; j < end; ++j) {
-                    batch_data.data[j - i] = data.data[j];
-                    batch_labels.data[j - i] = labels.data[j];
+                // Copiar los datos correspondientes
+                for (int j = 0; j < current_batch_size; ++j) {
+                    batch_data.data[j] = data.data[i + j];
+                    batch_labels.data[j] = labels.data[i + j];
                 }
-                
-                batches.push_back({batch_data, batch_labels});
+
+                // Agregar el batch a la lista
+                batches.emplace_back(batch_data, batch_labels);
             }
+
             return batches;
         }
 
