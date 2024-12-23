@@ -56,11 +56,11 @@ int main() {
                 const Matrix &batch_labels = batch.second;
 
                 for (int i = 0; i < batch_data.getRows(); ++i) {
-                    
+                    cout << 1 << endl;
                     Matrix input = Matrix({batch_data.data[i]});
                     Matrix label = Matrix(1, 10);
                     label.data[0][static_cast<int>(batch_labels.data[i][0])] = 1.0;
-
+                    cout << 2 << endl;
                     // Forward pass
                     Matrix hidden1 = input_layer.forward_relu(input);
                     Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
