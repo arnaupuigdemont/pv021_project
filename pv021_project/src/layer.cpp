@@ -4,7 +4,7 @@
 
         Layer::Layer(int input_size, int output_size) 
             : weights(Matrix::HeIni(input_size, output_size, input_size)), 
-            biases(Matrix(1, output_size)),                              
+            biases(Matrix(1, output_size, 0.01)),                              
             cached_input(Matrix(0, 0)) {}
 
 

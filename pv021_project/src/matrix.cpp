@@ -5,6 +5,10 @@
             data.resize(rows, vector<double>(cols, 0.0));
         }
 
+        Matrix::Matrix(int rows, int cols, double val) {
+            data.resize(rows, vector<double>(cols, val));
+        }
+
         Matrix Matrix::Random(int rows, int cols) {
             Matrix mat(rows, cols);
             random_device rd;
