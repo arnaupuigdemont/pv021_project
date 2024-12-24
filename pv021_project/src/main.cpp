@@ -73,15 +73,8 @@ int main() {
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
                 Matrix output = output_layer.forward_softmax(hidden3);
 
-                std::cout << "label: ";
-                for (double val : label.data[0]) {
-                    std::cout << val << " ";
-                }
-                std::cout << std::endl;
-
                 // Loss
                 double loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
-                cout << "loss: " << loss;
                 total_loss += loss; // Assuming loss is a single value
 
                 // Track accuracy
