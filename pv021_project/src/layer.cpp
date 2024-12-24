@@ -13,6 +13,11 @@
             return relu((input * weights) + biases);
         }
 
+        Matrix Layer::forward_leaky_relu(const Matrix &input) {
+            cached_input = input;
+            return leaky_relu((input * weights) + biases);
+        }
+
         Matrix Layer::forward_softmax(const Matrix &input) {
             cached_input = input;
             return softmax((input * weights) + biases);

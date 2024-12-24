@@ -17,6 +17,8 @@ class Layer {
 
         Matrix forward_relu(const Matrix &input);
 
+        Matrix forward_leaky_relu(const Matrix &input);
+
         Matrix forward_softmax(const Matrix &input);
 
         Matrix backward(const Matrix &grad_output, double learning_rate);

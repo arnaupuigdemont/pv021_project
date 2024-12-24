@@ -118,7 +118,8 @@
 
             for (int i = 0; i < output.getCols(); ++i) {
                 // Compute the log probability; add a small value (1e-9) to prevent log(0)
-                sum_loss += -label.data[0][i] * log(output.data[0][i] + 1e-9);
+                double clipped_val = std::max(output.data[0][i], 1e-9);
+                loss.data[0][i] = -label.data[0][i] * log(clipped_val);
             }
 
             // Store the total loss as the single entry in the loss matrix
@@ -133,4 +134,14 @@
                 }
                 cout << endl;
             }
+        }
+
+        Matrix Matrix::clip_gradients(double min_val, double max_val) {
+            Matrix clipped = *this; // Create a copy of the matrix
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    clipped.data[i][j] = std::max(min_val, std::min(clipped.data[i][j], max_val));
+                }
+            }
+            return clipped;
         }

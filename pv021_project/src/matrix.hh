@@ -41,6 +41,8 @@ class Matrix {
 
         Matrix cross_entropy_loss(const Matrix &output, const Matrix &label);
 
+        Matrix clip_gradients(double min, double max);
+
     private:
 
 };

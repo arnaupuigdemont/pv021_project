@@ -63,11 +63,11 @@ int main() {
                 Matrix input = Matrix({train_data.data[i]});
                 Matrix label = to_one_hot(train_labels.data[i][0], 10);
                 
-                Matrix hidden1 = input_layer.forward_relu(input);
+                Matrix hidden1 = input_layer.forward_leaky_relu(input);
                 std::cout << "Hidden1: "; hidden1.print();
-                Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
+                Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 std::cout << "Hidden2: "; hidden2.print();
-                Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
+                Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
                 std::cout << "Hidden3: "; hidden3.print();
                 Matrix output = output_layer.forward_softmax(hidden3);
                 std::cout << "output: "; output.print();
@@ -85,12 +85,19 @@ int main() {
 
                 // Backward pass
                 Matrix grad = output_layer.backward(loss, LEARNING_RATE);
+                grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients to range [-10.0, 10.0]
                 cout << "output grad: "; grad.print();
+
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);
+                grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
                 cout << "layer3: "; grad.print();
+
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
+                grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
                 cout << "layer2: "; grad.print();
+
                 grad = input_layer.backward(grad, LEARNING_RATE);
+                grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
                 cout << "layer1: "; grad.print();
             }
 
