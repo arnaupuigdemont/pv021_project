@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <random>
 
+#include <chrono>
+
 #include "matrix.hh"
 #include "dataset.hh"
 #include "layer.hh"
@@ -25,6 +27,8 @@ Matrix to_one_hot(int label, int num_classes) {
 }
 
 int main() {
+
+    auto total_start = std::chrono::high_resolution_clock::now();
 
     // LOAD DATA
         Dataset dataset;
@@ -50,6 +54,9 @@ int main() {
     //TRAINING 
 
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
+
+            auto epoch_start = std::chrono::high_resolution_clock::now();
+
             double total_loss = 0.0;
             int correct_predictions = 0;
 
@@ -74,7 +81,7 @@ int main() {
 
                 // Loss
                 double loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
-                cout << "loss: "; loss;
+                cout << "loss: " << loss;
                 total_loss += loss; // Assuming loss is a single value
 
                 // Track accuracy
@@ -104,10 +111,14 @@ int main() {
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
             }
 
+            auto epoch_end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
+
             // Log epoch stats
-            std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
+            cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
                     << " - Loss: " << total_loss / train_data.getRows()
-                    << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << std::endl;
+                    << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << 
+                    "duration: " << epoch_duration.count() << " seconds" << endl;
         }
 
     //TESTING
@@ -120,6 +131,10 @@ int main() {
             Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
             predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
+
+        auto total_end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> total_duration = total_end - total_start;
+        std::cout << "Tiempo total de entrenamiento: " << total_duration.count() << " segundos\n";
 
         double accuracy = dataset.calculate_accuracy(predictions, test_labels);
         cout << "Accuracy: " << accuracy << endl;  
