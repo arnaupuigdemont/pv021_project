@@ -37,6 +37,8 @@ class Matrix {
 
         void normalize();
 
+        void print();
+
         Matrix cross_entropy_loss(const Matrix &output, const Matrix &label);
 
     private:

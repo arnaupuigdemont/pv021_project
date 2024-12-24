@@ -125,3 +125,12 @@
             loss.data[0][0] = sum_loss;
             return loss;
         }
+
+        void Matrix::print() {
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    cout << data[i][j] << " ";
+                }
+                cout << endl;
+            }
+        }

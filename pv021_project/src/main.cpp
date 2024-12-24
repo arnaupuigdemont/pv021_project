@@ -64,9 +64,13 @@ int main() {
                 Matrix label = to_one_hot(train_labels.data[i][0], 10);
                 
                 Matrix hidden1 = input_layer.forward_relu(input);
+                std::cout << "Hidden1: "; hidden1.print();
                 Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
+                std::cout << "Hidden2: "; hidden2.print();
                 Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
+                std::cout << "Hidden3: "; hidden3.print();
                 Matrix output = output_layer.forward_softmax(hidden3);
+                std::cout << "output: "; output.print();
 
                 // Loss
                 Matrix loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
@@ -81,9 +85,13 @@ int main() {
 
                 // Backward pass
                 Matrix grad = output_layer.backward(loss, LEARNING_RATE);
+                cout << "output grad: "; grad.print();
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);
+                cout << "layer3: "; grad.print();
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
+                cout << "layer2: "; grad.print();
                 grad = input_layer.backward(grad, LEARNING_RATE);
+                cout << "layer1: "; grad.print();
             }
 
             // Log epoch stats
