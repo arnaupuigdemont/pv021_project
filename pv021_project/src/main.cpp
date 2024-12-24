@@ -72,11 +72,17 @@ int main() {
                 Matrix output = output_layer.forward_softmax(hidden3);
                 std::cout << "output: "; output.print();
 
+                std::cout << "label: ";
+for (double val : label.data[0]) {
+    std::cout << val << " ";
+}
+std::cout << std::endl;
+
                 // Loss
                 Matrix loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
                 cout << "loss: "; loss.print();
                 total_loss += loss.data[0][0]; // Assuming loss is a single value
-cout << 1 << endl;
+
                 // Track accuracy
                 int predicted_label = distance(output.data[0].begin(), max_element(output.data[0].begin(), output.data[0].end()));
                 int true_label = distance(label.data[0].begin(), max_element(label.data[0].begin(), label.data[0].end()));
