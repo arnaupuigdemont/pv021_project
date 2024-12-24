@@ -49,10 +49,13 @@
             int r1 = getRows(), c1 = getCols();
             int c2 = other.getCols();
             Matrix result(r1, c2);
-            for (int i = 0; i < r1; ++i)
-                for (int j = 0; j < c2; ++j)
-                    for (int k = 0; k < c1; ++k)
+            for (int i = 0; i < r1; ++i) {
+                for (int k = 0; k < c1; ++k) {
+                    for (int j = 0; j < c2; ++j) {
                         result.data[i][j] += data[i][k] * other.data[k][j];
+                    }
+                }
+            }
             return result;
         }
 
