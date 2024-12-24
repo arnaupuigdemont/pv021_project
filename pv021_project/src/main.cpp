@@ -72,13 +72,11 @@ int main() {
                 std::cout << "Processing batch starting at index " << batch_start << std::endl;
 
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
-                int batch_size = batch_end - batch_start;
+                int batch_size = batch_end - batch_start; // Adjust batch size for the last batch
 
-                // Verify batch size and data dimensions
-                if (batch_size <= 0) {
-                    cerr << "Invalid batch size: " << batch_size << endl;
-                    exit(EXIT_FAILURE);
-                }
+                // Create batches dynamically based on actual batch size
+                Matrix batch_inputs(batch_size, train_data.getCols());
+                Matrix batch_labels(batch_size, OUTPUT_SIZE);
 
                 // Prepare the batch
                 for (int i = batch_start; i < batch_end; ++i) {
@@ -94,9 +92,8 @@ int main() {
 
                     std::cout << "Processed sample index " << data_index << " for batch" << std::endl;
                 }
-            }
 
-                // Forward pass for the entire batch
+                // Forward pass for the batch
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
@@ -104,13 +101,13 @@ int main() {
 
                 // Compute batch loss
                 double batch_loss = 0.0;
-                for (int i = 0; i < BATCH_SIZE; ++i) {
+                for (int i = 0; i < batch_size; ++i) { // Use batch_size instead of BATCH_SIZE
                     batch_loss += output.cross_entropy_loss(Matrix({output.data[i]}), Matrix({batch_labels.data[i]}));
                 }
                 total_loss += batch_loss;
 
                 // Track accuracy for the batch
-                for (int i = 0; i < BATCH_SIZE; ++i) {
+                for (int i = 0; i < batch_size; ++i) { // Use batch_size instead of BATCH_SIZE
                     int predicted_label = distance(output.data[i].begin(), max_element(output.data[i].begin(), output.data[i].end()));
                     int true_label = distance(batch_labels.data[i].begin(), max_element(batch_labels.data[i].begin(), batch_labels.data[i].end()));
                     if (predicted_label == true_label) {
@@ -118,27 +115,29 @@ int main() {
                     }
                 }
 
-                // Backward pass for the entire batch
-                Matrix grad_output = output;
-                for (int i = 0; i < BATCH_SIZE; ++i) {
+                // Backward pass for the batch
+                Matrix grad_output(batch_size, OUTPUT_SIZE); // Adjusted to actual batch size
+                for (int i = 0; i < batch_size; ++i) {
                     for (int j = 0; j < grad_output.getCols(); ++j) {
-                        grad_output.data[i][j] -= batch_labels.data[i][j];
+                        grad_output.data[i][j] = output.data[i][j] - batch_labels.data[i][j];
                     }
                 }
-                grad_output = grad_output / BATCH_SIZE; // Normalize gradients by batch size
+                grad_output = grad_output / batch_size; // Normalize gradients by batch size
 
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
                 grad = input_layer.backward(grad, LEARNING_RATE);
+            }
+
             auto epoch_end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
 
             // Log epoch stats
             std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
-                << " - Loss: " << total_loss / train_data.getRows()
-                << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() 
-                << "%, Duration: " << epoch_duration.count() << " seconds" << endl;
+            << " - Loss: " << total_loss / train_data.getRows()
+            << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() 
+            << "%, Duration: " << epoch_duration.count() << " seconds" << endl;
         }
 
     //TESTING
