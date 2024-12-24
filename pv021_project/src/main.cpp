@@ -16,8 +16,8 @@ using namespace std;
 
 const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 3;
-const double LEARNING_RATE = 0.001;
+const int EPOCHS = 4;
+const double LEARNING_RATE = 0.01;
 const int BATCH_SIZE = 64;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -62,7 +62,6 @@ int main() {
 
             // Iterate over all training samples
             for (int i = 0; i < train_data.getRows(); ++i) {
-                cout << "Processing sample " << i << endl;
 
                 // Forward pass
                 Matrix input = Matrix({train_data.data[i]});
