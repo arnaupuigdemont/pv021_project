@@ -61,19 +61,25 @@ int main() {
             vector<int> indices(train_data.getRows());
             iota(indices.begin(), indices.end(), 0); // Fill with 0, 1, ..., train_data.getRows() - 1
             random_shuffle(indices.begin(), indices.end());
-
+cout << 1 << endl;
             // Iterate over batches
             for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
+cout << 2 << endl;
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
+cout << 3 << endl;
                 int batch_size = batch_end - batch_start;
-
+cout << 4 << endl;
                 Matrix batch_inputs(batch_size, train_data.getCols());
+cout << 5 << endl;
                 Matrix batch_labels(batch_size, OUTPUT_SIZE);
-
+cout << 6 << endl;
                 // Prepare the batch
                 for (int i = batch_start; i < batch_end; ++i) {
+cout << 7 << endl;
                     batch_inputs.data[i - batch_start] = train_data.data[indices[i]];
+cout << 8 << endl;
                     batch_labels.data[i - batch_start] = to_one_hot(train_labels.data[indices[i]][0], OUTPUT_SIZE).data[0];
+cout << 9 << endl;
                 }
 
                 // Forward pass for the entire batch
