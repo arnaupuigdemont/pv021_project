@@ -53,31 +53,31 @@ int main() {
     // TRAINING
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
             auto epoch_start = std::chrono::high_resolution_clock::now();
-
+cout << 1 << endl;
             double total_loss = 0.0;
             int correct_predictions = 0;
-
+cout << 2 << endl;
             // Shuffle the training data at the start of each epoch
             vector<int> indices(train_data.getRows());
             iota(indices.begin(), indices.end(), 0); // Fill with 0, 1, ..., train_data.getRows() - 1
             random_shuffle(indices.begin(), indices.end());
-
+cout << 3 << endl;
             std::cout << "Shuffling completed" << std::endl;
 
             Matrix batch_inputs(BATCH_SIZE, train_data.getCols());
             Matrix batch_labels(BATCH_SIZE, OUTPUT_SIZE);
-
+cout << 4 << endl;
             // Iterate over batches
             for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
                 std::cout << "Processing batch starting at index " << batch_start << std::endl;
-
+cout << 5 << endl;
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
                 int batch_size = batch_end - batch_start; // Adjust batch size for the last batch
-
+cout << 6 << endl;
                 // Create batches dynamically based on actual batch size
                 Matrix batch_inputs(batch_size, train_data.getCols());
                 Matrix batch_labels(batch_size, OUTPUT_SIZE);
-
+cout << 7 << endl;
                 // Prepare the batch
                 for (int i = batch_start; i < batch_end; ++i) {
                     int data_index = indices[i];
@@ -85,11 +85,11 @@ int main() {
                         cerr << "Index out of bounds: " << data_index << endl;
                         exit(EXIT_FAILURE);
                     }
-
+cout << 8 << endl;
                     // Copy data to the batch
                     batch_inputs.data[i - batch_start] = train_data.data[data_index];
                     batch_labels.data[i - batch_start] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
-
+cout << 9 << endl;
                     std::cout << "Processed sample index " << data_index << " for batch" << std::endl;
                 }
 
