@@ -14,7 +14,7 @@ using namespace std;
 
 const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 5;
+const int EPOCHS = 3;
 const double LEARNING_RATE = 0.001;
 const int BATCH_SIZE = 64;
 
@@ -49,8 +49,6 @@ int main() {
 
     //TRAINING 
 
-        cout << "Train data rows: " << train_data.getRows() << ", Train labels rows: " << train_labels.getRows() << endl;
-
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
             double total_loss = 0.0;
             int correct_predictions = 0;
@@ -64,13 +62,9 @@ int main() {
                 Matrix label = to_one_hot(train_labels.data[i][0], 10);
                 
                 Matrix hidden1 = input_layer.forward_leaky_relu(input);
-                std::cout << "Hidden1: "; hidden1.print();
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-                std::cout << "Hidden2: "; hidden2.print();
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-                std::cout << "Hidden3: "; hidden3.print();
                 Matrix output = output_layer.forward_softmax(hidden3);
-                std::cout << "output: "; output.print();
 
                 std::cout << "label: ";
                 for (double val : label.data[0]) {
@@ -89,7 +83,7 @@ int main() {
                 if (predicted_label == true_label) {
                     ++correct_predictions;
                 }
-cout << 2 << endl;
+
                 // Backward pass
                 Matrix grad_output = output; // Copy the output (softmax probabilities)
                 for (int i = 0; i < grad_output.getCols(); ++i) {
@@ -99,19 +93,15 @@ cout << 2 << endl;
                 // Pass `grad_output` to the backward function
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients to range [-10.0, 10.0]
-                cout << "output grad: "; grad.print();
 
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
-                cout << "layer3: "; grad.print();
 
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
-                cout << "layer2: "; grad.print();
 
                 grad = input_layer.backward(grad, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
-                cout << "layer1: "; grad.print();
             }
 
             // Log epoch stats
