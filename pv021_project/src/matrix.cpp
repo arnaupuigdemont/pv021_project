@@ -84,6 +84,20 @@
             return mat;
         }
 
+        Matrix Matrix::HeIni(int rows, int cols, int input_size) {
+            Matrix mat(rows, cols);
+            double limit = sqrt(2.0 / input_size); 
+            random_device rd;
+            mt19937 gen(rd());
+            uniform_real_distribution<> dis(-limit, limit);
+
+            for (int i = 0; i < rows; ++i)
+                for (int j = 0; j < cols; ++j)
+                    mat.data[i][j] = dis(gen);
+
+            return mat;
+        }
+
         void Matrix::normalize() {
             int r = getRows(), c = getCols();
 

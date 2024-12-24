@@ -14,7 +14,7 @@ using namespace std;
 
 const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 2;
+const int EPOCHS = 5;
 const double LEARNING_RATE = 0.001;
 const int BATCH_SIZE = 64;
 
@@ -59,7 +59,8 @@ cout << endl;
             double total_loss = 0.0;
             int correct_predictions = 0;
 
-            for (int i = 0; i < train_data.getRows(); ++i) {
+            for (int i = 0; i < 50; ++i) {
+                cout << "Batch " << i << endl;
                 // Forward pass
                 Matrix input = Matrix({train_data.data[i]});
                 Matrix label = Matrix({train_labels.data[i]});
@@ -74,8 +75,8 @@ cout << endl;
                 total_loss += loss.data[0][0]; // Assuming loss is a single value
 
                 // Track accuracy
-                int predicted_label = std::distance(output.data[0].begin(), std::max_element(output.data[0].begin(), output.data[0].end()));
-                int true_label = std::distance(label.data[0].begin(), std::max_element(label.data[0].begin(), label.data[0].end()));
+                int predicted_label = distance(output.data[0].begin(), max_element(output.data[0].begin(), output.data[0].end()));
+                int true_label = distance(label.data[0].begin(), max_element(label.data[0].begin(), label.data[0].end()));
                 if (predicted_label == true_label) {
                     ++correct_predictions;
                 }

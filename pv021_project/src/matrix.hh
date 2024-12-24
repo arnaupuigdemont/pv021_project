@@ -32,6 +32,8 @@ class Matrix {
 
         static Matrix Xavier(int rows, int cols, int input_size);
 
+        static Matrix HeIni(int rows, int cols, int input_size);
+
         void normalize();
 
         Matrix cross_entropy_loss(const Matrix &output, const Matrix &label);
