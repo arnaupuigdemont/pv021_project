@@ -23,6 +23,10 @@ class Layer {
 
         Matrix backward(const Matrix &grad_output, double learning_rate);
 
+        Matrix getWeights();
+
+        Matrix getBiases();
+
     private:
 
         Matrix cached_input;

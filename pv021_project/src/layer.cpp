@@ -41,6 +41,14 @@
             return grad_input;
         }
 
+        Matrix Layer::getWeights() {
+            return weights;
+        }
+
+        Matrix Layer::getBiases() {
+            return biases;
+        }
+
     //PRIVATE
 
         Matrix Layer::relu(const Matrix &input) {

@@ -98,7 +98,7 @@ int main() {
 
                     std::cout << "Processed sample index " << data_index << " for batch" << std::endl;
                 }
-cout << 0 << endl;
+
                 // Validar las dimensiones de las matrices
                 if (batch_inputs.getRows() != batch_size || batch_labels.getRows() != batch_size) {
                     std::cerr << "Batch dimensions mismatch: inputs rows " << batch_inputs.getRows()
@@ -106,7 +106,11 @@ cout << 0 << endl;
                             << ", expected " << batch_size << std::endl;
                     exit(EXIT_FAILURE);
                 }
-cout << 1 << endl;
+
+std::cout << "Batch inputs dimensions: " << batch_inputs.getRows() << " x " << batch_inputs.getCols() << std::endl;
+std::cout << "Input layer weights dimensions: " << input_layer.getWeights().getRows() << " x " << input_layer.getWeights().getCols() << std::endl;
+std::cout << "Input layer biases dimensions: " << input_layer.getBiases().getRows() << " x " << input_layer.getBiases().getCols() << std::endl;
+
                 // **Forward pass**
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
