@@ -25,6 +25,10 @@
 
         Matrix Layer::backward(const Matrix &grad_output, double learning_rate) {
             cout << 3 << endl;
+            std::cout << "grad_output dimensions: " 
+          << grad_output.getRows() << " x " << grad_output.getCols() << std::endl;
+std::cout << "weights dimensions (transposed): " 
+          << weights.transpose().getRows() << " x " << weights.transpose().getCols() << std::endl;
             Matrix grad_input = grad_output * weights.transpose();
             cout << 4 << endl;
             Matrix grad_weights = cached_input.transpose() * grad_output;
