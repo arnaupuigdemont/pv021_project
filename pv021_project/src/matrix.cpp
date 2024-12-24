@@ -112,18 +112,14 @@
             
         }
 
-        Matrix Matrix::cross_entropy_loss(const Matrix &output, const Matrix &label) {
-            Matrix loss(1, 1); // A single value for the loss
-            double sum_loss = 0.0;
-
+        double Matrix::cross_entropy_loss(const Matrix &output, const Matrix &label) {
+            double loss = 0.0;
             for (int i = 0; i < output.getCols(); ++i) {
-                // Compute the log probability; add a small value (1e-9) to prevent log(0)
-                double clipped_val = max(output.data[0][i], 1e-9);
-                loss.data[0][i] = -label.data[0][i] * log(clipped_val);
+                if (label.data[0][i] == 1) { // Only calculate for the true class
+                    loss = -log(output.data[0][i] + 1e-9);
+                    break; // Stop after finding the true class
+                }
             }
-
-            // Store the total loss as the single entry in the loss matrix
-            loss.data[0][0] = sum_loss;
             return loss;
         }
 

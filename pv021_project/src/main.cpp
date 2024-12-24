@@ -73,15 +73,15 @@ int main() {
                 std::cout << "output: "; output.print();
 
                 std::cout << "label: ";
-for (double val : label.data[0]) {
-    std::cout << val << " ";
-}
-std::cout << std::endl;
+                for (double val : label.data[0]) {
+                    std::cout << val << " ";
+                }
+                std::cout << std::endl;
 
                 // Loss
-                Matrix loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
-                cout << "loss: "; loss.print();
-                total_loss += loss.data[0][0]; // Assuming loss is a single value
+                double loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
+                cout << "loss: "; loss;
+                total_loss += loss; // Assuming loss is a single value
 
                 // Track accuracy
                 int predicted_label = distance(output.data[0].begin(), max_element(output.data[0].begin(), output.data[0].end()));
@@ -91,7 +91,13 @@ std::cout << std::endl;
                 }
 cout << 2 << endl;
                 // Backward pass
-                Matrix grad = output_layer.backward(loss, LEARNING_RATE);
+                Matrix grad_output = output; // Copy the output (softmax probabilities)
+                for (int i = 0; i < grad_output.getCols(); ++i) {
+                    grad_output.data[0][i] -= label.data[0][i]; // Subtract true label from predicted probabilities
+                }
+
+                // Pass `grad_output` to the backward function
+                Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients to range [-10.0, 10.0]
                 cout << "output grad: "; grad.print();
 
