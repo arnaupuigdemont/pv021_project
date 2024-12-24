@@ -74,6 +74,7 @@ int main() {
 
                 // Loss
                 Matrix loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
+                cout << "loss: "; loss.print();
                 total_loss += loss.data[0][0]; // Assuming loss is a single value
 cout << 1 << endl;
                 // Track accuracy
@@ -85,9 +86,7 @@ cout << 1 << endl;
 cout << 2 << endl;
                 // Backward pass
                 Matrix grad = output_layer.backward(loss, LEARNING_RATE);
-cout << 3 << endl;
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients to range [-10.0, 10.0]
-cout << 4 << endl;
                 cout << "output grad: "; grad.print();
 
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);

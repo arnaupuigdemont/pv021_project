@@ -118,7 +118,7 @@
 
             for (int i = 0; i < output.getCols(); ++i) {
                 // Compute the log probability; add a small value (1e-9) to prevent log(0)
-                double clipped_val = std::max(output.data[0][i], 1e-9);
+                double clipped_val = max(output.data[0][i], 1e-9);
                 loss.data[0][i] = -label.data[0][i] * log(clipped_val);
             }
 

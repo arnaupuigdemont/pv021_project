@@ -24,15 +24,19 @@
         }
 
         Matrix Layer::backward(const Matrix &grad_output, double learning_rate) {
+            cout << 3 << endl;
             Matrix grad_input = grad_output * weights.transpose();
+            cout << 4 << endl;
             Matrix grad_weights = cached_input.transpose() * grad_output;
-
+            cout << 5 << endl;
             Matrix grad_biases(1, grad_output.getCols());
+            cout << 6 << endl;
             for (int j = 0; j < grad_output.getCols(); ++j) {
                 for (int i = 0; i < grad_output.getRows(); ++i) {
                     grad_biases.data[0][j] += grad_output.data[i][j];
                 }
             }
+            cout << 7 << endl;
 
             weights = weights - grad_weights.scalar_mul(learning_rate);
             biases = biases - grad_biases.scalar_mul(learning_rate);
