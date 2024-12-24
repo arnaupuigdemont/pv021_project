@@ -80,17 +80,22 @@
     }
 
         double Dataset::calculate_accuracy(const Matrix &predictions, const Matrix &labels) {
-            int correct = 0;
-            for (int i = 0; i < predictions.getRows(); ++i) {
+            int correct_predictions = 0;
 
-                int pred_class = std::distance(predictions.data[i].begin(),
-                                            std::max_element(predictions.data[i].begin(), predictions.data[i].end()));
-                int true_class = std::distance(labels.data[i].begin(),
-                                                std::max_element(labels.data[i].begin(), labels.data[i].end()));
-                if (pred_class == true_class) correct++;
+            for (int i = 0; i < labels.getRows(); ++i) {
+                // Índice de la clase predicha
+                int predicted_label = distance(predictions.data[i].begin(), 
+                                            max_element(predictions.data[i].begin(), predictions.data[i].end()));
+
+                // Índice de la clase verdadera
+                int true_label = static_cast<int>(labels.data[i][0]); // Assuming labels are indices of classes
+
+                if (predicted_label == true_label) {
+                    ++correct_predictions;
+                }
             }
 
-            return static_cast<double>(correct) / predictions.getRows();
+            return 100.0 * correct_predictions / labels.getRows(); // Accuracy en porcentaje
         }
 
         vector<pair<Matrix, Matrix>> Dataset::create_batches(const Matrix &data, const Matrix &labels, int batch_size) {

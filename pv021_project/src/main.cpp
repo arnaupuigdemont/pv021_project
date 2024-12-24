@@ -117,20 +117,22 @@ int main() {
     //TESTING
     
         Matrix predictions(test_data.getRows(), 10);
+
         for (int i = 0; i < test_data.getRows(); ++i) {
             Matrix input = Matrix({test_data.data[i]});
-            Matrix hidden1 = input_layer.forward_relu(input);
-            Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
-            Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
+            Matrix hidden1 = input_layer.forward_leaky_relu(input);
+            Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
+            Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
             predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
 
         auto total_end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_duration = total_end - total_start;
-        std::cout << "Tiempo total de entrenamiento: " << total_duration.count() << " segundos\n";
+        std::cout << "Tiempo total de entrenamiento y testing: " << total_duration.count() << " segundos\n";
 
+        // Calcular Accuracy
         double accuracy = dataset.calculate_accuracy(predictions, test_labels);
-        cout << "Accuracy: " << accuracy << endl;  
+        cout << "Accuracy on test set: " << accuracy << "%" << endl;
 
     return 0;
 }
