@@ -28,6 +28,7 @@ class Matrix {
         Matrix operator+(const Matrix &m) const;
         Matrix operator-(const Matrix &m) const;
         Matrix operator*(const Matrix &m) const;
+        Matrix operator/(double scalar) const;
         Matrix transpose() const;
         Matrix scalar_mul(double scalar) const;
 

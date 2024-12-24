@@ -74,6 +74,18 @@
             return result;
         }
 
+        Matrix Matrix::operator/(double scalar) const {
+
+        Matrix result = *this;
+
+        for (auto& row : result.data) {
+            for (auto& elem : row) {
+                elem /= scalar;
+            }
+        }
+        return result;
+    }
+
         Matrix Matrix::Xavier(int rows, int cols, int input_size) {
             Matrix mat(rows, cols);
             double limit = sqrt(1.0 / input_size); 
