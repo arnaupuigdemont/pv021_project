@@ -50,7 +50,7 @@ int main() {
             int correct_predictions = 0;
 
             // Iterate over all training samples
-            for (int i = 0; i < 50; ++i) {
+            for (int i = 0; i < train_data.getRows(); ++i) {
                 cout << "Processing sample " << i << endl;
 
                 // Forward pass
@@ -82,8 +82,8 @@ int main() {
 
             // Log epoch stats
             std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
-                    << " - Loss: " << total_loss / 50 
-                    << ", Accuracy: " << 100.0 * correct_predictions / 50 << "%" << std::endl;
+                    << " - Loss: " << total_loss / train_data.getRows()
+                    << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << std::endl;
         }
 
     //TESTING
