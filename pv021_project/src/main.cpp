@@ -14,7 +14,7 @@ using namespace std;
 
 const int INPUT_SIZE = 784;
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 1;
+const int EPOCHS = 2;
 const double LEARNING_RATE = 0.001;
 const int BATCH_SIZE = 64;
 
@@ -55,62 +55,41 @@ cout << endl;
 
         cout << "Train data rows: " << train_data.getRows() << ", Train labels rows: " << train_labels.getRows() << endl;
 
-        vector<pair<Matrix, Matrix>> batches = dataset.create_batches(train_data, train_labels, BATCH_SIZE);
-        cout << "number batches = " << batches.size() << endl;
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
-            cout << "Epoch " << epoch + 1 << endl;
-            int e = 0;
-            for (const auto &batch : batches) {
-                //cout << "batch = " << e << endl;
-                const Matrix &batch_data = batch.first;
-                const Matrix &batch_labels = batch.second;
-
-                for (int i = 0; i < batch_data.getRows(); ++i) {
-                    
-                    Matrix input = Matrix({batch_data.data[i]});
-                    Matrix label = Matrix(1, 10);
-                    label.data[0][static_cast<int>(batch_labels.data[i][0])] = 1.0;
-
-                    // Forward pass
-                    Matrix hidden1 = input_layer.forward_relu(input);
-                    Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
-                    Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
-                    Matrix output = output_layer.forward_softmax(hidden3); // Apply softmax
-
-                    // Loss
-                    Matrix loss = loss.cross_entropy_loss(output, label);
-
-                    // Backward pass
-                    Matrix grad = output_layer.backward(loss, LEARNING_RATE);
-                    grad = hidden_layer3.backward(grad, LEARNING_RATE);
-                    grad = hidden_layer2.backward(grad, LEARNING_RATE);
-                    grad = input_layer.backward(grad, LEARNING_RATE);
-                    
-                }
-                e++;
-            }
-            // Calcular precisión después de procesar todos los batches
+            double total_loss = 0.0;
             int correct_predictions = 0;
+
             for (int i = 0; i < train_data.getRows(); ++i) {
+                // Forward pass
                 Matrix input = Matrix({train_data.data[i]});
+                Matrix label = Matrix({train_labels.data[i]});
+                
                 Matrix hidden1 = input_layer.forward_relu(input);
                 Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
                 Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
                 Matrix output = output_layer.forward_softmax(hidden3);
-                // Índice de la predicción más probable
-                int predicted_class = std::distance(output.data[0].begin(),
-                                                    std::max_element(output.data[0].begin(), output.data[0].end()));
 
-                // Clase real
-                int true_class = static_cast<int>(train_labels.data[i][0]);
+                // Loss
+                Matrix loss = output.cross_entropy_loss(output, train_labels);
+                total_loss += loss.data[0][0]; // Assuming loss is a single value
 
-                if (predicted_class == true_class) {
-                    correct_predictions++;
+                // Track accuracy
+                int predicted_label = std::distance(output.data[0].begin(), std::max_element(output.data[0].begin(), output.data[0].end()));
+                int true_label = std::distance(label.data[0].begin(), std::max_element(label.data[0].begin(), label.data[0].end()));
+                if (predicted_label == true_label) {
+                    ++correct_predictions;
                 }
+
+                // Backward pass
+                Matrix grad = output_layer.backward(loss, LEARNING_RATE);
+                grad = hidden_layer3.backward(grad, LEARNING_RATE);
+                grad = hidden_layer2.backward(grad, LEARNING_RATE);
+                grad = input_layer.backward(grad, LEARNING_RATE);
             }
 
-            double accuracy = static_cast<double>(correct_predictions) / train_data.getRows() * 100.0;
-            cout << "Accuracy after epoch " << epoch + 1 << ": " << accuracy << "%" << endl;
+            // Log epoch stats
+            std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS << " - Loss: " << total_loss / train_data.getRows()
+                    << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << std::endl;
         }
 
     //TESTING
