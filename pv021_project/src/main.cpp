@@ -59,8 +59,10 @@ cout << endl;
             double total_loss = 0.0;
             int correct_predictions = 0;
 
+            // Iterate over all training samples
             for (int i = 0; i < 50; ++i) {
-                cout << "Batch " << i << endl;
+                cout << "Processing sample " << i << endl;
+
                 // Forward pass
                 Matrix input = Matrix({train_data.data[i]});
                 Matrix label = Matrix({train_labels.data[i]});
@@ -71,7 +73,7 @@ cout << endl;
                 Matrix output = output_layer.forward_softmax(hidden3);
 
                 // Loss
-                Matrix loss = output.cross_entropy_loss(output, train_labels);
+                Matrix loss = output.cross_entropy_loss(output, label); // Correct label passed for the loss
                 total_loss += loss.data[0][0]; // Assuming loss is a single value
 
                 // Track accuracy
@@ -89,8 +91,9 @@ cout << endl;
             }
 
             // Log epoch stats
-            std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS << " - Loss: " << total_loss / train_data.getRows()
-                    << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << std::endl;
+            std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
+                    << " - Loss: " << total_loss / 50 
+                    << ", Accuracy: " << 100.0 * correct_predictions / 50 << "%" << std::endl;
         }
 
     //TESTING
