@@ -106,13 +106,13 @@ cout << 0 << endl;
                             << ", expected " << batch_size << std::endl;
                     exit(EXIT_FAILURE);
                 }
-
+cout << 1 << endl;
                 // **Forward pass**
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
                 Matrix output = output_layer.forward_softmax(hidden3);
-
+cout << 2 << endl;
                 // **Calcular pérdida del batch**
                 double batch_loss = 0.0;
                 for (int i = 0; i < batch_size; ++i) {
@@ -122,7 +122,7 @@ cout << 0 << endl;
                     );
                 }
                 total_loss += batch_loss;
-
+cout << 3 << endl;
                 // **Calcular precisión del batch**
                 for (int i = 0; i < batch_size; ++i) {
                     int predicted_label = distance(
@@ -137,7 +137,7 @@ cout << 0 << endl;
                         ++correct_predictions;
                     }
                 }
-
+cout << 4 << endl;
                 // **Backward pass**
                 Matrix grad_output(batch_size, OUTPUT_SIZE);
                 for (int i = 0; i < batch_size; ++i) {
@@ -152,7 +152,7 @@ cout << 0 << endl;
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
                 grad = input_layer.backward(grad, LEARNING_RATE);
             }
-cout << 1 << endl;
+
             auto epoch_end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
 
