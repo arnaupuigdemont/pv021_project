@@ -14,6 +14,11 @@
         }
 
         Matrix Layer::forward_leaky_relu(const Matrix &input) {
+
+            cout << input.getRows() << " " << input.getCols() << endl;
+            cout << weights.getRows() << " " << weights.getCols() << endl;
+            cout << biases.getRows() << " " << biases.getCols() << endl;
+
             cached_input = input;
             return leaky_relu((input * weights) + biases);
         }

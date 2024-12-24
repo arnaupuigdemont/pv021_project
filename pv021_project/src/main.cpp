@@ -107,10 +107,6 @@ int main() {
                     exit(EXIT_FAILURE);
                 }
 
-std::cout << "Batch inputs dimensions: " << batch_inputs.getRows() << " x " << batch_inputs.getCols() << std::endl;
-std::cout << "Input layer weights dimensions: " << input_layer.getWeights().getRows() << " x " << input_layer.getWeights().getCols() << std::endl;
-std::cout << "Input layer biases dimensions: " << input_layer.getBiases().getRows() << " x " << input_layer.getBiases().getCols() << std::endl;
-
                 // **Forward pass**
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 std::cout << "Hidden1 dimensions: " << hidden1.getRows() << " x " << hidden1.getCols() << std::endl;
