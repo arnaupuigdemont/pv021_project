@@ -87,6 +87,7 @@
         }
 
         Matrix Layer::leaky_relu(const Matrix &input) {
+            cout << "leaky_relu" << endl;
             Matrix result(input.getRows(), input.getCols());
             for (int i = 0; i < input.getRows(); ++i)
                 for (int j = 0; j < input.getCols(); ++j)
