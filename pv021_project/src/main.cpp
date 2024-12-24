@@ -98,7 +98,7 @@ int main() {
 
                     std::cout << "Processed sample index " << data_index << " for batch" << std::endl;
                 }
-
+cout << 0 << endl;
                 // Validar las dimensiones de las matrices
                 if (batch_inputs.getRows() != batch_size || batch_labels.getRows() != batch_size) {
                     std::cerr << "Batch dimensions mismatch: inputs rows " << batch_inputs.getRows()
@@ -152,7 +152,7 @@ int main() {
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
                 grad = input_layer.backward(grad, LEARNING_RATE);
             }
-
+cout << 1 << endl;
             auto epoch_end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
 
