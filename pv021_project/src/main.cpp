@@ -61,26 +61,40 @@ int main() {
             vector<int> indices(train_data.getRows());
             iota(indices.begin(), indices.end(), 0); // Fill with 0, 1, ..., train_data.getRows() - 1
             random_shuffle(indices.begin(), indices.end());
-cout << 1 << endl;
+
+            std::cout << "Shuffling completed" << std::endl;
+
+            Matrix batch_inputs(BATCH_SIZE, train_data.getCols());
+            Matrix batch_labels(BATCH_SIZE, OUTPUT_SIZE);
+
             // Iterate over batches
             for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
-cout << 2 << endl;
+                std::cout << "Processing batch starting at index " << batch_start << std::endl;
+
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
-cout << 3 << endl;
                 int batch_size = batch_end - batch_start;
-cout << 4 << endl;
-                Matrix batch_inputs(batch_size, train_data.getCols());
-cout << 5 << endl;
-                Matrix batch_labels(batch_size, OUTPUT_SIZE);
-cout << 6 << endl;
+
+                // Verify batch size and data dimensions
+                if (batch_size <= 0) {
+                    cerr << "Invalid batch size: " << batch_size << endl;
+                    exit(EXIT_FAILURE);
+                }
+
                 // Prepare the batch
                 for (int i = batch_start; i < batch_end; ++i) {
-cout << 7 << endl;
-                    batch_inputs.data[i - batch_start] = train_data.data[indices[i]];
-cout << 8 << endl;
-                    batch_labels.data[i - batch_start] = to_one_hot(train_labels.data[indices[i]][0], OUTPUT_SIZE).data[0];
-cout << 9 << endl;
+                    int data_index = indices[i];
+                    if (data_index < 0 || data_index >= train_data.getRows()) {
+                        cerr << "Index out of bounds: " << data_index << endl;
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // Copy data to the batch
+                    batch_inputs.data[i - batch_start] = train_data.data[data_index];
+                    batch_labels.data[i - batch_start] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
+
+                    std::cout << "Processed sample index " << data_index << " for batch" << std::endl;
                 }
+            }
 
                 // Forward pass for the entire batch
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
@@ -90,13 +104,13 @@ cout << 9 << endl;
 
                 // Compute batch loss
                 double batch_loss = 0.0;
-                for (int i = 0; i < batch_size; ++i) {
+                for (int i = 0; i < BATCH_SIZE; ++i) {
                     batch_loss += output.cross_entropy_loss(Matrix({output.data[i]}), Matrix({batch_labels.data[i]}));
                 }
                 total_loss += batch_loss;
 
                 // Track accuracy for the batch
-                for (int i = 0; i < batch_size; ++i) {
+                for (int i = 0; i < BATCH_SIZE; ++i) {
                     int predicted_label = distance(output.data[i].begin(), max_element(output.data[i].begin(), output.data[i].end()));
                     int true_label = distance(batch_labels.data[i].begin(), max_element(batch_labels.data[i].begin(), batch_labels.data[i].end()));
                     if (predicted_label == true_label) {
@@ -106,24 +120,22 @@ cout << 9 << endl;
 
                 // Backward pass for the entire batch
                 Matrix grad_output = output;
-                for (int i = 0; i < batch_size; ++i) {
+                for (int i = 0; i < BATCH_SIZE; ++i) {
                     for (int j = 0; j < grad_output.getCols(); ++j) {
                         grad_output.data[i][j] -= batch_labels.data[i][j];
                     }
                 }
-                grad_output = grad_output / batch_size; // Normalize gradients by batch size
+                grad_output = grad_output / BATCH_SIZE; // Normalize gradients by batch size
 
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
                 grad = input_layer.backward(grad, LEARNING_RATE);
-            }
-
             auto epoch_end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
 
             // Log epoch stats
-            cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
+            std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
                 << " - Loss: " << total_loss / train_data.getRows()
                 << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() 
                 << "%, Duration: " << epoch_duration.count() << " seconds" << endl;
