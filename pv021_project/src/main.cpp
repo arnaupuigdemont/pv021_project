@@ -18,6 +18,12 @@ const int EPOCHS = 5;
 const double LEARNING_RATE = 0.001;
 const int BATCH_SIZE = 64;
 
+Matrix to_one_hot(int label, int num_classes) {
+    std::vector<double> one_hot(num_classes, 0.0);
+    one_hot[label] = 1.0; // Set the correct class index to 1.0
+    return Matrix({one_hot});
+}
+
 int main() {
 
     // LOAD DATA
@@ -55,7 +61,7 @@ int main() {
 
                 // Forward pass
                 Matrix input = Matrix({train_data.data[i]});
-                Matrix label = Matrix({train_labels.data[i]});
+                Matrix label = to_one_hot(train_labels.data[i][0], 10);
                 
                 Matrix hidden1 = input_layer.forward_relu(input);
                 Matrix hidden2 = hidden_layer2.forward_relu(hidden1);

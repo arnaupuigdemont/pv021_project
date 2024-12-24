@@ -113,9 +113,15 @@
         }
 
         Matrix Matrix::cross_entropy_loss(const Matrix &output, const Matrix &label) {
-            Matrix loss(1, output.getCols());
+            Matrix loss(1, 1); // A single value for the loss
+            double sum_loss = 0.0;
+
             for (int i = 0; i < output.getCols(); ++i) {
-                loss.data[0][i] = -label.data[0][i] * log(output.data[0][i] + 1e-9);
+                // Compute the log probability; add a small value (1e-9) to prevent log(0)
+                sum_loss += -label.data[0][i] * log(output.data[0][i] + 1e-9);
             }
+
+            // Store the total loss as the single entry in the loss matrix
+            loss.data[0][0] = sum_loss;
             return loss;
         }
