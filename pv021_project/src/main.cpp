@@ -70,58 +70,82 @@ int main() {
             for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
                 std::cout << "Processing batch starting at index " << batch_start << std::endl;
 
-                int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
-                int batch_size = batch_end - batch_start; // Adjust batch size for the last batch
+                // Calcular el final del batch y su tamaño
+                int batch_end = std::min(batch_start + BATCH_SIZE, train_data.getRows());
+                int batch_size = batch_end - batch_start; // Tamaño real del batch
 
-                // Create batches dynamically based on actual batch size
+                // Verificar el tamaño del batch
+                if (batch_size <= 0) {
+                    std::cerr << "Invalid batch size: " << batch_size << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+
+                // Crear dinámicamente las matrices para el batch
                 Matrix batch_inputs(batch_size, train_data.getCols());
                 Matrix batch_labels(batch_size, OUTPUT_SIZE);
 
-                // Prepare the batch
+                // Rellenar el batch
                 for (int i = batch_start; i < batch_end; ++i) {
-                    int data_index = indices[i];
+                    int data_index = indices[i]; // Índice después de hacer shuffle
                     if (data_index < 0 || data_index >= train_data.getRows()) {
-                        cerr << "Index out of bounds: " << data_index << endl;
+                        std::cerr << "Index out of bounds: " << data_index << std::endl;
                         exit(EXIT_FAILURE);
                     }
 
-                    // Copy data to the batch
+                    // Copiar datos a las matrices del batch
                     batch_inputs.data[i - batch_start] = train_data.data[data_index];
                     batch_labels.data[i - batch_start] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
 
                     std::cout << "Processed sample index " << data_index << " for batch" << std::endl;
                 }
 
-                // Forward pass for the batch
+                // Validar las dimensiones de las matrices
+                if (batch_inputs.getRows() != batch_size || batch_labels.getRows() != batch_size) {
+                    std::cerr << "Batch dimensions mismatch: inputs rows " << batch_inputs.getRows()
+                            << ", labels rows " << batch_labels.getRows()
+                            << ", expected " << batch_size << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+
+                // **Forward pass**
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
                 Matrix output = output_layer.forward_softmax(hidden3);
 
-                // Compute batch loss
+                // **Calcular pérdida del batch**
                 double batch_loss = 0.0;
-                for (int i = 0; i < batch_size; ++i) { // Use batch_size instead of BATCH_SIZE
-                    batch_loss += output.cross_entropy_loss(Matrix({output.data[i]}), Matrix({batch_labels.data[i]}));
+                for (int i = 0; i < batch_size; ++i) {
+                    batch_loss += output.cross_entropy_loss(
+                        Matrix({output.data[i]}),
+                        Matrix({batch_labels.data[i]})
+                    );
                 }
                 total_loss += batch_loss;
 
-                // Track accuracy for the batch
-                for (int i = 0; i < batch_size; ++i) { // Use batch_size instead of BATCH_SIZE
-                    int predicted_label = distance(output.data[i].begin(), max_element(output.data[i].begin(), output.data[i].end()));
-                    int true_label = distance(batch_labels.data[i].begin(), max_element(batch_labels.data[i].begin(), batch_labels.data[i].end()));
+                // **Calcular precisión del batch**
+                for (int i = 0; i < batch_size; ++i) {
+                    int predicted_label = distance(
+                        output.data[i].begin(),
+                        max_element(output.data[i].begin(), output.data[i].end())
+                    );
+                    int true_label = distance(
+                        batch_labels.data[i].begin(),
+                        max_element(batch_labels.data[i].begin(), batch_labels.data[i].end())
+                    );
                     if (predicted_label == true_label) {
                         ++correct_predictions;
                     }
                 }
 
-                // Backward pass for the batch
-                Matrix grad_output(batch_size, OUTPUT_SIZE); // Adjusted to actual batch size
+                // **Backward pass**
+                Matrix grad_output(batch_size, OUTPUT_SIZE);
                 for (int i = 0; i < batch_size; ++i) {
                     for (int j = 0; j < grad_output.getCols(); ++j) {
                         grad_output.data[i][j] = output.data[i][j] - batch_labels.data[i][j];
                     }
                 }
-                grad_output = grad_output / batch_size; // Normalize gradients by batch size
+                grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);
