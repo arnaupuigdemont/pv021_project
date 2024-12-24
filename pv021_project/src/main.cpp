@@ -113,9 +113,13 @@ std::cout << "Input layer biases dimensions: " << input_layer.getBiases().getRow
 
                 // **Forward pass**
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
+                std::cout << "Hidden1 dimensions: " << hidden1.getRows() << " x " << hidden1.getCols() << std::endl;
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
+                std::cout << "Hidden2 dimensions: " << hidden2.getRows() << " x " << hidden2.getCols() << std::endl;
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
+                std::cout << "Hidden3 dimensions: " << hidden3.getRows() << " x " << hidden3.getCols() << std::endl;
                 Matrix output = output_layer.forward_softmax(hidden3);
+                std::cout << "Output dimensions: " << output.getRows() << " x " << output.getCols() << std::endl;
 cout << 2 << endl;
                 // **Calcular pérdida del batch**
                 double batch_loss = 0.0;
