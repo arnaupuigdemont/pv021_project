@@ -17,7 +17,7 @@ using namespace std;
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10;
 double initial_lr = 0.001;
-double decay_rate = 0.2;
+double decay_rate = 0.13;
 const int BATCH_SIZE = 128;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -72,7 +72,6 @@ int main() {
 
             // Iterate over all training samples
             for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
-std::cout << "Iteracion: " << batch_start << endl;
 
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
                 int batch_size = batch_end - batch_start; 
