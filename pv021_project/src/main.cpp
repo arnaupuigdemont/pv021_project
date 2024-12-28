@@ -69,21 +69,21 @@ std::cout << "Iteracion: " << batch_start << endl;
 
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
                 int batch_size = batch_end - batch_start; // Tamaño del batch actual
-
+std::cout << 1 << endl;
                 Matrix batch_inputs(batch_size, train_data.getCols());
                 Matrix batch_labels(batch_size, OUTPUT_SIZE);
-
+std::cout << 2 << endl;
                 for (int i = 0; i < batch_size; ++i) {
                     int data_index = indices[batch_start + i];
                     batch_inputs.data[i] = train_data.data[data_index];
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
-
+std::cout << 3 << endl;
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
               //  Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
                 Matrix output = output_layer.forward_softmax(hidden2);
-
+std::cout << 4 << endl;
                 // Loss
                 double batch_loss = 0.0;
                 for (int i = 0; i < batch_size; ++i) {
@@ -92,7 +92,7 @@ std::cout << "Iteracion: " << batch_start << endl;
                     );
                 }
                 total_loss += batch_loss; // Assuming loss is a single value
-
+std::cout << 5 << endl;
                 // Track accuracy
                 for (int i = 0; i < batch_size; ++i) {
                     int predicted_label = distance(
@@ -105,7 +105,7 @@ std::cout << "Iteracion: " << batch_start << endl;
                         ++correct_predictions;
                     }
                 }
-
+std::cout << 6 << endl;
                 // Backward pass
                 Matrix grad_output = output;
                 for (int i = 0; i < batch_size; ++i) {
@@ -114,7 +114,7 @@ std::cout << "Iteracion: " << batch_start << endl;
                     }
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
-
+std::cout << 7 << endl;
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0);
                 //grad = hidden_layer3.backward(grad, LEARNING_RATE);
