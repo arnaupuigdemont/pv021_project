@@ -84,8 +84,10 @@ std::cout << "Iteracion: " << batch_start << endl;
                                 std :: cout << "batch_labels: " << batch_labels.getRows() << " " << batch_labels.getCols() << endl;
 std::cout << 3 << endl;
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
+std::cout << 3 << endl;
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
               //  Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
+std::cout << 3 << endl;
                 Matrix output = output_layer.forward_softmax(hidden2);
 std::cout << 4 << endl;
                 // Loss
