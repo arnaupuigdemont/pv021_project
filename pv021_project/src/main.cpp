@@ -17,7 +17,7 @@ using namespace std;
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10;
 const double LEARNING_RATE = 0.001;
-const int BATCH_SIZE = 64;
+const int BATCH_SIZE = 128;
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
@@ -46,8 +46,8 @@ int main() {
     //CREATE LAYERS
 
         Layer input_layer(784, 256);
-        Layer hidden_layer2(256, 64);
-       // Layer hidden_layer3(128, 64);
+        Layer hidden_layer2(256, 128);
+        Layer hidden_layer3(128, 64);
         Layer output_layer(64, 10);
 
     //TRAINING 
@@ -80,11 +80,9 @@ std::cout << "Iteracion: " << batch_start << endl;
                 }
 
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
-
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-              //  Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-
-                Matrix output = output_layer.forward_softmax(hidden2);
+                Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
+                Matrix output = output_layer.forward_softmax(hidden3);
 
                 // Loss
                 double batch_loss = 0.0;
@@ -118,12 +116,13 @@ std::cout << "Iteracion: " << batch_start << endl;
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
-                grad = grad.clip_gradients(-10.0, 10.0);
-                //grad = hidden_layer3.backward(grad, LEARNING_RATE);
+                grad = grad.clip_gradients(-100.0, 100.0);
+                grad = hidden_layer3.backward(grad, LEARNING_RATE);
+                grad = grad.clip_gradients(-100.0, 100.0);
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
-                grad = grad.clip_gradients(-10.0, 10.0);
+                grad = grad.clip_gradients(-100.0, 100.0);
                 grad = input_layer.backward(grad, LEARNING_RATE);
-                grad = grad.clip_gradients(-10.0, 10.0);
+                grad = grad.clip_gradients(-100.0, 100.0);
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
@@ -144,8 +143,8 @@ std::cout << "Iteracion: " << batch_start << endl;
             Matrix input = Matrix({test_data.data[i]});
             Matrix hidden1 = input_layer.forward_leaky_relu(input);
             Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-           // Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-            predictions.data[i] = output_layer.forward_softmax(hidden2).data[0];
+            Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
+            predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
 
         auto total_end = std::chrono::high_resolution_clock::now();
