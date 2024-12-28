@@ -19,6 +19,7 @@ const int EPOCHS = 12;
 double initial_lr = 0.0005; 
 double decay_rate = 0.2;
 const int BATCH_SIZE = 128;
+int lambda = 0.01;
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
@@ -97,7 +98,15 @@ int main() {
                         Matrix({output.data[i]}), Matrix({batch_labels.data[i]})
                     );
                 }
-                total_loss += batch_loss; // Assuming loss is a single value
+                double l2_penalty = lambda * (
+                    input_layer.compute_l2_penalty() +
+                    hidden_layer2.compute_l2_penalty() +
+                    hidden_layer3.compute_l2_penalty() +
+                    output_layer.compute_l2_penalty()
+                );
+
+                batch_loss += l2_penalty;
+                total_loss += batch_loss;
 
                 // Track accuracy
                 for (int i = 0; i < batch_size; ++i) {
@@ -121,13 +130,13 @@ int main() {
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
-                Matrix grad = output_layer.backward(grad_output, learning_rate);
+                Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
                 grad = grad.clip_gradients(-10.0, 10.0);
-                grad = hidden_layer3.backward(grad, learning_rate);
+                grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
                 grad = grad.clip_gradients(-10.0, 10.0);
-                grad = hidden_layer2.backward(grad, learning_rate);
+                grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
                 grad = grad.clip_gradients(-10.0, 10.0);
-                grad = input_layer.backward(grad, learning_rate);
+                grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
                 grad = grad.clip_gradients(-10.0, 10.0);
             }
 
@@ -138,7 +147,7 @@ int main() {
             std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
                     << " - Loss: " << total_loss / train_data.getRows()
                     << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << 
-                    "duration: " << epoch_duration.count() << " seconds" << endl;
+                    " duration: " << epoch_duration.count() << " seconds" << endl;
         }
 
     //TESTING
