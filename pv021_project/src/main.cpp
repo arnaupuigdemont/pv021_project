@@ -16,10 +16,10 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 20; //20
-double initial_lr = 0.002; //0.001 //0.005 //0.001 //0.001
-double decay_rate = 0.1; //0.1 //0.1 //0.2 //0.15
+double initial_lr = 0.01; //0.001 //0.005 //0.001 //0.001
+double decay_rate = 0.2; //0.1 //0.1 //0.2 //0.15
 const int BATCH_SIZE = 128; //128 //128 //256 //128
-int lambda = 0.0005; //0.0001 // 0.001 //0.001 //0.0005
+int lambda = 0.0001; //0.0001 // 0.001 //0.001 //0.0005
 
 //86.1% no clipping 86.44% //85.27% // 85.65% //no clipping 86.4% 
 
