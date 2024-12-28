@@ -16,12 +16,12 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 20; //20
-double initial_lr = 0.001; //0.001 //0.005
-double decay_rate = 0.2; //0.1 //0.1 //0.2
-const int BATCH_SIZE = 256; //128 //128 //256
-int lambda = 0.001; //0.0001 // 0.001 //0.001
+double initial_lr = 0.001; //0.001 //0.005 //0.001 //0.001
+double decay_rate = 0.15; //0.1 //0.1 //0.2 //0.15
+const int BATCH_SIZE = 128; //128 //128 //256 //128
+int lambda = 0.0005; //0.0001 // 0.001 //0.001 //0.0005
 
-//86.1% //85.27% //
+//86.1% //85.27% // 85.65% //
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
@@ -140,15 +140,15 @@ int main() {
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
-                grad = grad.clip_gradients(-25.0, 25.0);
+               // grad = grad.clip_gradients(-25.0, 25.0);
                 grad = hidden_layer4.backward_ADAM(grad, learning_rate, lambda);
-                grad = grad.clip_gradients(-25.0, 25.0);
+                //grad = grad.clip_gradients(-25.0, 25.0);
                 grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
-                grad = grad.clip_gradients(-25.0, 25.0);
+                //grad = grad.clip_gradients(-25.0, 25.0);
                 grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
-                grad = grad.clip_gradients(-25.0, 25.0);
+                //grad = grad.clip_gradients(-25.0, 25.0);
                 grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
-                grad = grad.clip_gradients(-25.0, 25.0);
+                //grad = grad.clip_gradients(-25.0, 25.0);
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
