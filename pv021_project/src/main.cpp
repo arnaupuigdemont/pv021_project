@@ -16,12 +16,12 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 20; //20
-double initial_lr = 0.005; //0.001
-double decay_rate = 0.1; //0.1
-const int BATCH_SIZE = 128; //128
-int lambda = 0.001; //0.0001
+double initial_lr = 0.001; //0.001 //0.005
+double decay_rate = 0.2; //0.1 //0.1 //0.2
+const int BATCH_SIZE = 256; //128 //128 //256
+int lambda = 0.001; //0.0001 // 0.001 //0.001
 
-//86.1%
+//86.1% //85.27% //
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
