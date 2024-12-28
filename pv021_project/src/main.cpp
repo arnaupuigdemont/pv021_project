@@ -56,8 +56,8 @@ int main() {
         Layer input_layer(784, 256);
         Layer hidden_layer2(256, 128);
         Layer hidden_layer3(128, 64);
-        Layer hidden_layer4(64, 32);
-        Layer output_layer(32, 10);
+        //Layer hidden_layer4(64, 32);
+        Layer output_layer(64, 10);
 
     //TRAINING 
 
@@ -92,12 +92,12 @@ int main() {
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 //hidden1 = hidden1.apply_dropout(0.7);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-                hidden2 = hidden2.apply_dropout(0.7);
+               // hidden2 = hidden2.apply_dropout(0.8);
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-                hidden3 = hidden3.apply_dropout(0.7);
-                Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
+               // hidden3 = hidden3.apply_dropout(0.7);
+               // Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
                 //hidden4 = hidden4.apply_dropout(0.7);
-                Matrix output = output_layer.forward_softmax(hidden4);
+                Matrix output = output_layer.forward_softmax(hidden3);
 
                 // Loss
                 double batch_loss = 0.0;
@@ -110,7 +110,7 @@ int main() {
                     input_layer.compute_l2_penalty() +
                     hidden_layer2.compute_l2_penalty() +
                     hidden_layer3.compute_l2_penalty() +
-                    hidden_layer4.compute_l2_penalty() +
+                 //   hidden_layer4.compute_l2_penalty() +
                     output_layer.compute_l2_penalty()
                 );
 
@@ -141,7 +141,7 @@ int main() {
 
                 Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
                // grad = grad.clip_gradients(-25.0, 25.0);
-                grad = hidden_layer4.backward_ADAM(grad, learning_rate, lambda);
+              //  grad = hidden_layer4.backward_ADAM(grad, learning_rate, lambda);
                 //grad = grad.clip_gradients(-25.0, 25.0);
                 grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
                 //grad = grad.clip_gradients(-25.0, 25.0);
@@ -170,8 +170,8 @@ int main() {
             Matrix hidden1 = input_layer.forward_leaky_relu(input);
             Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
             Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-            Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
-            predictions.data[i] = output_layer.forward_softmax(hidden4).data[0];
+          //  Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
+            predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
 
         auto total_end = std::chrono::high_resolution_clock::now();
