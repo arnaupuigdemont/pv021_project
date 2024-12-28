@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10;
-const double LEARNING_RATE = 0.001;
+const double LEARNING_RATE = 0.0005;
 const int BATCH_SIZE = 128;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -116,13 +116,13 @@ std::cout << "Iteracion: " << batch_start << endl;
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
-                grad = grad.clip_gradients(-100.0, 100.0);
+                grad = grad.clip_gradients(-10.0, 10.0);
                 grad = hidden_layer3.backward(grad, LEARNING_RATE);
-                grad = grad.clip_gradients(-100.0, 100.0);
+                grad = grad.clip_gradients(-10.0, 10.0);
                 grad = hidden_layer2.backward(grad, LEARNING_RATE);
-                grad = grad.clip_gradients(-100.0, 100.0);
+                grad = grad.clip_gradients(-10.0, 10.0);
                 grad = input_layer.backward(grad, LEARNING_RATE);
-                grad = grad.clip_gradients(-100.0, 100.0);
+                grad = grad.clip_gradients(-10.0, 10.0);
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
