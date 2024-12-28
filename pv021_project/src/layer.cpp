@@ -21,7 +21,9 @@
             cached_input = input;
             cout << "input: " << input.getRows() << " " << input.getCols() << endl;
             Matrix res = input * weights;
-            cout << "res: " << res.getRows() << " " << res.getCols() << endl;
+            std::cout << "Result dimensions (res): " << res.getRows() << " x " << res.getCols() << std::endl;
+            std::cout << "Biases dimensions: " << biases.getRows() << " x " << biases.getCols() << std::endl;
+
             res = res + biases;
             cout << "res: " << res.getRows() << " " << res.getCols() << endl;
             return leaky_relu(res);
