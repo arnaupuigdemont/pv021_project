@@ -66,7 +66,7 @@ int main() {
             // Iterate over all training samples
             for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
 std::cout << "Iteracion: " << batch_start << endl;
-
+std::cout << train_data.getRows() << " " << train_data.getCols() << endl;
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
                 std::cout << batch_end << endl;
                 int batch_size = batch_end - batch_start; // Tamaño del batch actual
