@@ -109,6 +109,21 @@
             return result;
         }
 
+        Matrix Matrix::apply_dropout(double keep_prob) {
+            Matrix result(getRows(), getCols());
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<> dis(0.0, 1.0);
+
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    result.data[i][j] = (dis(gen) < keep_prob) ? data[i][j] / keep_prob : 0.0;
+                }
+            }
+
+            return result;
+        }
+
         Matrix Matrix::broadcast_biases(const Matrix &res, const Matrix &biases) {
             if (biases.getRows() != 1 || biases.getCols() != res.getCols()) {
                 throw std::invalid_argument("Bias dimensions are incompatible with result matrix");

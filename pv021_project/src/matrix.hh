@@ -33,6 +33,8 @@ class Matrix {
         Matrix operator/(double scalar) const;
         Matrix transpose() const;
         Matrix scalar_mul(double scalar) const;
+
+        Matrix apply_dropout(double keep_prob);
         Matrix broadcast_biases(const Matrix &res, const Matrix &biases);
 
         static Matrix Xavier(int rows, int cols, int input_size);
