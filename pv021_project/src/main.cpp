@@ -61,7 +61,7 @@ int main() {
 
             // Iterate over all training samples
             for (int i = 0; i < train_data.getRows(); ++i) {
-
+cout << "Iteracion: " << i << endl;
                 // Forward pass
                 Matrix input = Matrix({train_data.data[i]});
                 Matrix label = to_one_hot(train_labels.data[i][0], 10);
