@@ -134,13 +134,13 @@ int main() {
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
-                grad = grad.clip_gradients(-10.0, 10.0);
+                grad = grad.clip_gradients(-25.0, 25.0);
                 grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
-                grad = grad.clip_gradients(-10.0, 10.0);
+                grad = grad.clip_gradients(-25.0, 25.0);
                 grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
-                grad = grad.clip_gradients(-10.0, 10.0);
+                grad = grad.clip_gradients(-25.0, 25.0);
                 grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
-                grad = grad.clip_gradients(-10.0, 10.0);
+                grad = grad.clip_gradients(-25.0, 25.0);
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
