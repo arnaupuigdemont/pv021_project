@@ -36,6 +36,16 @@
             return result;
         }
 
+        Matrix Matrix::operator+(double scalar) const {
+            Matrix result(getRows(), getCols()); 
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    result.data[i][j] = data[i][j] + scalar; 
+                }
+            }
+            return result;
+        }
+
         Matrix Matrix::operator-(const Matrix &other) const {
             int r = getRows(), c = getCols();
             Matrix result(r, c);
@@ -77,21 +87,31 @@
             return result;
         }
 
+        Matrix Matrix::operator/(const Matrix &other) const {
+            Matrix result = *this;
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    result.data[i][j] /= other.data[i][j];
+                }
+            }
+            return result;
+        }
+
         Matrix Matrix::operator/(double scalar) const {
 
-        Matrix result = *this;
+            Matrix result = *this;
 
-        for (auto& row : result.data) {
-            for (auto& elem : row) {
-                elem /= scalar;
+            for (auto& row : result.data) {
+                for (auto& elem : row) {
+                    elem /= scalar;
+                }
             }
+            return result;
         }
-        return result;
-    }
 
         Matrix Matrix::Xavier(int rows, int cols, int input_size) {
             Matrix mat(rows, cols);
-            double limit = sqrt(1.0 / input_size); 
+            double limit = std::sqrt(1.0 / input_size); 
             random_device rd;
             mt19937 gen(rd());
             uniform_real_distribution<> dis(-limit, limit);
@@ -105,7 +125,7 @@
 
         Matrix Matrix::HeIni(int rows, int cols, int input_size) {
             Matrix mat(rows, cols);
-            double limit = sqrt(2.0 / input_size); 
+            double limit = std::sqrt(2.0 / input_size); 
             random_device rd;
             mt19937 gen(rd());
             uniform_real_distribution<> dis(-limit, limit);
@@ -136,6 +156,35 @@
                 }
             }
             return loss;
+        }
+
+        Matrix Matrix::hadamard(const Matrix &other) const {
+
+            Matrix result(getRows(), getCols());
+
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    result.data[i][j] = data[i][j] * other.data[i][j];
+                }
+            }
+
+            return result;
+        }
+
+        Matrix Matrix::sqrt() const {
+
+            Matrix result(getRows(), getCols());
+
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    if (data[i][j] < 0) {
+                        throw std::domain_error("Negative number.");
+                    }
+                    result.data[i][j] = std::sqrt(data[i][j]);
+                }
+            }
+
+            return result;
         }
 
         void Matrix::print() {

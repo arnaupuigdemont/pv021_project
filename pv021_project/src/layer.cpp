@@ -4,8 +4,12 @@
 
         Layer::Layer(int input_size, int output_size) 
             : weights(Matrix::HeIni(input_size, output_size, input_size)), 
-            biases(Matrix(1, output_size, 0.01)),                              
-            cached_input(Matrix(0, 0)) {}
+                biases(Matrix(1, output_size, 0.01)), 
+                m_weights(input_size, output_size),    // Init to zeros
+                v_weights(input_size, output_size),
+                m_biases(1, output_size),
+                v_biases(1, output_size),                             
+                cached_input(Matrix(0, 0)) {}
 
 
         Matrix Layer::forward_relu(const Matrix &input) {
@@ -38,6 +42,38 @@
             weights = weights - grad_weights.scalar_mul(learning_rate);
             biases = biases - grad_biases.scalar_mul(learning_rate);
 
+            return grad_input;
+        }
+
+        Matrix Layer::backward_ADAM(const Matrix &grad_output, double learning_rate) {
+
+             t++; // Increment time step
+
+            // Compute gradients
+            Matrix grad_weights = cached_input.transpose() * grad_output;
+            Matrix grad_biases(1, grad_output.getCols());
+            for (int j = 0; j < grad_output.getCols(); ++j) {
+                for (int i = 0; i < grad_output.getRows(); ++i) {
+                    grad_biases.data[0][j] += grad_output.data[i][j];
+                }
+            }
+
+            // Update weights with Adam
+            m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
+            v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
+            Matrix m_weights_hat = m_weights / (1 - pow(beta1, t));
+            Matrix v_weights_hat = v_weights / (1 - pow(beta2, t));
+            weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
+
+            // Update biases with Adam
+            m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
+            v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
+            Matrix m_biases_hat = m_biases / (1 - pow(beta1, t));
+            Matrix v_biases_hat = v_biases / (1 - pow(beta2, t));
+            biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
+
+            // Compute gradient for input to pass to previous layer
+            Matrix grad_input = grad_output * weights.transpose();
             return grad_input;
         }
 

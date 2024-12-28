@@ -26,8 +26,10 @@ class Matrix {
 
         //OPERATORS
         Matrix operator+(const Matrix &m) const;
+        Matrix operator+(double scalar) const;
         Matrix operator-(const Matrix &m) const;
         Matrix operator*(const Matrix &m) const;
+        Matrix operator/(const Matrix &m) const;
         Matrix operator/(double scalar) const;
         Matrix transpose() const;
         Matrix scalar_mul(double scalar) const;
@@ -37,6 +39,10 @@ class Matrix {
         static Matrix HeIni(int rows, int cols, int input_size);
 
         void normalize();
+
+        Matrix hadamard(const Matrix &m) const;
+
+        Matrix sqrt() const;
 
         void print();
 

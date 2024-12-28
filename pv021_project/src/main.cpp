@@ -89,16 +89,16 @@ int main() {
                 }
 
                 // Pass `grad_output` to the backward function
-                Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
+                Matrix grad = output_layer.backward_ADAM(grad_output, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients to range [-10.0, 10.0]
 
               //  grad = hidden_layer3.backward(grad, LEARNING_RATE);
                // grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
 
-                grad = hidden_layer2.backward(grad, LEARNING_RATE);
+                grad = hidden_layer2.backward_ADAM(grad, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
 
-                grad = input_layer.backward(grad, LEARNING_RATE);
+                grad = input_layer.backward_ADAM(grad, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0); // Clip gradients again
             }
 
