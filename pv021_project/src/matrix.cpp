@@ -141,7 +141,7 @@
             Matrix mat(rows, cols);
             double limit = std::sqrt(2.0 / input_size); 
             random_device rd;
-            mt19937 gen(rd());
+            mt19937 gen(3);
             uniform_real_distribution<> dis(-limit, limit);
 
             for (int i = 0; i < rows; ++i)
