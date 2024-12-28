@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10;
-const double LEARNING_RATE = 0.0005;
+const double LEARNING_RATE = 0.001;
 const int BATCH_SIZE = 128;
 
 Matrix to_one_hot(int label, int num_classes) {
