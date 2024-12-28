@@ -31,7 +31,10 @@
 
         Matrix Layer::forward_softmax(const Matrix &input) {
             cached_input = input;
-            return softmax((input * weights) + biases);
+
+            Matrix res = input * weights;
+            res = res.broadcast_biases(res, biases);
+            return softmax(res);
         }
 
         Matrix Layer::backward(const Matrix &grad_output, double learning_rate) {
