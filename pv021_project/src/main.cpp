@@ -15,8 +15,8 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 19;
-double initial_lr = 0.005; 
+const int EPOCHS = 20;
+double initial_lr = 0.001; 
 double decay_rate = 0.1;
 const int BATCH_SIZE = 128;
 int lambda = 0.0001;
@@ -169,7 +169,7 @@ int main() {
             Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
             Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
             Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
-            predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
+            predictions.data[i] = output_layer.forward_softmax(hidden4).data[0];
         }
 
         auto total_end = std::chrono::high_resolution_clock::now();
