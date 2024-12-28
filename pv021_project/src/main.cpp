@@ -66,22 +66,22 @@ int main() {
             // Iterate over all training samples
             for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
 std::cout << "Iteracion: " << batch_start << endl;
-std::cout << train_data.getRows() << " " << train_data.getCols() << endl;
+
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
                 std::cout << batch_start << " " << batch_end << endl;
                 int batch_size = batch_end - batch_start; // Tamaño del batch actual
                 std::cout << batch_size << endl;
-std::cout << 1 << endl;
+
                 Matrix batch_inputs(batch_size, train_data.getCols());
-                std :: cout << "batch_inputs: " << batch_inputs.getRows() << " " << batch_inputs.getCols() << endl;
                 Matrix batch_labels(batch_size, OUTPUT_SIZE);
-                std :: cout << "batch_labels: " << batch_labels.getRows() << " " << batch_labels.getCols() << endl;
-std::cout << 2 << endl;
+
                 for (int i = 0; i < batch_size; ++i) {
                     int data_index = indices[batch_start + i];
                     batch_inputs.data[i] = train_data.data[data_index];
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
+                                std :: cout << "batch_inputs: " << batch_inputs.getRows() << " " << batch_inputs.getCols() << endl;
+                                std :: cout << "batch_labels: " << batch_labels.getRows() << " " << batch_labels.getCols() << endl;
 std::cout << 3 << endl;
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
