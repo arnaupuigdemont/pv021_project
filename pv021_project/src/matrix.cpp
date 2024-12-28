@@ -109,6 +109,20 @@
             return result;
         }
 
+        Matrix Matrix::broadcast_biases(const Matrix &res, const Matrix &biases) {
+            if (biases.getRows() != 1 || biases.getCols() != res.getCols()) {
+                throw std::invalid_argument("Bias dimensions are incompatible with result matrix");
+            }
+
+            Matrix result = res; // Copia la matriz original
+            for (int i = 0; i < res.getRows(); ++i) {
+                for (int j = 0; j < res.getCols(); ++j) {
+                    result.data[i][j] += biases.data[0][j]; // Suma el sesgo correspondiente
+                }
+            }
+            return result;
+        }
+
         Matrix Matrix::Xavier(int rows, int cols, int input_size) {
             Matrix mat(rows, cols);
             double limit = std::sqrt(1.0 / input_size); 
