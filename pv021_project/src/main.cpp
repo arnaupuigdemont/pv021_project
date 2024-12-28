@@ -68,7 +68,7 @@ int main() {
 std::cout << "Iteracion: " << batch_start << endl;
 std::cout << train_data.getRows() << " " << train_data.getCols() << endl;
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
-                std::cout << batch_end << endl;
+                std::cout << batch_start << " " << batch_end << endl;
                 int batch_size = batch_end - batch_start; // Tamaño del batch actual
                 std::cout << batch_size << endl;
 std::cout << 1 << endl;
