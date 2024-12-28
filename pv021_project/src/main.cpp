@@ -79,6 +79,9 @@ std::cout << 2 << endl;
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
 std::cout << 3 << endl;
+std::cout << "Batch inputs dimensions: " << batch_inputs.getRows() << " x " << batch_inputs.getCols() << std::endl;
+std::cout << "Input layer weights dimensions: " << input_layer.weights.getRows() << " x " << input_layer.weights.getCols() << std::endl;
+std::cout << "Input layer biases dimensions: " << input_layer.biases.getRows() << " x " << input_layer.biases.getCols() << std::endl;
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
               //  Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
