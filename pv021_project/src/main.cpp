@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 5;
-const double LEARNING_RATE = 0.001;
+const double LEARNING_RATE = 0.005;
 const int BATCH_SIZE = 64;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -45,8 +45,8 @@ int main() {
 
     //CREATE LAYERS
 
-        Layer input_layer(784, 256);
-        Layer hidden_layer2(256, 64);
+        Layer input_layer(256, 128);
+        Layer hidden_layer2(128, 64);
        // Layer hidden_layer3(128, 64);
         Layer output_layer(64, 10);
 
