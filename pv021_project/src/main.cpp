@@ -16,13 +16,18 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10;
-const double LEARNING_RATE = 0.001;
+double initial_lr = 0.001;
+double decay_rate = 0.1;
 const int BATCH_SIZE = 128;
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
     one_hot[label] = 1.0; // Set the correct class index to 1.0
     return Matrix({one_hot});
+}
+
+double adjust_learning_rate(double initial_lr, double decay_rate, int epoch) {
+    return initial_lr / (1 + decay_rate * epoch);
 }
 
 int main() {
@@ -55,6 +60,8 @@ int main() {
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
+
+            double learning_rate = adjust_learning_rate(initial_lr, decay_rate, epoch);
 
             double total_loss = 0.0;
             int correct_predictions = 0;
@@ -115,13 +122,13 @@ std::cout << "Iteracion: " << batch_start << endl;
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
-                Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
+                Matrix grad = output_layer.backward(grad_output, learning_rate);
                 grad = grad.clip_gradients(-10.0, 10.0);
-                grad = hidden_layer3.backward(grad, LEARNING_RATE);
+                grad = hidden_layer3.backward(grad, learning_rate);
                 grad = grad.clip_gradients(-10.0, 10.0);
-                grad = hidden_layer2.backward(grad, LEARNING_RATE);
+                grad = hidden_layer2.backward(grad, learning_rate);
                 grad = grad.clip_gradients(-10.0, 10.0);
-                grad = input_layer.backward(grad, LEARNING_RATE);
+                grad = input_layer.backward(grad, learning_rate);
                 grad = grad.clip_gradients(-10.0, 10.0);
             }
 
