@@ -80,16 +80,14 @@ std::cout << "Iteracion: " << batch_start << endl;
                     batch_inputs.data[i] = train_data.data[data_index];
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
-                                std :: cout << "batch_inputs: " << batch_inputs.getRows() << " " << batch_inputs.getCols() << endl;
-                                std :: cout << "batch_labels: " << batch_labels.getRows() << " " << batch_labels.getCols() << endl;
-std::cout << 3 << endl;
+
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
-std::cout << 3 << endl;
+
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
               //  Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-std::cout << 3 << endl;
+
                 Matrix output = output_layer.forward_softmax(hidden2);
-std::cout << 4 << endl;
+
                 // Loss
                 double batch_loss = 0.0;
                 for (int i = 0; i < batch_size; ++i) {
@@ -98,7 +96,7 @@ std::cout << 4 << endl;
                     );
                 }
                 total_loss += batch_loss; // Assuming loss is a single value
-std::cout << 5 << endl;
+
                 // Track accuracy
                 for (int i = 0; i < batch_size; ++i) {
                     int predicted_label = distance(
@@ -111,7 +109,7 @@ std::cout << 5 << endl;
                         ++correct_predictions;
                     }
                 }
-std::cout << 6 << endl;
+
                 // Backward pass
                 Matrix grad_output = output;
                 for (int i = 0; i < batch_size; ++i) {
@@ -120,7 +118,7 @@ std::cout << 6 << endl;
                     }
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
-std::cout << 7 << endl;
+
                 Matrix grad = output_layer.backward(grad_output, LEARNING_RATE);
                 grad = grad.clip_gradients(-10.0, 10.0);
                 //grad = hidden_layer3.backward(grad, LEARNING_RATE);

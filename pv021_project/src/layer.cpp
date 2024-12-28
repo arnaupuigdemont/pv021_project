@@ -19,19 +19,13 @@
 
         Matrix Layer::forward_leaky_relu(const Matrix &input) {
             cached_input = input;
-            cout << "input: " << input.getRows() << " " << input.getCols() << endl;
             Matrix res = input * weights;
-            std::cout << "Result dimensions (res): " << res.getRows() << " x " << res.getCols() << std::endl;
-            std::cout << "Biases dimensions: " << biases.getRows() << " x " << biases.getCols() << std::endl;
-
             res = res.broadcast_biases(res, biases);
-            cout << "res: " << res.getRows() << " " << res.getCols() << endl;
             return leaky_relu(res);
         }
 
         Matrix Layer::forward_softmax(const Matrix &input) {
             cached_input = input;
-
             Matrix res = input * weights;
             res = res.broadcast_biases(res, biases);
             return softmax(res);
