@@ -45,7 +45,7 @@ int main() {
 
     //CREATE LAYERS
 
-        Layer input_layer(256, 128);
+        Layer input_layer(784, 128);
         Layer hidden_layer2(128, 64);
        // Layer hidden_layer3(128, 64);
         Layer output_layer(64, 10);
