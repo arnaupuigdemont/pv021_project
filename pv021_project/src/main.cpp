@@ -15,8 +15,8 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 3;
-const double LEARNING_RATE = 0.002;
+const int EPOCHS = 10;
+const double LEARNING_RATE = 0.001;
 const int BATCH_SIZE = 64;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -68,9 +68,7 @@ int main() {
 std::cout << "Iteracion: " << batch_start << endl;
 
                 int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
-                std::cout << batch_start << " " << batch_end << endl;
-                int batch_size = batch_end - batch_start; // Tamaño del batch actual
-                std::cout << batch_size << endl;
+                int batch_size = batch_end - batch_start; 
 
                 Matrix batch_inputs(batch_size, train_data.getCols());
                 Matrix batch_labels(batch_size, OUTPUT_SIZE);
