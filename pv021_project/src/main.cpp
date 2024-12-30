@@ -16,20 +16,19 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 15; 
-double learning_rate = 0.001; 
-double decay_rate = 0.1; 
+double learning_rate = 0.01; 
+double decay_rate = 0.2; 
 const int BATCH_SIZE = 256; 
 int lambda = 0.0001;
 
-double best_loss = std::numeric_limits<double>::max();
-int patience_counter = 0;
-int max_patience = 5; 
-double min_lr = 0.0001; 
-double max_lr = 0.01; 
-int cycle_length = 10; 
-
 void adjust_learning_rate(int epoch) {
-    
+    // Parámetros del decay
+    double initial_lr = 0.01; // Learning rate inicial
+    double decay_rate = 0.2;  // Tasa de decay aumentada para hacerlo más rápido
+    int total_epochs = 15;    // Total de épocas disponibles
+
+    // Fórmula de decay ajustada: lr = initial_lr * (1 / (1 + decay_rate * (epoch / total_epochs)))
+    learning_rate = initial_lr / (1.0 + decay_rate * (epoch / double(total_epochs)));
 }
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -69,7 +68,7 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
-            adjust_learning_rate(epoch); // Ajustar learning rate cíclicamente
+            adjust_learning_rate(epoch); 
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
@@ -169,15 +168,7 @@ int main() {
                     << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << 
                     " duration: " << epoch_duration.count() << " seconds" << endl;
 
-            // Early Stopping: Monitorear pérdida
-            if (avg_loss < best_loss) {
-                best_loss = avg_loss;
-                patience_counter = 0;
-            } else {
-                patience_counter++;
-            }
         }
-
     //TESTING
 
         Matrix predictions(test_data.getRows(), 10);
