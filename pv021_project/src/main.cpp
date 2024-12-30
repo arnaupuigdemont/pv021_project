@@ -62,6 +62,8 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
+            cout << "learning rate: " << learning_rate << endl;
+
             double total_loss = 0.0;
             int correct_predictions = 0;
 
@@ -128,11 +130,17 @@ int main() {
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
+                //BACKPROPAGATION
+                Matrix grad = output_layer.backward(grad_output, learning_rate);
+                grad = hidden_layer3.backward(grad, learning_rate);
+                grad = hidden_layer2.backward(grad, learning_rate);
+                grad = input_layer.backward(grad, learning_rate);
+
                 //ADAM
-                Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
-                grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
-                grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
-                grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
+                //Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
+                //grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
+                //grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
+                //grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
 
                 //SGD MOMENTUM
                 //Matrix grad = output_layer.backward_SGD_Momentum(grad_output, initial_lr, 0.9);
