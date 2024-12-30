@@ -67,7 +67,7 @@
 cout << 1 << endl;
             // Calcular gradientes estándar usando Leaky ReLU derivada
             Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
-
+cout << 2 << endl;
             // Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_activation;
             Matrix grad_biases(1, grad_activation.getCols());
@@ -76,24 +76,24 @@ cout << 1 << endl;
                     grad_biases.data[0][j] += grad_activation.data[i][j];
                 }
             }
-
+cout << 3 << endl;
             // Regularización L2
             grad_weights = grad_weights + weights.scalar_mul(lambda);
-
+cout << 4 << endl;
             // Actualización de momentos de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
-
+cout << 5 << endl;
             m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
             v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
-
+cout << 6 << endl;
             // Corregir sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
-
+cout << 7 << endl;
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
-
+cout << 8 << endl;
             // Actualización de los pesos y los sesgos
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
