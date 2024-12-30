@@ -54,7 +54,11 @@ class Layer {
 
         Matrix leaky_relu(const Matrix &input);
 
+        Matrix leaky_relu_derivative(const Matrix &input);
+
         Matrix softmax(const Matrix &input);
+
+        Matrix softmax_derivative(const Matrix &input);
 
 };
 #endif

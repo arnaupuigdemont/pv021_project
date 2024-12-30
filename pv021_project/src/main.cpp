@@ -16,20 +16,10 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 15; 
-double learning_rate = 0.01; 
+double learning_rate = 0.001; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 256; 
 int lambda = 0.0001;
-
-void adjust_learning_rate(int epoch) {
-    // Parámetros del decay
-    double initial_lr = 0.01; // Learning rate inicial
-    double decay_rate = 0.2;  // Tasa de decay aumentada para hacerlo más rápido
-    int total_epochs = 15;    // Total de épocas disponibles
-
-    // Fórmula de decay ajustada: lr = initial_lr * (1 / (1 + decay_rate * (epoch / total_epochs)))
-    learning_rate = initial_lr / (1.0 + decay_rate * (epoch / double(total_epochs)));
-}
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
@@ -67,8 +57,7 @@ int main() {
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
-
-            adjust_learning_rate(epoch); 
+ 
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
@@ -105,14 +94,14 @@ int main() {
                         Matrix({output.data[i]}), Matrix({batch_labels.data[i]})
                     );
                 }
-                double l2_penalty = lambda * (
+            /*    double l2_penalty = lambda * (
                     input_layer.compute_l2_penalty() +
                     hidden_layer2.compute_l2_penalty() +
                     hidden_layer3.compute_l2_penalty() +
                     output_layer.compute_l2_penalty()
-                ); 
+                ); */
 
-                batch_loss += l2_penalty;
+                //batch_loss += l2_penalty;
                 total_loss += batch_loss;
 
                 // Track accuracy

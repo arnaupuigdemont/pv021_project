@@ -63,18 +63,22 @@
 
         Matrix Layer::backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda) {
 
-             t++; // Incrementar el paso de tiempo
+            t++; // Incrementar el paso de tiempo
 
-            // Gradientes estándar
-            Matrix grad_weights = cached_input.transpose() * grad_output;
+            // Calcular gradientes estándar usando Leaky ReLU derivada
+            Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
 
-            // Gradiente de los sesgos
-            Matrix grad_biases(1, grad_output.getCols());
-            for (int j = 0; j < grad_output.getCols(); ++j) {
-                for (int i = 0; i < grad_output.getRows(); ++i) {
-                    grad_biases.data[0][j] += grad_output.data[i][j];
+            // Gradientes estándar para pesos y sesgos
+            Matrix grad_weights = cached_input.transpose() * grad_activation;
+            Matrix grad_biases(1, grad_activation.getCols());
+            for (int j = 0; j < grad_activation.getCols(); ++j) {
+                for (int i = 0; i < grad_activation.getRows(); ++i) {
+                    grad_biases.data[0][j] += grad_activation.data[i][j];
                 }
             }
+
+            // Regularización L2
+            grad_weights = grad_weights + weights.scalar_mul(lambda);
 
             // Actualización de momentos de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
@@ -94,8 +98,8 @@
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-            // Gradiente de entrada
-            Matrix grad_input = grad_output * weights.transpose();
+            // Gradiente de entrada para la siguiente capa
+            Matrix grad_input = grad_activation * weights.transpose();
             return grad_input;
         }
 
@@ -140,6 +144,7 @@
             return result;
         }
 
+
         Matrix Layer::softmax(const Matrix &input) {
             Matrix result(input.getRows(), input.getCols());
             for (int i = 0; i < input.getRows(); ++i) {
@@ -162,10 +167,28 @@
             return result;
         }
 
+        Matrix Layer::softmax_derivative(const Matrix &input) {
+            Matrix result(input.getRows(), input.getCols());
+            for (int i = 0; i < input.getRows(); ++i) {
+                for (int j = 0; j < input.getCols(); ++j) {
+                    result.data[i][j] = input.data[i][j] * (1 - input.data[i][j]);
+                }
+            }
+            return result;
+        }
+
         Matrix Layer::leaky_relu(const Matrix &input) {
             Matrix result(input.getRows(), input.getCols());
             for (int i = 0; i < input.getRows(); ++i)
                 for (int j = 0; j < input.getCols(); ++j)
                     result.data[i][j] = (input.data[i][j] > 0) ? input.data[i][j] : 0.01 * input.data[i][j];
+            return result;
+        }
+
+        Matrix Layer::leaky_relu_derivative(const Matrix &input) {
+            Matrix result(input.getRows(), input.getCols());
+            for (int i = 0; i < input.getRows(); ++i)
+                for (int j = 0; j < input.getCols(); ++j)
+                    result.data[i][j] = (input.data[i][j] > 0) ? 1 : 0.01;
             return result;
         }
