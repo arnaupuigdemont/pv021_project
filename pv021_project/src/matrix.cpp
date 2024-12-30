@@ -69,6 +69,16 @@
             return result;
         }
 
+        Matrix Matrix::operator*(double scalar) const {
+            Matrix result(getRows(), getCols());
+            for (int i = 0; i < getRows(); ++i) {
+                for (int j = 0; j < getCols(); ++j) {
+                    result.data[i][j] = data[i][j] * scalar;
+                }
+            }
+            return result;
+        }
+
         Matrix Matrix::transpose() const {
             int r = getRows(), c = getCols();
             Matrix result(c, r);

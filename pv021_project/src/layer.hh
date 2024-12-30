@@ -18,6 +18,9 @@ class Layer {
         Matrix v_weights;  
         Matrix v_biases;
 
+        Matrix momentum_weights;
+        Matrix momentum_biases;
+
         double beta1 = 0.9;
         double beta2 = 0.999;
         double epsilon = 1e-8;
@@ -36,6 +39,8 @@ class Layer {
         Matrix backward(const Matrix &grad_output, double learning_rate);
 
         Matrix backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda);
+
+        Matrix backward_SGD_Momentum(const Matrix &grad_output, double learning_rate, double momentum);
 
         Matrix getWeights();
 
