@@ -3,7 +3,7 @@
     //PUBLIC
 
         Layer::Layer(int input_size, int output_size) 
-            : weights(Matrix::Xavier(input_size, output_size, input_size)), 
+            : weights(Matrix::HeIni(input_size, output_size, input_size)), 
                 biases(Matrix(1, output_size, 0.01)), 
                 m_weights(input_size, output_size),    
                 v_weights(input_size, output_size),
@@ -67,7 +67,7 @@
 
             // Gradientes estándar
             Matrix grad_weights = cached_input.transpose() * grad_output;
-            
+
             // Gradiente de los sesgos
             Matrix grad_biases(1, grad_output.getCols());
             for (int j = 0; j < grad_output.getCols(); ++j) {
