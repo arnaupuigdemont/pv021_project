@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 30; 
-double learning_rate = 0.0001; 
+double learning_rate = 0.001; 
 double decay_rate = 0.1; 
 const int BATCH_SIZE = 128; 
 int lambda = 0.0001;
@@ -24,17 +24,17 @@ int lambda = 0.0001;
 double best_loss = std::numeric_limits<double>::max();
 int patience_counter = 0;
 int max_patience = 5; 
-double base_lr = 0.0001; 
+double min_lr = 0.0001; 
 double max_lr = 0.01; 
 int cycle_length = 10; 
 
 void adjust_learning_rate(int epoch) {
     int cycle_position = epoch % cycle_length;
-    double lr_range = max_lr - base_lr;
+    double lr_range = max_lr - learning_rate;
 
     // Learning rate aumenta y disminuye en un patrón triangular
     if (cycle_position <= cycle_length / 2) {
-        learning_rate = base_lr + (lr_range * (double(cycle_position) / (cycle_length / 2)));
+        learning_rate = learning_rate + (lr_range * (double(cycle_position) / (cycle_length / 2)));
     } else {
         learning_rate = max_lr - (lr_range * (double(cycle_position - cycle_length / 2) / (cycle_length / 2)));
     }
