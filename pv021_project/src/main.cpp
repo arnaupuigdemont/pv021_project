@@ -104,7 +104,7 @@ int main() {
                     output_layer.compute_l2_penalty()
                 ); 
 
-               // batch_loss += l2_penalty;
+                batch_loss += l2_penalty;
                 total_loss += batch_loss;
 
                 // Track accuracy
