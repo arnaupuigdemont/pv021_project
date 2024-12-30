@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
-double initial_lr = 0.001; 
+double learning_rate = 0.0001; 
 double decay_rate = 0.1; 
 const int BATCH_SIZE = 128; 
 int lambda = 0.0005;
@@ -47,6 +47,7 @@ int main() {
     //NORMALIZE DATA MIN MAX
 
         train_data.normalize();
+        test_data.normalize();
 
     //CREATE LAYERS
 
@@ -60,8 +61,6 @@ int main() {
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
-
-            double learning_rate = initial_lr;
 
             double total_loss = 0.0;
             int correct_predictions = 0;
@@ -129,9 +128,7 @@ int main() {
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
-
                 //ADAM
-
                 Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
                 grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
                 grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);

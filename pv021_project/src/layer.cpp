@@ -67,10 +67,7 @@
 
             // Gradientes estándar
             Matrix grad_weights = cached_input.transpose() * grad_output;
-
-            // Añadir regularización L2 al gradiente de los pesos
-            //grad_weights = grad_weights + weights.scalar_mul(lambda);
-
+            
             // Gradiente de los sesgos
             Matrix grad_biases(1, grad_output.getCols());
             for (int j = 0; j < grad_output.getCols(); ++j) {
