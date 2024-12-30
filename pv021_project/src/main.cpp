@@ -15,7 +15,7 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 15; 
+const int EPOCHS = 25; 
 double initial_lr = 0.001; 
 double decay_rate = 0.1; 
 const int BATCH_SIZE = 512; 
@@ -89,7 +89,7 @@ int main() {
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 //hidden1 = hidden1.apply_dropout(0.7);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-                //hidden2 = hidden2.apply_dropout(0.85);
+                hidden2 = hidden2.apply_dropout(0.8);
                 //Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
                 //hidden3 = hidden3.apply_dropout(0.85);
                // Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
@@ -111,7 +111,7 @@ int main() {
                     output_layer.compute_l2_penalty()
                 );
 
-                batch_loss += l2_penalty;
+               // batch_loss += l2_penalty;
                 total_loss += batch_loss;
 
                 // Track accuracy
