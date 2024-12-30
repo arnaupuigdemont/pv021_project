@@ -21,14 +21,41 @@ double decay_rate = 0.1;
 const int BATCH_SIZE = 100; 
 int lambda = 0.0005;
 
+double best_loss = std::numeric_limits<double>::max();
+int patience_counter = 0;
+int max_patience = 5; // Número de épocas sin mejora antes de reiniciar
+double base_lr = 0.001; // Learning rate inicial
+double max_lr = 0.01; // Learning rate máximo para ciclos
+int cycle_length = 10; // Duración del ciclo en épocas
+
+void reset_learning_rate() {
+    learning_rate = max_lr; // Restablece al learning rate máximo
+    std::cout << "Learning rate reiniciado a: " << learning_rate << std::endl;
+}
+
+void adjust_learning_rate(int epoch) {
+    int cycle = epoch % cycle_length; // Ciclo actual
+    double lr_range = max_lr - base_lr;
+    
+    // Learning rate triangular
+    double new_lr = base_lr + lr_range * (1.0 - abs(cycle_length - 2 * cycle) / cycle_length);
+    learning_rate = new_lr;
+
+    std::cout << "Learning rate ajustado a: " << learning_rate << std::endl;
+}
+
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
     one_hot[label] = 1.0; // Set the correct class index to 1.0
     return Matrix({one_hot});
 }
 
-double adjust_learning_rate(double initial_lr, double decay_rate, int epoch) {
-    return initial_lr / (1 + decay_rate * epoch);
+void adjust_learning_rate(int epoch, double &learning_rate) {
+    int cycle = epoch % cycle_length; // Ciclo actual
+    double lr_range = max_lr - base_lr;
+
+    // Learning rate triangular
+    learning_rate = base_lr + lr_range * (1.0 - abs(cycle_length - 2 * cycle) / cycle_length);
 }
 
 int main() {
@@ -62,7 +89,8 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
-            cout << "learning rate: " << learning_rate << endl;
+            adjust_learning_rate(epoch, learning_rate); // Ajustar learning rate cíclicamente
+            std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
             int correct_predictions = 0;
@@ -153,11 +181,28 @@ int main() {
             auto epoch_end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
 
+            double avg_loss = total_loss / train_data.getRows();
+
             // Log epoch stats
             std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
                     << " - Loss: " << total_loss / train_data.getRows()
                     << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << 
                     " duration: " << epoch_duration.count() << " seconds" << endl;
+
+            // Early Stopping: Monitorear pérdida
+            if (avg_loss < best_loss) {
+                best_loss = avg_loss;
+                patience_counter = 0;
+            } else {
+                patience_counter++;
+            }
+
+            // Si no hay mejora, reiniciar learning rate
+            if (patience_counter >= max_patience) {
+                std::cout << "Reiniciando entrenamiento en la época " << epoch + 1 << std::endl;
+                reset_learning_rate(); // Reiniciar learning rate
+                patience_counter = 0; // Reiniciar paciencia
+            }
         }
 
     //TESTING
