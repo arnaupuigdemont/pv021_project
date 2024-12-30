@@ -15,10 +15,10 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 25; 
-double initial_lr = 0.005; 
+const int EPOCHS = 15; 
+double initial_lr = 0.001; 
 double decay_rate = 0.1; 
-const int BATCH_SIZE = 128; 
+const int BATCH_SIZE = 512; 
 int lambda = 0.0005;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -50,11 +50,11 @@ int main() {
 
     //CREATE LAYERS
 
-        Layer input_layer(784, 256);
-        Layer hidden_layer2(256, 64);
+        Layer input_layer(784, 128);
+        Layer hidden_layer2(128, 32);
         //Layer hidden_layer3(128, 32);
         //Layer hidden_layer4(64, 32);
-        Layer output_layer(64, 10);
+        Layer output_layer(32, 10);
 
     //TRAINING 
 
