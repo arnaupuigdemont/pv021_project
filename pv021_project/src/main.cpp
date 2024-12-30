@@ -19,7 +19,7 @@ const int EPOCHS = 35;
 double initial_lr = 0.0008; 
 double decay_rate = 0.05; 
 const int BATCH_SIZE = 128; 
-int lambda = 0.0005; 
+int lambda = 0.001; 
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
@@ -50,8 +50,8 @@ int main() {
 
     //CREATE LAYERS
 
-        Layer input_layer(784, 128);
-        Layer hidden_layer2(128, 64);
+        Layer input_layer(784, 256);
+        Layer hidden_layer2(256, 64);
         Layer hidden_layer3(64, 32);
         //Layer hidden_layer4(64, 32);
         Layer output_layer(32, 10);
@@ -91,7 +91,7 @@ int main() {
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 hidden2 = hidden2.apply_dropout(0.85);
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-                hidden3 = hidden3.apply_dropout(0.75);
+                hidden3 = hidden3.apply_dropout(0.85);
                // Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
                 //hidden4 = hidden4.apply_dropout(0.7);
                 Matrix output = output_layer.forward_softmax(hidden3);
