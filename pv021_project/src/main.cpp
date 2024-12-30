@@ -29,15 +29,7 @@ double max_lr = 0.01;
 int cycle_length = 10; 
 
 void adjust_learning_rate(int epoch) {
-    int cycle_position = epoch % cycle_length;
-    double lr_range = max_lr - learning_rate;
-
-    // Learning rate aumenta y disminuye en un patrón triangular
-    if (cycle_position <= cycle_length / 2) {
-        learning_rate = learning_rate + (lr_range * (double(cycle_position) / (cycle_length / 2)));
-    } else {
-        learning_rate = max_lr - (lr_range * (double(cycle_position - cycle_length / 2) / (cycle_length / 2)));
-    }
+    
 }
 
 Matrix to_one_hot(int label, int num_classes) {
