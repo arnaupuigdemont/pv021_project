@@ -16,10 +16,10 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 18; 
-double initial_lr = 0.0008; 
-double decay_rate = 0.05; 
+double initial_lr = 0.01; 
+double decay_rate = 0.1; 
 const int BATCH_SIZE = 128; 
-int lambda = 0.001; 
+int lambda = 0.0001; 
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
@@ -89,9 +89,9 @@ int main() {
                 Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
                 //hidden1 = hidden1.apply_dropout(0.7);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-                hidden2 = hidden2.apply_dropout(0.85);
+                //hidden2 = hidden2.apply_dropout(0.85);
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
-                hidden3 = hidden3.apply_dropout(0.85);
+                //hidden3 = hidden3.apply_dropout(0.85);
                // Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
                 //hidden4 = hidden4.apply_dropout(0.7);
                 Matrix output = output_layer.forward_softmax(hidden3);
