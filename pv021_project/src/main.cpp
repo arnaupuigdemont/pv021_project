@@ -51,9 +51,9 @@ int main() {
 
     //CREATE LAYERS
 
-        Layer input_layer(784, 256);
-        Layer hidden_layer2(256, 128);
-        Layer hidden_layer3(128, 64);
+        Layer input_layer(784, 150);
+        Layer hidden_layer2(150, 100);
+        Layer hidden_layer3(100, 64);
         Layer output_layer(64, 10);
 
     //TRAINING 
