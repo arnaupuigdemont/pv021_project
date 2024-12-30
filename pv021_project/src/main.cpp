@@ -47,7 +47,6 @@ int main() {
     //NORMALIZE DATA MIN MAX
 
         train_data.normalize();
-        test_data.normalize();
 
     //CREATE LAYERS
 
@@ -167,7 +166,7 @@ int main() {
             Matrix input = Matrix({test_data.data[i]});
             Matrix hidden1 = input_layer.forward_leaky_relu(input);
             Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-            Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden1);
+            Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
           //  Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
             predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
