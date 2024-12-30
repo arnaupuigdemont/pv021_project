@@ -64,7 +64,7 @@
         Matrix Layer::backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda) {
 
             t++; // Incrementar el paso de tiempo
-
+cout << 1 << endl;
             // Calcular gradientes estándar usando Leaky ReLU derivada
             Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
 
