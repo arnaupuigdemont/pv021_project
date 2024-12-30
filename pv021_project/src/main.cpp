@@ -15,10 +15,10 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 15; 
+const int EPOCHS = 42; 
 double learning_rate = 0.0001; 
 double decay_rate = 0.1; 
-const int BATCH_SIZE = 128; 
+const int BATCH_SIZE = 100; 
 int lambda = 0.0005;
 
 Matrix to_one_hot(int label, int num_classes) {
