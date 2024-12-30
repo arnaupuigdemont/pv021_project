@@ -92,7 +92,7 @@ int main() {
                 //Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                // hidden2 = hidden2.apply_dropout(0.8);
                 Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden1);
-               // hidden3 = hidden3.apply_dropout(0.7);
+                hidden3 = hidden3.apply_dropout(0.7);
                // Matrix hidden4 = hidden_layer4.forward_leaky_relu(hidden3);
                 //hidden4 = hidden4.apply_dropout(0.7);
                 Matrix output = output_layer.forward_softmax(hidden3);
