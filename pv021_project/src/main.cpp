@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 42; 
-double learning_rate = 0.01; 
+double learning_rate = 0.0001; 
 double decay_rate = 0.1; 
 const int BATCH_SIZE = 100; 
 int lambda = 0.0005;
@@ -24,8 +24,8 @@ int lambda = 0.0005;
 double best_loss = std::numeric_limits<double>::max();
 int patience_counter = 0;
 int max_patience = 5; // Número de épocas sin mejora antes de reiniciar
-double base_lr = 0.01; // Learning rate inicial
-double max_lr = 0.05; // Learning rate máximo para ciclos
+double base_lr = 0.0001; // Learning rate inicial
+double max_lr = 0.01; // Learning rate máximo para ciclos
 int cycle_length = 10; // Duración del ciclo en épocas
 
 void reset_learning_rate() {
