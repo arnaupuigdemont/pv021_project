@@ -54,7 +54,7 @@ int main() {
         Layer hidden_layer2(256, 64);
         //Layer hidden_layer3(128, 32);
         //Layer hidden_layer4(64, 32);
-        Layer output_layer(32, 10);
+        Layer output_layer(64, 10);
 
     //TRAINING 
 
