@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 42; 
-double learning_rate = 0.001; 
+double learning_rate = 0.01; 
 double decay_rate = 0.1; 
 const int BATCH_SIZE = 100; 
 int lambda = 0.0005;
@@ -24,8 +24,8 @@ int lambda = 0.0005;
 double best_loss = std::numeric_limits<double>::max();
 int patience_counter = 0;
 int max_patience = 5; // Número de épocas sin mejora antes de reiniciar
-double base_lr = 0.001; // Learning rate inicial
-double max_lr = 0.01; // Learning rate máximo para ciclos
+double base_lr = 0.01; // Learning rate inicial
+double max_lr = 0.05; // Learning rate máximo para ciclos
 int cycle_length = 10; // Duración del ciclo en épocas
 
 void reset_learning_rate() {
@@ -34,28 +34,21 @@ void reset_learning_rate() {
 }
 
 void adjust_learning_rate(int epoch) {
-    int cycle = epoch % cycle_length; // Ciclo actual
+    int cycle_position = epoch % cycle_length;
     double lr_range = max_lr - base_lr;
-    
-    // Learning rate triangular
-    double new_lr = base_lr + lr_range * (1.0 - abs(cycle_length - 2 * cycle) / cycle_length);
-    learning_rate = new_lr;
 
-    std::cout << "Learning rate ajustado a: " << learning_rate << std::endl;
+    // Learning rate aumenta y disminuye en un patrón triangular
+    if (cycle_position <= cycle_length / 2) {
+        learning_rate = base_lr + (lr_range * (double(cycle_position) / (cycle_length / 2)));
+    } else {
+        learning_rate = max_lr - (lr_range * (double(cycle_position - cycle_length / 2) / (cycle_length / 2)));
+    }
 }
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
     one_hot[label] = 1.0; // Set the correct class index to 1.0
     return Matrix({one_hot});
-}
-
-void adjust_learning_rate(int epoch, double &learning_rate) {
-    int cycle = epoch % cycle_length; // Ciclo actual
-    double lr_range = max_lr - base_lr;
-
-    // Learning rate triangular
-    learning_rate = base_lr + lr_range * (1.0 - abs(cycle_length - 2 * cycle) / cycle_length);
 }
 
 int main() {
@@ -89,7 +82,7 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
 
-            adjust_learning_rate(epoch, learning_rate); // Ajustar learning rate cíclicamente
+            adjust_learning_rate(epoch); // Ajustar learning rate cíclicamente
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
@@ -159,16 +152,16 @@ int main() {
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 //BACKPROPAGATION
-                Matrix grad = output_layer.backward(grad_output, learning_rate);
-                grad = hidden_layer3.backward(grad, learning_rate);
-                grad = hidden_layer2.backward(grad, learning_rate);
-                grad = input_layer.backward(grad, learning_rate);
+                //Matrix grad = output_layer.backward(grad_output, learning_rate);
+                //grad = hidden_layer3.backward(grad, learning_rate);
+                //grad = hidden_layer2.backward(grad, learning_rate);
+                //grad = input_layer.backward(grad, learning_rate);
 
                 //ADAM
-                //Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
-                //grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
-                //grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
-                //grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
+                Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
+                grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
+                grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
+                grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
 
                 //SGD MOMENTUM
                 //Matrix grad = output_layer.backward_SGD_Momentum(grad_output, initial_lr, 0.9);
