@@ -97,13 +97,12 @@ int main() {
                         Matrix({output.data[i]}), Matrix({batch_labels.data[i]})
                     );
                 }
-           /*     double l2_penalty = lambda * (
+                double l2_penalty = lambda * (
                     input_layer.compute_l2_penalty() +
                     hidden_layer2.compute_l2_penalty() +
                     hidden_layer3.compute_l2_penalty() +
-                    hidden_layer4.compute_l2_penalty() +
                     output_layer.compute_l2_penalty()
-                ); */
+                ); 
 
                // batch_loss += l2_penalty;
                 total_loss += batch_loss;
