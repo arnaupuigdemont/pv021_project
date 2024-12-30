@@ -18,7 +18,7 @@ const int OUTPUT_SIZE = 10;
 const int EPOCHS = 18; 
 double learning_rate = 0.001; 
 double decay_rate = 0.1; 
-const int BATCH_SIZE = 128; 
+const int BATCH_SIZE = 256; 
 int lambda = 0.0001;
 
 double best_loss = std::numeric_limits<double>::max();
