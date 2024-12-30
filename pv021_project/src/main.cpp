@@ -15,7 +15,7 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 18; 
+const int EPOCHS = 15; 
 double learning_rate = 0.001; 
 double decay_rate = 0.1; 
 const int BATCH_SIZE = 256; 
@@ -58,10 +58,10 @@ int main() {
 
     //CREATE LAYERS
 
-        Layer input_layer(784, 256);
-        Layer hidden_layer2(256, 128);
-        Layer hidden_layer3(128, 64);
-        Layer output_layer(64, 10);
+        Layer input_layer(784, 392);
+        Layer hidden_layer2(392, 196);
+        Layer hidden_layer3(196, 49);
+        Layer output_layer(49, 10);
 
     //TRAINING 
 
