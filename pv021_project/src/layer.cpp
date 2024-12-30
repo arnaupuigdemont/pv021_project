@@ -5,7 +5,7 @@
         Layer::Layer(int input_size, int output_size) 
             : weights(Matrix::Xavier(input_size, output_size, input_size)), 
                 biases(Matrix(1, output_size, 0.01)), 
-                m_weights(input_size, output_size),    // Init to zeros
+                m_weights(input_size, output_size),    
                 v_weights(input_size, output_size),
                 m_biases(1, output_size),
                 v_biases(1, output_size),                             
