@@ -97,9 +97,10 @@ cout << 8 << endl;
             // Actualización de los pesos y los sesgos
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
-
+cout << 9 << endl;
             // Gradiente de entrada para la siguiente capa
             Matrix grad_input = grad_activation * weights.transpose();
+cout << 10 << endl;
             return grad_input;
         }
 
