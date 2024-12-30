@@ -15,23 +15,18 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 42; 
+const int EPOCHS = 30; 
 double learning_rate = 0.0001; 
 double decay_rate = 0.1; 
-const int BATCH_SIZE = 100; 
-int lambda = 0.0005;
+const int BATCH_SIZE = 128; 
+int lambda = 0.0001;
 
 double best_loss = std::numeric_limits<double>::max();
 int patience_counter = 0;
-int max_patience = 5; // Número de épocas sin mejora antes de reiniciar
-double base_lr = 0.0001; // Learning rate inicial
-double max_lr = 0.01; // Learning rate máximo para ciclos
-int cycle_length = 10; // Duración del ciclo en épocas
-
-void reset_learning_rate() {
-    learning_rate = max_lr; // Restablece al learning rate máximo
-    std::cout << "Learning rate reiniciado a: " << learning_rate << std::endl;
-}
+int max_patience = 5; 
+double base_lr = 0.0001; 
+double max_lr = 0.01; 
+int cycle_length = 10; 
 
 void adjust_learning_rate(int epoch) {
     int cycle_position = epoch % cycle_length;
@@ -71,9 +66,9 @@ int main() {
 
     //CREATE LAYERS
 
-        Layer input_layer(784, 150);
-        Layer hidden_layer2(150, 100);
-        Layer hidden_layer3(100, 64);
+        Layer input_layer(784, 256);
+        Layer hidden_layer2(256, 128);
+        Layer hidden_layer3(128, 64);
         Layer output_layer(64, 10);
 
     //TRAINING 
@@ -188,13 +183,6 @@ int main() {
                 patience_counter = 0;
             } else {
                 patience_counter++;
-            }
-
-            // Si no hay mejora, reiniciar learning rate
-            if (patience_counter >= max_patience) {
-                std::cout << "Reiniciando entrenamiento en la época " << epoch + 1 << std::endl;
-                reset_learning_rate(); // Reiniciar learning rate
-                patience_counter = 0; // Reiniciar paciencia
             }
         }
 
