@@ -15,7 +15,7 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 28; 
+const int EPOCHS = 35; 
 double initial_lr = 0.0008; 
 double decay_rate = 0.05; 
 const int BATCH_SIZE = 128; 
