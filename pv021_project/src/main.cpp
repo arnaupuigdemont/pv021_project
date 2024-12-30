@@ -147,14 +147,11 @@ int main() {
                 //grad = grad.clip_gradients(-25.0, 25.0);
                 //grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
                 //grad = grad.clip_gradients(-25.0, 25.0);
-cout << 1 << endl;
+
                 //SGD MOMENTUM
                 Matrix grad = output_layer.backward_SGD_Momentum(grad_output, learning_rate, 0.9);
-cout << 2 << endl;
                 grad = hidden_layer3.backward_SGD_Momentum(grad, learning_rate, 0.9);
-cout << 3 << endl;
                 grad = hidden_layer2.backward_SGD_Momentum(grad, learning_rate, 0.9);
-cout << 4 << endl;
                 grad = input_layer.backward_SGD_Momentum(grad, learning_rate, 0.9);
 
             }
