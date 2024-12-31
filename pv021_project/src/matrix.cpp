@@ -11,8 +11,7 @@
 
         Matrix Matrix::Random(int rows, int cols) {
             Matrix mat(rows, cols);
-            random_device rd;
-            mt19937 gen(rd());
+            mt19937 gen(0);
             uniform_real_distribution<> dis(-0.1, 0.1);
 
             for (int i = 0; i < rows; ++i)
