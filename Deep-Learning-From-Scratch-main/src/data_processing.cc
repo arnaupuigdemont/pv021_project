@@ -2,10 +2,10 @@
 
 //___________CONSTRUCTORS__________
 Data_processing::Data_processing() {
-    this->test_labels_path = "../data/fashion_mnist_test_labels.csv";
-    this->test_vectors_path = "../data/fashion_mnist_test_vectors.csv";
-    this->train_labels_path = "../data/fashion_mnist_train_labels.csv";
-    this->train_vectors_path = "../data/fashion_mnist_train_vectors.csv";
+    this->test_labels_path = "../pv021_project/data/fashion_mnist_test_labels.csv";
+    this->test_vectors_path = "../pv021_project/data/fashion_mnist_test_vectors.csv";
+    this->train_labels_path = "../pv021_project/data/fashion_mnist_train_labels.csv";
+    this->train_vectors_path = "../pv021_project/data/fashion_mnist_train_vectors.csv";
     this->output_path = "../actualPredictions";
 }
 
