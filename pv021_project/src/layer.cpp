@@ -145,6 +145,9 @@
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             std::cout << "Updated weights and biases" << std::endl;
 
+std::cout << "grad_output: (" << grad_output.getRows() << ", " << grad_output.getCols() << ")" << std::endl;
+std::cout << "weights.transpose: (" << weights.transpose().getRows() << ", " << weights.transpose().getCols() << ")" << std::endl;
+
             // Gradiente para la siguiente capa
             Matrix grad_input = grad_activation * weights.transpose();
             std::cout << "Computed grad_input" << std::endl;
