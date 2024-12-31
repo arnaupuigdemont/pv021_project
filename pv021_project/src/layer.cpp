@@ -108,12 +108,14 @@
             std::cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << std::endl;
 
             // Derivada de Leaky ReLU
+            cout << "cached_input rows: " << cached_input.getRows() << ", cols: " << cached_input.getCols() << endl;
             Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
-            std::cout << "Computed grad_activation" << std::endl;
+            cout << "grad_activation rows: " << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << endl;
 
             // Gradientes estándar para pesos y sesgos
+            cout << "cached_input rows: " << cached_input.getRows() << ", cols: " << cached_input.getCols() << endl;
             Matrix grad_weights = cached_input.transpose() * grad_activation;
-            std::cout << "Computed grad_weights" << std::endl;
+            cout << "grad_weights rows: " << grad_weights.getRows() << ", cols: " << grad_weights.getCols() << endl;
 
             Matrix grad_biases(1, grad_activation.getCols());
             for (int j = 0; j < grad_activation.getCols(); ++j) {
