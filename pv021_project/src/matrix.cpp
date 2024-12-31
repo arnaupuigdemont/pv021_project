@@ -186,14 +186,18 @@
         }
 
         double Matrix::cross_entropy_loss(const Matrix &output, const Matrix &label) {
+            double epsilon = 1e-9; // Evitar log(0)
             double loss = 0.0;
-            for (int i = 0; i < output.getCols(); ++i) {
-                if (label.data[0][i] == 1) { // Only calculate for the true class
-                    loss = -log(output.data[0][i] + 1e-9);
-                    break; // Stop after finding the true class
+
+            for (int i = 0; i < output.getRows(); ++i) { // Iterar por cada fila (ejemplo)
+                for (int j = 0; j < output.getCols(); ++j) {
+                    if (label.data[i][j] > 0) { // Considerar solo la clase verdadera
+                        loss -= label.data[i][j] * log(output.data[i][j] + epsilon);
+                    }
                 }
             }
-            return loss;
+
+            return loss / output.getRows(); // Retornar la pérdida promedio por ejemplo
         }
 
         Matrix Matrix::hadamard(const Matrix &other) const {

@@ -91,7 +91,7 @@ int main() {
                         Matrix({output.data[i]}), Matrix({batch_labels.data[i]})
                     );
                 }
-                total_loss += batch_loss;
+                total_loss += batch_loss / batch_size;
 
                 // Track accuracy
                 for (int i = 0; i < batch_size; ++i) {
@@ -117,21 +117,9 @@ int main() {
 
                 //ADAM
                 Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
-                cout << "grad output: ";
-                grad.print(); 
-                cout << endl;
                 grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
-                cout << "grad hidden 3: ";
-                grad.print(); 
-                cout << endl;
                 grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
-                cout << "grad hidden 2: ";
-                grad.print(); 
-                cout << endl;
                 grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
-                cout << "grad input: ";
-                grad.print(); 
-                cout << endl;
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
