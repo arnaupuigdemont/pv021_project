@@ -16,7 +16,9 @@
 
         Matrix Layer::forward_relu(const Matrix &input) {
             cached_input = input;
-            return relu((input * weights) + biases);
+            Matrix res = input * weights;
+            res = res.broadcast_biases(res, biases);
+            return relu(res);
         }
 
         Matrix Layer::forward_leaky_relu(const Matrix &input) {
