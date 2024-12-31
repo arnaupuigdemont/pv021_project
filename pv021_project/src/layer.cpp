@@ -103,37 +103,6 @@
             return grad_input;
         }
 
-        Matrix Layer::backward_SGD_Momentum(const Matrix &grad_output, double learning_rate, double momentum) {
-            // Gradientes para pesos y biases
-            Matrix grad_weights = cached_input.transpose() * grad_output;
-            Matrix grad_biases(1, grad_output.getCols());
-
-            for (int j = 0; j < grad_output.getCols(); ++j) {
-                for (int i = 0; i < grad_output.getRows(); ++i) {
-                    grad_biases.data[0][j] += grad_output.data[i][j];
-                }
-            }
-
-            // Actualización con momentum
-            momentum_weights = (momentum_weights * momentum) - (grad_weights * learning_rate);
-            momentum_biases = (momentum_biases * momentum) - (grad_biases * learning_rate);
-
-            // Actualizar pesos y biases
-            weights = weights + momentum_weights;
-            biases = biases + momentum_biases;
-
-            // Propagar el gradiente hacia atrás
-            return grad_output * weights.transpose();
-        }
-
-        Matrix Layer::getWeights() {
-            return weights;
-        }
-
-        Matrix Layer::getBiases() {
-            return biases;
-        }
-
     //PRIVATE
 
         Matrix Layer::relu(const Matrix &input) {

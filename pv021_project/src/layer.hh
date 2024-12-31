@@ -40,8 +40,6 @@ class Layer {
 
         Matrix backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda);
 
-        Matrix backward_SGD_Momentum(const Matrix &grad_output, double learning_rate, double momentum);
-
         Matrix getWeights();
 
         Matrix getBiases();
