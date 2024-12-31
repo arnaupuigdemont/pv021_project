@@ -129,10 +129,10 @@ int main() {
 
                 //ADAM
                 Matrix grad = output_layer.backward_ADAM_output(grad_output, batch_labels, learning_rate, lambda);
-                
-                grad = hidden_layer2.backward_ADAM_hidden(grad, learning_rate, lambda);
+
+                grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
 cout << "grad rows: " << grad.getRows() << ", cols: " << grad.getCols() << endl;
-                grad = input_layer.backward_ADAM_hidden(grad, learning_rate, lambda);
+                grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
 cout << "grad rows: " << grad.getRows() << ", cols: " << grad.getCols() << endl;
             }
 

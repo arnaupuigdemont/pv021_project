@@ -128,28 +128,25 @@
                 }
             }
 
+            // Añadir regularización L2
+            grad_weights = grad_weights + weights.scalar_mul(lambda);
+
             // Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
-            m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
-            v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
 
-            // Corrección del sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
+
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
 
-            // Actualización de parámetros
+            // Actualización de los pesos y los sesgos
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-            // Debug después de actualizar pesos y sesgos
-            std::cout << "Updated weights and biases" << std::endl;
-
-            // Gradiente para la siguiente capa
-            Matrix grad_input = grad_activation * weights.transpose();
-            std::cout << "grad_input rows: " << grad_input.getRows() << ", cols: " << grad_input.getCols() << std::endl;
+            // Gradiente de entrada
+            Matrix grad_input = grad_output * weights.transpose();
 
             return grad_input;
         }
