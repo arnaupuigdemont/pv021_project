@@ -104,16 +104,12 @@
         }
 
         Matrix Layer::backward_ADAM_hidden(const Matrix &grad_output, double learning_rate, double lambda) {
-        
-            std::cout << "Entering backward_ADAM_hidden" << std::endl;
 
             // Derivada de Leaky ReLU
             Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
-            std::cout << "Computed grad_activation" << std::endl;
 
             // Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_activation;
-            std::cout << "Computed grad_weights" << std::endl;
 
             Matrix grad_biases(1, grad_activation.getCols());
             for (int j = 0; j < grad_activation.getCols(); ++j) {
@@ -121,35 +117,26 @@
                     grad_biases.data[0][j] += grad_activation.data[i][j];
                 }
             }
-            std::cout << "Computed grad_biases" << std::endl;
 
             // Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
-            std::cout << "Updated m_weights and v_weights" << std::endl;
 
             m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
             v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
-            std::cout << "Updated m_biases and v_biases" << std::endl;
 
             // Corrección del sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
-            std::cout << "Applied bias correction" << std::endl;
 
             // Actualización de parámetros
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
-            std::cout << "Updated weights and biases" << std::endl;
-
-std::cout << "grad_output: (" << grad_output.getRows() << ", " << grad_output.getCols() << ")" << std::endl;
-std::cout << "weights.transpose: (" << weights.transpose().getRows() << ", " << weights.transpose().getCols() << ")" << std::endl;
 
             // Gradiente para la siguiente capa
             Matrix grad_input = grad_activation * weights.transpose();
-            std::cout << "Computed grad_input" << std::endl;
 
             return grad_input;
         }
