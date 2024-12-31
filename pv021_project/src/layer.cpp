@@ -16,9 +16,7 @@
 
         Matrix Layer::forward_relu(const Matrix &input) {
             cached_input = input;
-            Matrix res = input * weights;
-            res = res.broadcast_biases(res, biases);
-            return relu(res);
+            return relu((input * weights) + biases);
         }
 
         Matrix Layer::forward_leaky_relu(const Matrix &input) {
@@ -66,43 +64,42 @@
         Matrix Layer::backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda) {
 
             t++; // Incrementar el paso de tiempo
-cout << 1 << endl;
+
             // Calcular gradientes estándar usando Leaky ReLU derivada
-            Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
-cout << 2 << endl;
+            Matrix grad_weights = cached_input.transpose() * grad_output;
+
             // Gradientes estándar para pesos y sesgos
-            Matrix grad_weights = cached_input.transpose() * grad_activation;
-            Matrix grad_biases(1, grad_activation.getCols());
-            for (int j = 0; j < grad_activation.getCols(); ++j) {
-                for (int i = 0; i < grad_activation.getRows(); ++i) {
-                    grad_biases.data[0][j] += grad_activation.data[i][j];
+            Matrix grad_biases(1, grad_output.getCols());
+            for (int j = 0; j < grad_output.getCols(); ++j) {
+                for (int i = 0; i < grad_output.getRows(); ++i) {
+                    grad_biases.data[0][j] += grad_output.data[i][j];
                 }
             }
-cout << 3 << endl;
+
             // Regularización L2
             grad_weights = grad_weights + weights.scalar_mul(lambda);
-cout << 4 << endl;
+
             // Actualización de momentos de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
-cout << 5 << endl;
+
             m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
             v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
-cout << 6 << endl;
+
             // Corregir sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
-cout << 7 << endl;
+
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
-cout << 8 << endl;
+
             // Actualización de los pesos y los sesgos
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
-cout << 9 << endl;
+
             // Gradiente de entrada para la siguiente capa
-            Matrix grad_input = grad_activation * weights.transpose();
-cout << 10 << endl;
+            Matrix grad_input = grad_output * weights.transpose();
+
             return grad_input;
         }
 
