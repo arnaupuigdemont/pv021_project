@@ -127,15 +127,15 @@ int main() {
                     }
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
-cout << 1 << endl;
+cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << endl;
                 //ADAM
                 Matrix grad = output_layer.backward_ADAM_output(grad_output, batch_labels, learning_rate, lambda);
-cout << 2 << endl;
+cout << "grad rows: " << grad.getRows() << ", cols: " << grad.getCols() << endl;
                 //grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
                 grad = hidden_layer2.backward_ADAM_hidden(grad, learning_rate, lambda);
-cout << 3 << endl;
+cout << "grad rows: " << grad.getRows() << ", cols: " << grad.getCols() << endl;
                 grad = input_layer.backward_ADAM_hidden(grad, learning_rate, lambda);
-cout << 4 << endl;
+cout << "grad rows: " << grad.getRows() << ", cols: " << grad.getCols() << endl;
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();

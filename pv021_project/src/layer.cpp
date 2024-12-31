@@ -106,7 +106,6 @@
         Matrix Layer::backward_ADAM_hidden(const Matrix &grad_output, double learning_rate, double lambda) {
         
             std::cout << "Entering backward_ADAM_hidden" << std::endl;
-            std::cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << std::endl;
 
             // Derivada de Leaky ReLU
             Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
