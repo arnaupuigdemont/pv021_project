@@ -172,8 +172,9 @@ cout << "biases rows: " << biases.getRows() << ", cols: " << biases.getCols() <<
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-            // Gradiente para la siguiente capa (no aplica a la salida)
-            return grad_output; // Este gradiente no se retropropaga más allá de la capa de salida
+            // Transformar el gradiente para ajustarse a la capa anterior
+            Matrix grad_input = grad_output * weights.transpose(); // Tamaño resultante: (128, 64)
+            return grad_input;
         }
 
         Matrix Layer::getWeights() {
