@@ -36,7 +36,7 @@ class Layer {
 
         Matrix backward(const Matrix &grad_output, double learning_rate);
         Matrix backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda);
-        Matrix backward_ADAM_hidden(const Matrix &grad_output, double learning_rate, double lambda);
+        Matrix backward_ADAM_relu(const Matrix &grad_output, double learning_rate, double lambda);
         Matrix backward_ADAM_output(const Matrix &output, const Matrix &target, double learning_rate, double lambda);
 
         Matrix getWeights();
