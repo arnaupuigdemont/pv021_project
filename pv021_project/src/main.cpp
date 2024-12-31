@@ -52,11 +52,14 @@ int main() {
     //CREATE LAYERS
         Layer input_layer(784, 256);
         cout << "input wights: " << input_layer.weights.getRows() << ", " << input_layer.weights.getCols() << endl;
+        cout << "biases: " << input_layer.biases.getRows() << ", " << input_layer.biases.getCols() << endl;
         Layer hidden_layer2(256, 64);
         cout << "layer wights: " << input_layer.weights.getRows() << ", " << input_layer.weights.getCols() << endl;
+        cout << "biases: " << input_layer.biases.getRows() << ", " << input_layer.biases.getCols() << endl;
         //Layer hidden_layer3(64, 49);
         Layer output_layer(64, 10);
         cout << "layer wights: " << input_layer.weights.getRows() << ", " << input_layer.weights.getCols() << endl;
+        cout << "biases: " << input_layer.biases.getRows() << ", " << input_layer.biases.getCols() << endl;
 
     //TRAINING 
         double learning_rate = initial_rate;
