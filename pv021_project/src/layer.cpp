@@ -97,7 +97,7 @@
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-            // Gradiente de entrada para la siguiente capa
+            // Gradiente de entrada
             Matrix grad_input = grad_output * weights.transpose();
 
             return grad_input;
