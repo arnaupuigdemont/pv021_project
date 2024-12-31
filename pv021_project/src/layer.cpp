@@ -143,6 +143,8 @@
             std::cout << "Updated weights and biases" << std::endl;
 
             // Gradiente para la siguiente capa
+            cout << "grad_activation rows: " << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << endl;
+            cout << "weights rows: " << weights.getRows() << ", cols: " << weights.getCols() << endl;
             Matrix grad_input = grad_activation * weights.transpose(); // Tamaño resultante: (128, 256)
             std::cout << "Computed grad_input: (" << grad_input.getRows() << ", " << grad_input.getCols() << ")" << std::endl;
 
