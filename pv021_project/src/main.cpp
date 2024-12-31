@@ -41,19 +41,16 @@ int main() {
         Matrix test_labels = dataset.read_labels("data/fashion_mnist_test_labels.csv");
 
     //NORMALIZE DATA MIN MAX
-
         train_data.normalize();
         test_data.normalize();
 
     //CREATE LAYERS
-
         Layer input_layer(784, 392);
         Layer hidden_layer2(392, 196);
         Layer hidden_layer3(196, 49);
         Layer output_layer(49, 10);
 
     //TRAINING 
-
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
@@ -82,9 +79,9 @@ int main() {
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
 
-                Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
-                Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-                Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
+                Matrix hidden1 = input_layer.forward_relu(batch_inputs);
+                Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
+                Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
                 Matrix output = output_layer.forward_softmax(hidden3);
 
                 // Loss
@@ -94,14 +91,6 @@ int main() {
                         Matrix({output.data[i]}), Matrix({batch_labels.data[i]})
                     );
                 }
-            /*    double l2_penalty = lambda * (
-                    input_layer.compute_l2_penalty() +
-                    hidden_layer2.compute_l2_penalty() +
-                    hidden_layer3.compute_l2_penalty() +
-                    output_layer.compute_l2_penalty()
-                ); */
-
-                //batch_loss += l2_penalty;
                 total_loss += batch_loss;
 
                 // Track accuracy
@@ -126,24 +115,11 @@ int main() {
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
-                //BACKPROPAGATION
-                //Matrix grad = output_layer.backward(grad_output, learning_rate);
-                //grad = hidden_layer3.backward(grad, learning_rate);
-                //grad = hidden_layer2.backward(grad, learning_rate);
-                //grad = input_layer.backward(grad, learning_rate);
-
                 //ADAM
                 Matrix grad = output_layer.backward_ADAM(grad_output, learning_rate, lambda);
                 grad = hidden_layer3.backward_ADAM(grad, learning_rate, lambda);
                 grad = hidden_layer2.backward_ADAM(grad, learning_rate, lambda);
                 grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
-
-                //SGD MOMENTUM
-                //Matrix grad = output_layer.backward_SGD_Momentum(grad_output, initial_lr, 0.9);
-                //grad = hidden_layer3.backward_SGD_Momentum(grad, initial_lr, 0.9);
-                //grad = hidden_layer2.backward_SGD_Momentum(grad, initial_lr, 0.9);
-                //grad = input_layer.backward_SGD_Momentum(grad, initial_lr, 0.9);
-
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
@@ -159,14 +135,13 @@ int main() {
 
         }
     //TESTING
-
         Matrix predictions(test_data.getRows(), 10);
 
         for (int i = 0; i < test_data.getRows(); ++i) {
             Matrix input = Matrix({test_data.data[i]});
-            Matrix hidden1 = input_layer.forward_leaky_relu(input);
-            Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-            Matrix hidden3 = hidden_layer3.forward_leaky_relu(hidden2);
+            Matrix hidden1 = input_layer.forward_relu(input);
+            Matrix hidden2 = hidden_layer2.forward_relu(hidden1);
+            Matrix hidden3 = hidden_layer3.forward_relu(hidden2);
             predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
 
