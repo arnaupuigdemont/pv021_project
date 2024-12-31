@@ -107,48 +107,49 @@
             std::cout << "Entering backward_ADAM_hidden" << std::endl;
             std::cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << std::endl;
 
+            // Debug de dimensiones de cached_input
+            std::cout << "cached_input rows: " << cached_input.getRows() << ", cols: " << cached_input.getCols() << std::endl;
+
+            // Validación de dimensiones
+            if (cached_input.getCols() != weights.getRows()) {
+                throw std::runtime_error("Dimension mismatch: cached_input and weights are incompatible.");
+            }
+
             // Derivada de Leaky ReLU
-            cout << "cached_input rows: " << cached_input.getRows() << ", cols: " << cached_input.getCols() << endl;
             Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
-            cout << "grad_activation rows: " << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << endl;
+            std::cout << "grad_activation rows: " << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << std::endl;
 
             // Gradientes estándar para pesos y sesgos
-            cout << "cached_input rows: " << cached_input.getRows() << ", cols: " << cached_input.getCols() << endl;
             Matrix grad_weights = cached_input.transpose() * grad_activation;
-            cout << "grad_weights rows: " << grad_weights.getRows() << ", cols: " << grad_weights.getCols() << endl;
-
             Matrix grad_biases(1, grad_activation.getCols());
             for (int j = 0; j < grad_activation.getCols(); ++j) {
                 for (int i = 0; i < grad_activation.getRows(); ++i) {
                     grad_biases.data[0][j] += grad_activation.data[i][j];
                 }
             }
-            std::cout << "Computed grad_biases" << std::endl;
 
-            // Actualización de Adam para pesos y sesgos
+            // Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
             m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
             v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
-            std::cout << "Updated m_weights and v_weights, m_biases and v_biases" << std::endl;
 
             // Corrección del sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
-            std::cout << "Applied bias correction" << std::endl;
 
             // Actualización de parámetros
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
+
+            // Debug después de actualizar pesos y sesgos
             std::cout << "Updated weights and biases" << std::endl;
 
             // Gradiente para la siguiente capa
-            cout << "grad_activation rows: " << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << endl;
-            cout << "weights rows: " << weights.getRows() << ", cols: " << weights.getCols() << endl;
-            Matrix grad_input = grad_activation * weights.transpose(); // Tamaño resultante: (128, 256)
-            std::cout << "Computed grad_input: (" << grad_input.getRows() << ", " << grad_input.getCols() << ")" << std::endl;
+            Matrix grad_input = grad_activation * weights.transpose();
+            std::cout << "grad_input rows: " << grad_input.getRows() << ", cols: " << grad_input.getCols() << std::endl;
 
             return grad_input;
         }
