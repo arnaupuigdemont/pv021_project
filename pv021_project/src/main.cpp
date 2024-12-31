@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 15; 
-double learning_rate = 0.001; 
+double initial_rate = 0.001; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 256; 
 int lambda = 0.0001;
@@ -25,6 +25,10 @@ Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
     one_hot[label] = 1.0; // Set the correct class index to 1.0
     return Matrix({one_hot});
+}
+
+double adjust_learning_rate(double initial_lr, int epoch, double decay_rate) {
+    return initial_lr * exp(-decay_rate * epoch);
 }
 
 int main() {
@@ -54,7 +58,8 @@ int main() {
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
- 
+
+            double learning_rate = adjust_learning_rate(initial_rate, epoch, decay_rate);
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
@@ -91,7 +96,7 @@ int main() {
                         Matrix({output.data[i]}), Matrix({batch_labels.data[i]})
                     );
                 }
-                total_loss += batch_loss / batch_size;
+                total_loss += batch_loss;
 
                 // Track accuracy
                 for (int i = 0; i < batch_size; ++i) {
@@ -124,8 +129,6 @@ int main() {
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
-
-            double avg_loss = total_loss / train_data.getRows();
 
             // Log epoch stats
             std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 

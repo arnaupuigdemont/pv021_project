@@ -29,19 +29,15 @@ class Layer {
         Layer(int input_size, int output_size);
 
         Matrix forward_relu(const Matrix &input);
-
         Matrix forward_leaky_relu(const Matrix &input);
-
         Matrix forward_softmax(const Matrix &input);
 
         double compute_l2_penalty() const;
 
         Matrix backward(const Matrix &grad_output, double learning_rate);
-
         Matrix backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda);
 
         Matrix getWeights();
-
         Matrix getBiases();
 
     private:
@@ -49,13 +45,9 @@ class Layer {
         Matrix cached_input;
 
         Matrix relu(const Matrix &input); 
-
         Matrix leaky_relu(const Matrix &input);
-
         Matrix leaky_relu_derivative(const Matrix &input);
-
         Matrix softmax(const Matrix &input);
-
         Matrix softmax_derivative(const Matrix &input);
 
 };
