@@ -63,9 +63,11 @@ int main() {
 
             
             if (learning_rate <= 0.0001) {
-                return 0.0001;
-            }
-            learning_rate = adjust_learning_rate(initial_rate, epoch, decay_rate);
+                learning_rate =  0.0001;
+            } else {
+                learning_rate = adjust_learning_rate(initial_rate, epoch, decay_rate);
+                }
+            
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
