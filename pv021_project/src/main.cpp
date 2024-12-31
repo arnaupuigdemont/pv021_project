@@ -18,7 +18,7 @@ const int OUTPUT_SIZE = 10;
 const int EPOCHS = 20; 
 double initial_rate = 0.001; 
 double decay_rate = 0.2; 
-const int BATCH_SIZE = 64; 
+const int BATCH_SIZE = 128; 
 int lambda = 0.001;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -51,15 +51,8 @@ int main() {
 
     //CREATE LAYERS
         Layer input_layer(784, 256);
-        cout << "input wights: " << input_layer.weights.getRows() << ", " << input_layer.weights.getCols() << endl;
-        cout << "biases: " << input_layer.biases.getRows() << ", " << input_layer.biases.getCols() << endl;
         Layer hidden_layer2(256, 64);
-        cout << "layer wights: " << hidden_layer2.weights.getRows() << ", " << hidden_layer2.weights.getCols() << endl;
-        cout << "biases: " << hidden_layer2.biases.getRows() << ", " << hidden_layer2.biases.getCols() << endl;
-        //Layer hidden_layer3(64, 49);
         Layer output_layer(64, 10);
-        cout << "layer wights: " << output_layer.weights.getRows() << ", " << output_layer.weights.getCols() << endl;
-        cout << "biases: " << output_layer.biases.getRows() << ", " << output_layer.biases.getCols() << endl;
 
     //TRAINING 
         double learning_rate = initial_rate;
