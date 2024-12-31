@@ -152,11 +152,11 @@
         }
 
         Matrix Layer::backward_ADAM_output(const Matrix &output, const Matrix &target, double learning_rate, double lambda) {
-            
-            t++; // Incrementar el paso de tiempo
+            std::cout << "Entering backward_ADAM_output" << std::endl;
 
             // Gradiente de la pérdida (Cross-Entropy con Softmax)
             Matrix grad_output = output - target;
+            std::cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << std::endl;
 
             // Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_output;
@@ -167,24 +167,26 @@
                 }
             }
 
-            // Actualización de Adam para pesos y sesgos
+            // Añadir regularización L2
+            grad_weights = grad_weights + weights.scalar_mul(lambda);
+
+            // Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
-            m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
-            v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
 
-            // Corregir sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
+
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
 
-            // Actualización de parámetros
+            // Actualización de los pesos y los sesgos
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-            // Transformar el gradiente para ajustarse a la capa anterior
-            Matrix grad_input = grad_output * weights.transpose(); // Tamaño resultante: (128, 64)
+            // Gradiente de entrada
+            Matrix grad_input = grad_output * weights.transpose();
+
             return grad_input;
         }
 
