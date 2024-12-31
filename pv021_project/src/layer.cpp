@@ -152,6 +152,9 @@
         }
 
         Matrix Layer::backward_ADAM_output(const Matrix &output, const Matrix &target, double learning_rate, double lambda) {
+            
+            t++; // Incrementar el paso de tiempo
+
             // Gradiente de la pérdida (Cross-Entropy con Softmax)
             Matrix grad_output = output - target;
 
