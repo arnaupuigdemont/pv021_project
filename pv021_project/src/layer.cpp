@@ -77,7 +77,7 @@
             }
 
             // Regularización L2
-            //grad_weights = grad_weights + weights.scalar_mul(lambda);
+            grad_weights = grad_weights + weights.scalar_mul(lambda);
 
             // Actualización de momentos de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);

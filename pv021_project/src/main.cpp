@@ -28,6 +28,9 @@ Matrix to_one_hot(int label, int num_classes) {
 }
 
 double adjust_learning_rate(double initial_lr, int epoch, double decay_rate) {
+    if (initial_lr <= 0.0001) {
+        return 0.0001;
+    }
     return initial_lr * exp(-decay_rate * epoch);
 }
 
