@@ -71,12 +71,9 @@
 
         Matrix Layer::backward_ADAM_relu(const Matrix &grad_output, double learning_rate, double lambda) {
             t++;
-            std::cout << "Entering backward_ADAM" << std::endl;
 
             // Paso 1: Derivada de activación
             Matrix grad_activation = grad_output.hadamard(leaky_relu_derivative(cached_input));
-            std::cout << "grad_activation rows: " << grad_activation.getRows()
-                    << ", cols: " << grad_activation.getCols() << std::endl;
 
             // Paso 2: Gradientes para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_activation;
@@ -105,8 +102,6 @@
 
             // Gradiente para la capa anterior
             Matrix grad_input = grad_activation * weights.transpose();
-            std::cout << "Computed grad_input, rows: " << grad_input.getRows()
-                    << ", cols: " << grad_input.getCols() << std::endl;
 
             return grad_input;
         }
@@ -114,13 +109,9 @@
         Matrix Layer::backward_ADAM_output(const Matrix &output, const Matrix &target, double learning_rate, double lambda) {
            
             t++;
-            std::cout << "Entering backward_ADAM_output" << std::endl;
 
             // Gradiente de la pérdida (Cross-Entropy con Softmax)
-            cout << "output rows: " << output.getRows() << ", cols: " << output.getCols() << endl;
-            cout << "target rows: " << target.getRows() << ", cols: " << target.getCols() << endl;
-            Matrix grad_output = output - target;
-            std::cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << std::endl;
+            Matrix grad_output = output - target; 
 
             // Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_output;
