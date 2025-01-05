@@ -128,9 +128,9 @@ int main() {
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 //ADAM
-                Matrix grad = output_layer.backward(grad_output, learning_rate );
-                grad = hidden_layer2.backward(grad, learning_rate );
-                grad = input_layer.backward(grad, learning_rate);
+                Matrix grad = output_layer.backward_ADAM_relu(grad_output, learning_rate, lambda);
+                grad = hidden_layer2.backward_ADAM_relu(grad, learning_rate, lambda);
+                grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
