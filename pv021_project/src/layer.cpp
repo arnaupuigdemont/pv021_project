@@ -133,6 +133,8 @@
             std::cout << "Entering backward_ADAM_output" << std::endl;
 
             // Gradiente de la pérdida (Cross-Entropy con Softmax)
+            cout << "output rows: " << output.getRows() << ", cols: " << output.getCols() << endl;
+            cout << "target rows: " << target.getRows() << ", cols: " << target.getCols() << endl;
             Matrix grad_output = output - target;
             std::cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << std::endl;
 
