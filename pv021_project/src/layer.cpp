@@ -70,66 +70,50 @@
         }
 
         Matrix Layer::backward_ADAM_relu(const Matrix &grad_output, double learning_rate, double lambda) {
-
-            ++t;
-
+            t++;
             std::cout << "Entering backward_ADAM" << std::endl;
-            std::cout << "grad_output rows: " << grad_output.getRows() << ", cols: " << grad_output.getCols() << std::endl;
 
-            // Paso 1: Derivada de la función de activación (Leaky ReLU)
-            Matrix grad_activation = leaky_relu_derivative(cached_input).hadamard(grad_output);
-            std::cout << "Computed grad_activation, rows: " << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << std::endl;
+            // Paso 1: Derivada de activación
+            Matrix grad_activation = grad_output.hadamard(leaky_relu_derivative(cached_input));
+            std::cout << "grad_activation rows: " << grad_activation.getRows()
+                    << ", cols: " << grad_activation.getCols() << std::endl;
 
-            // Paso 2: Gradientes de los pesos y sesgos
-            Matrix grad_weights = cached_input.transpose() * grad_activation; // Gradiente de los pesos
-            std::cout << "Computed grad_weights, rows: " << grad_weights.getRows() << ", cols: " << grad_weights.getCols() << std::endl;
-
-            Matrix grad_biases(1, grad_activation.getCols()); // Gradiente de los sesgos
+            // Paso 2: Gradientes para pesos y sesgos
+            Matrix grad_weights = cached_input.transpose() * grad_activation;
+            Matrix grad_biases(1, grad_activation.getCols());
             for (int j = 0; j < grad_activation.getCols(); ++j) {
                 for (int i = 0; i < grad_activation.getRows(); ++i) {
                     grad_biases.data[0][j] += grad_activation.data[i][j];
                 }
             }
-            std::cout << "Computed grad_biases, rows: " << grad_biases.getRows() << ", cols: " << grad_biases.getCols() << std::endl;
 
-            // Paso 3: Actualización de Adam para pesos y sesgos
-            // Momento exponencial de primer orden (m)
+            // Paso 3: Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
-            m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
-
-            // Momento exponencial de segundo orden (v)
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
+            m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
             v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
 
-            std::cout << "Updated m_weights, v_weights, m_biases, and v_biases" << std::endl;
-
-            // Corrección del sesgo
+            // Corrección de sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
 
-            std::cout << "Applied bias correction" << std::endl;
-
-            // Paso 4: Regularización L2
-            Matrix regularization_term = weights.scalar_mul(lambda);
-            grad_weights = grad_weights + regularization_term;
-
-            // Paso 5: Actualización de parámetros
+            // Actualización de parámetros
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-            std::cout << "Updated weights and biases" << std::endl;
-            std::cout << "Weights rows: " << weights.getRows() << ", cols: " << weights.getCols() << std::endl;
-            std::cout << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << std::endl;
-            // Paso 6: Gradiente de entrada para la capa anterior
+            // Gradiente para la capa anterior
             Matrix grad_input = grad_activation * weights.transpose();
-            std::cout << "Computed grad_input, rows: " << grad_input.getRows() << ", cols: " << grad_input.getCols() << std::endl;
+            std::cout << "Computed grad_input, rows: " << grad_input.getRows()
+                    << ", cols: " << grad_input.getCols() << std::endl;
 
             return grad_input;
         }
 
         Matrix Layer::backward_ADAM_output(const Matrix &output, const Matrix &target, double learning_rate, double lambda) {
+           
+            t++;
             std::cout << "Entering backward_ADAM_output" << std::endl;
 
             // Gradiente de la pérdida (Cross-Entropy con Softmax)
