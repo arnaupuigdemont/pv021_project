@@ -120,7 +120,8 @@
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
             std::cout << "Updated weights and biases" << std::endl;
-
+            std::cout << "Weights rows: " << weights.getRows() << ", cols: " << weights.getCols() << std::endl;
+            std::cout << grad_activation.getRows() << ", cols: " << grad_activation.getCols() << std::endl;
             // Paso 6: Gradiente de entrada para la capa anterior
             Matrix grad_input = grad_activation * weights.transpose();
             std::cout << "Computed grad_input, rows: " << grad_input.getRows() << ", cols: " << grad_input.getCols() << std::endl;
