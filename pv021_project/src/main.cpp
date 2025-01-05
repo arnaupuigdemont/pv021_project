@@ -27,11 +27,6 @@ Matrix to_one_hot(int label, int num_classes) {
     return Matrix({one_hot});
 }
 
-double adjust_learning_rate(double initial_lr, int epoch, double decay_rate) {
-    
-    return initial_lr * exp(-decay_rate * epoch);
-}
-
 int main() {
 
     auto total_start = std::chrono::high_resolution_clock::now();
@@ -59,13 +54,6 @@ int main() {
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
-
-            
-            if (learning_rate <= 0.0001) {
-                learning_rate =  0.0001;
-            } else {
-                learning_rate = adjust_learning_rate(initial_rate, epoch, decay_rate);
-                }
             
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
