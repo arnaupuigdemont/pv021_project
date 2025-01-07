@@ -79,13 +79,10 @@ int main() {
                     batch_inputs.data[i] = train_data.data[data_index];
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
-cout << 1 << endl;
+
                 Matrix input = input_layer.forward_leaky_relu(batch_inputs);
-cout << 2 << endl;
                 Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
-cout << 3 << endl;
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-cout << 4 << endl;
                 Matrix output = output_layer.forward_softmax(hidden2);
 
                 // Loss
@@ -120,9 +117,13 @@ cout << 4 << endl;
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 //BACKPROPAGATION
+cout << 1 << endl;  
                 Matrix grad = output_layer.backward_output(grad_output, learning_rate);
+cout << 2 << endl;
                 grad = hidden_layer2.backward_relu(grad, learning_rate);
+cout << 3 << endl;
                 grad = hidden_layer1.backward_relu(grad, learning_rate);
+cout << 4 << endl;
                 grad = input_layer.backward_relu(grad, learning_rate);
 
                 //ADAM
