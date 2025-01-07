@@ -15,11 +15,11 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 20; 
+const int EPOCHS = 12; 
 double initial_rate = 0.001; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 128; 
-int lambda = 0.001;
+int lambda = 0.0001;
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
@@ -46,7 +46,8 @@ int main() {
 
     //CREATE LAYERS
         Layer input_layer(784, 256);
-        Layer hidden_layer2(256, 64);
+        Layer hidden_layer1(256, 128);
+        Layer hidden_layer2(128, 64);
         Layer output_layer(64, 10);
 
     //TRAINING 
@@ -79,7 +80,8 @@ int main() {
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
 
-                Matrix hidden1 = input_layer.forward_leaky_relu(batch_inputs);
+                Matrix input = input_layer.forward_leaky_relu(batch_inputs);
+                Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 Matrix output = output_layer.forward_softmax(hidden2);
 
@@ -117,6 +119,7 @@ int main() {
                 //ADAM
                 Matrix grad = output_layer.backward_ADAM_output(output, batch_labels.data, learning_rate, lambda);
                 grad = hidden_layer2.backward_ADAM_relu(grad, learning_rate, lambda);
+                grad = hidden_layer1.backward_ADAM_relu(grad, learning_rate, lambda);
                 grad = input_layer.backward_ADAM_relu(grad, learning_rate, lambda);
             }
 
@@ -135,7 +138,8 @@ int main() {
 
         for (int i = 0; i < test_data.getRows(); ++i) {
             Matrix input = Matrix({test_data.data[i]});
-            Matrix hidden1 = input_layer.forward_leaky_relu(input);
+            Matrix input = input_layer.forward_leaky_relu(input);
+            Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
             Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
             predictions.data[i] = output_layer.forward_softmax(hidden2).data[0];
         }
