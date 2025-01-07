@@ -79,10 +79,13 @@ int main() {
                     batch_inputs.data[i] = train_data.data[data_index];
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
-
+cout << 1 << endl;
                 Matrix input = input_layer.forward_leaky_relu(batch_inputs);
+cout << 2 << endl;
                 Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
+cout << 3 << endl;
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
+cout << 4 << endl;
                 Matrix output = output_layer.forward_softmax(hidden2);
 
                 // Loss
