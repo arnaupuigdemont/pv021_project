@@ -17,8 +17,8 @@ using namespace std;
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
 double initial_rate = 0.01; 
-double decay_rate = 0.1; 
-const int BATCH_SIZE = 64; 
+double decay_rate = 0.05; 
+const int BATCH_SIZE = 32; 
 int lambda = 0.001;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -45,10 +45,10 @@ int main() {
         test_data.normalize();
 
     //CREATE LAYERS
-        Layer input_layer(784, 512);
-        Layer hidden_layer1(512, 256);
-        Layer hidden_layer2(256, 64);
-        Layer output_layer(64, 10);
+        Layer input_layer(784, 1024);
+        Layer hidden_layer1(1024, 512);
+        Layer hidden_layer2(512, 128);
+        Layer output_layer(128, 10);
 
     //TRAINING 
         double learning_rate = initial_rate;
