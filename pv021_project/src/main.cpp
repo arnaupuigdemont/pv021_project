@@ -119,9 +119,7 @@ int main() {
                 //BACKPROPAGATION 
                 Matrix grad = output_layer.backward_output(grad_output, learning_rate);
                 grad = hidden_layer2.backward_relu(grad, learning_rate);
-cout << 3 << endl;
                 grad = hidden_layer1.backward_relu(grad, learning_rate);
-cout << 4 << endl;
                 grad = input_layer.backward_relu(grad, learning_rate);
 
                 //ADAM
