@@ -89,6 +89,7 @@ cout << 2 << endl;
 cout << 3 << endl;
             // Paso 4: Gradiente de entrada para la siguiente capa
             Matrix grad_input = grad_activation * weights.transpose(); // (batch_size, hidden_size) * (hidden_size, input_size)
+cout << 4 << endl;
             return grad_input;
 
         }
