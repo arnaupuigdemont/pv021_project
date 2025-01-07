@@ -65,9 +65,10 @@
         }
 
         Matrix Layer::backward_relu(const Matrix &grad_output, double learning_rate) {
-
+cout << "grad_output: " << grad_output.getRows() << " " << grad_output.getCols() << endl;
             // Paso 1: Derivada de activación Leaky ReLU
             Matrix grad_activation(cached_input.getRows(), cached_input.getCols());
+cout << "cached_input: " << cached_input.getRows() << " " << cached_input.getCols() << endl;
             for (int i = 0; i < cached_input.getRows(); ++i) {
                 for (int j = 0; j < cached_input.getCols(); ++j) {
                     grad_activation.data[i][j] = (cached_input.data[i][j] > 0) ? grad_output.data[i][j] : 0.01 * grad_output.data[i][j];
@@ -77,20 +78,23 @@
             // Paso 2: Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_activation; // (input_size, batch_size) * (batch_size, hidden_size)
             Matrix grad_biases(1, grad_activation.getCols());                 // (1, hidden_size)
+cout << "grad_activation: " << grad_activation.getRows() << " " << grad_activation.getCols() << endl;
+cout << "grad_weights: " << grad_weights.getRows() << " " << grad_weights.getCols() << endl;
+cout << "grad_biases: " << grad_biases.getRows() << " " << grad_biases.getCols() << endl;
             for (int j = 0; j < grad_activation.getCols(); ++j) {
                 for (int i = 0; i < grad_activation.getRows(); ++i) {
                     grad_biases.data[0][j] += grad_activation.data[i][j];
                 }
             }
-
+cout << "weights: " << weights.getRows() << " " << weights.getCols() << endl;
+cout << "biases: " << biases.getRows() << " " << biases.getCols() << endl;
             // Paso 3: Actualización de pesos y sesgos
             weights = weights - grad_weights.scalar_mul(learning_rate);
             biases = biases - grad_biases.scalar_mul(learning_rate);
-cout << weights.getRows() << " " << weights.getCols() << endl;
-cout << grad_weights.getRows() << " " << grad_weights.getCols() << endl;
+cout << "weights: " << weights.getRows() << " " << weights.getCols() << endl;
+cout << "biases: " << biases.getRows() << " " << biases.getCols() << endl;
             // Paso 4: Gradiente de entrada para la siguiente capa
             Matrix grad_input = grad_activation * weights.transpose(); // (batch_size, hidden_size) * (hidden_size, input_size)
-cout << 4 << endl;
             return grad_input;
 
         }
