@@ -19,7 +19,7 @@ const int EPOCHS = 12;
 double initial_rate = 0.001; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 128; 
-int lambda = 0.0001;
+int lambda = 0.001;
 
 Matrix to_one_hot(int label, int num_classes) {
     std::vector<double> one_hot(num_classes, 0.0);
