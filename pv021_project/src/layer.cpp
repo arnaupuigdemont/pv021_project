@@ -100,7 +100,7 @@
             t++;
 
             // Paso 1: Derivada de activación
-            Matrix grad_activation = grad_output.hadamard(leaky_relu_derivative(cached_input));
+            Matrix grad_activation = cached_input.hadamard(leaky_relu_derivative(grad_output));
 
             // Paso 2: Gradientes para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_activation;
@@ -135,35 +135,40 @@
 
         Matrix Layer::backward_ADAM_output(const Matrix &grad_output, double learning_rate, double lambda) {
            
+            // Incrementar el contador de pasos de Adam
             t++;
 
-            // Gradientes estándar para pesos y sesgos
+            // Gradientes de pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_output;
             Matrix grad_biases(1, grad_output.getCols());
+
+            // Sumar grad_output a lo largo de las filas (optimización)
             for (int j = 0; j < grad_output.getCols(); ++j) {
                 for (int i = 0; i < grad_output.getRows(); ++i) {
                     grad_biases.data[0][j] += grad_output.data[i][j];
                 }
             }
 
-            // Añadir regularización L2
+            // Añadir regularización L2 al gradiente de los pesos
             grad_weights = grad_weights + weights.scalar_mul(lambda);
 
             // Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
+            m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
+            v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
 
+            // Corrección de sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
-
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
 
-            // Actualización de los pesos y los sesgos
+            // Actualización de parámetros
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-            // Gradiente de entrada
+            // Gradiente de entrada para la capa anterior
             Matrix grad_input = grad_output * weights.transpose();
 
             return grad_input;
