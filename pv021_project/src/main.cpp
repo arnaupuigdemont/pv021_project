@@ -117,7 +117,7 @@ int main() {
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
                 //ADAM
-                Matrix grad = output_layer.backward_ADAM_output(output, batch_labels.data, learning_rate, lambda);
+                Matrix grad = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
                 grad = hidden_layer2.backward_ADAM_relu(grad, learning_rate, lambda);
                 grad = hidden_layer1.backward_ADAM_relu(grad, learning_rate, lambda);
                 grad = input_layer.backward_ADAM_relu(grad, learning_rate, lambda);

@@ -106,12 +106,9 @@
             return grad_input;
         }
 
-        Matrix Layer::backward_ADAM_output(const Matrix &output, const Matrix &target, double learning_rate, double lambda) {
+        Matrix Layer::backward_ADAM_output(const Matrix &grad_output, double learning_rate, double lambda) {
            
             t++;
-
-            // Gradiente de la pérdida (Cross-Entropy con Softmax)
-            Matrix grad_output = output - target; 
 
             // Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_output;
