@@ -45,9 +45,9 @@ int main() {
         test_data.normalize();
 
     //CREATE LAYERS
-        Layer input_layer(784, 256);
-        Layer hidden_layer1(256, 128);
-        Layer hidden_layer2(128, 64);
+        Layer input_layer(784, 512);
+        Layer hidden_layer1(512, 256);
+        Layer hidden_layer2(256, 64);
         Layer output_layer(64, 10);
 
     //TRAINING 
