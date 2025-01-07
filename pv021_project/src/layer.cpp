@@ -76,14 +76,12 @@ cout << "cached_input: " << cached_input.getRows() << " " << cached_input.getCol
             }
 
             // Paso 2: Gradientes estándar para pesos y sesgos
-            Matrix grad_weights = cached_input.transpose() * grad_activation; // (input_size, batch_size) * (batch_size, hidden_size)
-            Matrix grad_biases(1, grad_activation.getCols());                 // (1, hidden_size)
-cout << "grad_activation: " << grad_activation.getRows() << " " << grad_activation.getCols() << endl;
-cout << "grad_weights: " << grad_weights.getRows() << " " << grad_weights.getCols() << endl;
-cout << "grad_biases: " << grad_biases.getRows() << " " << grad_biases.getCols() << endl;
-            for (int j = 0; j < grad_activation.getCols(); ++j) {
-                for (int i = 0; i < grad_activation.getRows(); ++i) {
-                    grad_biases.data[0][j] += grad_activation.data[i][j];
+            Matrix grad_weights = cached_input.transpose() * grad_output; // (128 x 256) * (256 x 64) = (128 x 64)
+            Matrix grad_biases(1, grad_output.getCols()); // (1 x 64)
+
+            for (int j = 0; j < grad_output.getCols(); ++j) {
+                for (int i = 0; i < grad_output.getRows(); ++i) {
+                    grad_biases.data[0][j] += grad_output.data[i][j];
                 }
             }
 cout << "weights: " << weights.getRows() << " " << weights.getCols() << endl;
