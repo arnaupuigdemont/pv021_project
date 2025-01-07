@@ -116,10 +116,8 @@ int main() {
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
 
-                //BACKPROPAGATION
-cout << 1 << endl;  
+                //BACKPROPAGATION 
                 Matrix grad = output_layer.backward_output(grad_output, learning_rate);
-cout << 2 << endl;
                 grad = hidden_layer2.backward_relu(grad, learning_rate);
 cout << 3 << endl;
                 grad = hidden_layer1.backward_relu(grad, learning_rate);

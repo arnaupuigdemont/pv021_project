@@ -73,7 +73,7 @@
                     grad_activation.data[i][j] = (cached_input.data[i][j] > 0) ? grad_output.data[i][j] : 0.01 * grad_output.data[i][j];
                 }
             }
-
+cout << 1 << endl;
             // Paso 2: Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_activation; // (input_size, batch_size) * (batch_size, hidden_size)
             Matrix grad_biases(1, grad_activation.getCols());                 // (1, hidden_size)
@@ -82,11 +82,11 @@
                     grad_biases.data[0][j] += grad_activation.data[i][j];
                 }
             }
-
+cout << 2 << endl;
             // Paso 3: Actualización de pesos y sesgos
             weights = weights - grad_weights.scalar_mul(learning_rate);
             biases = biases - grad_biases.scalar_mul(learning_rate);
-
+cout << 3 << endl;
             // Paso 4: Gradiente de entrada para la siguiente capa
             Matrix grad_input = grad_activation * weights.transpose(); // (batch_size, hidden_size) * (hidden_size, input_size)
             return grad_input;
