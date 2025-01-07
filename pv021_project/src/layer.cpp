@@ -83,13 +83,6 @@
             biases = biases - grad_biases.scalar_mul(learning_rate);
             
             // Paso 4: Gradiente de entrada para la siguiente capa
-
-            cout << "grad_activation: " << grad_activation.getRows() << " x " << grad_activation.getCols() << endl;
-            cout << "weights: " << weights.getRows() << " x " << weights.getCols() << endl;
-            cout << "grad_output: " << grad_output.getRows() << " x " << grad_output.getCols() << endl;
-            cout << "weights.transpose(): " << weights.transpose().getRows() << " x " << weights.transpose().getCols() << endl;
-            cout << "grad_input: " << grad_activation.getRows() << " x " << weights.transpose().getCols() << endl;
-
             Matrix grad_input = grad_activation * weights.transpose(); // (batch_size, hidden_size) * (hidden_size, input_size)
             return grad_input;
 
