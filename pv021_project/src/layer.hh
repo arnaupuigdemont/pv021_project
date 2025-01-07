@@ -34,7 +34,8 @@ class Layer {
 
         double compute_l2_penalty() const;
 
-        Matrix backward(const Matrix &grad_output, double learning_rate);
+        Matrix backward_output(const Matrix &grad_output, double learning_rate);
+        Matrix backward_relu(const Matrix &grad_output, double learning_rate);
         Matrix backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda);
         Matrix backward_ADAM_relu(const Matrix &grad_output, double learning_rate, double lambda);
         Matrix backward_ADAM_output(const Matrix &grad_output, double learning_rate, double lambda);

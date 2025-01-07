@@ -43,22 +43,54 @@
             return penalty;
         }
 
-        Matrix Layer::backward(const Matrix &grad_output, double learning_rate) {
+        Matrix Layer::backward_output(const Matrix &grad_output, double learning_rate) {
 
-            Matrix grad_input = grad_output * weights.transpose();
-            Matrix grad_weights = cached_input.transpose() * grad_output;
-            Matrix grad_biases(1, grad_output.getCols());
-
+            // Paso 1: Gradientes estándar para pesos y sesgos
+            Matrix grad_weights = cached_input.transpose() * grad_output; // (input_size, batch_size) * (batch_size, output_size)
+            Matrix grad_biases(1, grad_output.getCols());                 // (1, output_size)
             for (int j = 0; j < grad_output.getCols(); ++j) {
                 for (int i = 0; i < grad_output.getRows(); ++i) {
                     grad_biases.data[0][j] += grad_output.data[i][j];
                 }
             }
 
+            // Paso 2: Actualización de pesos y sesgos
             weights = weights - grad_weights.scalar_mul(learning_rate);
             biases = biases - grad_biases.scalar_mul(learning_rate);
 
+            // Paso 3: Gradiente de entrada para la siguiente capa
+            Matrix grad_input = grad_output * weights.transpose(); // (batch_size, output_size) * (output_size, input_size)
             return grad_input;
+
+        }
+
+        Matrix Layer::backward_relu(const Matrix &grad_output, double learning_rate) {
+
+            // Paso 1: Derivada de activación Leaky ReLU
+            Matrix grad_activation(cached_input.getRows(), cached_input.getCols());
+            for (int i = 0; i < cached_input.getRows(); ++i) {
+                for (int j = 0; j < cached_input.getCols(); ++j) {
+                    grad_activation.data[i][j] = (cached_input.data[i][j] > 0) ? grad_output.data[i][j] : 0.01 * grad_output.data[i][j];
+                }
+            }
+
+            // Paso 2: Gradientes estándar para pesos y sesgos
+            Matrix grad_weights = cached_input.transpose() * grad_activation; // (input_size, batch_size) * (batch_size, hidden_size)
+            Matrix grad_biases(1, grad_activation.getCols());                 // (1, hidden_size)
+            for (int j = 0; j < grad_activation.getCols(); ++j) {
+                for (int i = 0; i < grad_activation.getRows(); ++i) {
+                    grad_biases.data[0][j] += grad_activation.data[i][j];
+                }
+            }
+
+            // Paso 3: Actualización de pesos y sesgos
+            weights = weights - grad_weights.scalar_mul(learning_rate);
+            biases = biases - grad_biases.scalar_mul(learning_rate);
+
+            // Paso 4: Gradiente de entrada para la siguiente capa
+            Matrix grad_input = grad_activation * weights.transpose(); // (batch_size, hidden_size) * (hidden_size, input_size)
+            return grad_input;
+
         }
 
         Matrix Layer::backward_ADAM(const Matrix &grad_output, double learning_rate, double lambda) {
