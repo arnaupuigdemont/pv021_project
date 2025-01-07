@@ -67,12 +67,7 @@
         Matrix Layer::backward_relu(const Matrix &grad_output, double learning_rate) {
 
             // Paso 1: Derivada de activación Leaky ReLU
-            Matrix grad_activation(cached_input.getRows(), cached_input.getCols());
-            for (int i = 0; i < cached_input.getRows(); ++i) {
-                for (int j = 0; j < cached_input.getCols(); ++j) {
-                    grad_activation.data[i][j] = (cached_input.data[i][j] > 0) ? grad_output.data[i][j] : 0.01;
-                }
-            }
+            Matrix grad_activation = grad_output.hadamard(leaky_relu_derivative(cached_input));
 
             // Paso 2: Gradientes estándar para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_output; // (128 x 256) * (256 x 64) = (128 x 64)
