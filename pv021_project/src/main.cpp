@@ -80,8 +80,8 @@ int main() {
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
 
-                Matrix input1 = input_layer.forward_leaky_relu(batch_inputs);
-                Matrix hidden1 = hidden_layer1.forward_leaky_relu(input1);
+                Matrix input = input_layer.forward_leaky_relu(batch_inputs);
+                Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 Matrix output = output_layer.forward_softmax(hidden2);
 
@@ -137,9 +137,9 @@ int main() {
         Matrix predictions(test_data.getRows(), 10);
 
         for (int i = 0; i < test_data.getRows(); ++i) {
-            Matrix input = Matrix({test_data.data[i]});
-            Matrix input1 = input_layer.forward_leaky_relu(input);
-            Matrix hidden1 = hidden_layer1.forward_leaky_relu(input1);
+            
+            Matrix input = input_layer.forward_leaky_relu(Matrix({test_data.data[i]}));
+            Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
             Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
             predictions.data[i] = output_layer.forward_softmax(hidden2).data[0];
         }
