@@ -17,8 +17,8 @@ using namespace std;
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
 double initial_rate = 0.01; 
-double decay_rate = 0.2; 
-const int BATCH_SIZE = 64; 
+double decay_rate = 0.1; 
+const int BATCH_SIZE = 256; 
 int lambda = 0.001;
 
 Matrix to_one_hot(int label, int num_classes) {
