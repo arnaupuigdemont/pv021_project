@@ -65,11 +65,12 @@
         }
 
         Matrix Layer::backward_relu(const Matrix &grad_output, double learning_rate) {
+
             // Paso 1: Derivada de activación Leaky ReLU
-            Matrix grad_activation(grad_output.getRows(), grad_output.getCols());
+            Matrix grad_activation(cached_input.getRows(), cached_input.getCols());
             for (int i = 0; i < cached_input.getRows(); ++i) {
                 for (int j = 0; j < cached_input.getCols(); ++j) {
-                    grad_activation.data[i][j] = (cached_input.data[i][j] > 0) ? grad_output.data[i][j] : 0.01 * grad_output.data[i][j];
+                    grad_activation.data[i][j] = (cached_input.data[i][j] > 0) ? grad_output.data[i][j] : 0.01;
                 }
             }
 
@@ -85,8 +86,15 @@
             // Paso 3: Actualización de pesos y sesgos
             weights = weights - grad_weights.scalar_mul(learning_rate);
             biases = biases - grad_biases.scalar_mul(learning_rate);
-
+            
             // Paso 4: Gradiente de entrada para la siguiente capa
+
+            cout << "grad_activation: " << grad_activation.getRows() << " x " << grad_activation.getCols() << endl;
+            cout << "weights: " << weights.getRows() << " x " << weights.getCols() << endl;
+            cout << "grad_output: " << grad_output.getRows() << " x " << grad_output.getCols() << endl;
+            cout << "weights.transpose(): " << weights.transpose().getRows() << " x " << weights.transpose().getCols() << endl;
+            cout << "grad_input: " << grad_activation.getRows() << " x " << weights.transpose().getCols() << endl;
+
             Matrix grad_input = grad_activation * weights.transpose(); // (batch_size, hidden_size) * (hidden_size, input_size)
             return grad_input;
 
