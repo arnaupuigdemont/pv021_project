@@ -65,11 +65,8 @@
         }
 
         Matrix Layer::backward_relu(const Matrix &grad_output, double learning_rate) {
-cout << "grad_output: " << grad_output.getRows() << " " << grad_output.getCols() << endl;
             // Paso 1: Derivada de activación Leaky ReLU
-            Matrix grad_activation(cached_input.getRows(), cached_input.getCols());
-cout << "grad_activation: " << grad_activation.getRows() << " " << grad_activation.getCols() << endl;
-cout << "cached_input: " << cached_input.getRows() << " " << cached_input.getCols() << endl;
+            Matrix grad_activation(grad_output.getRows(), grad_output.getCols());
             for (int i = 0; i < cached_input.getRows(); ++i) {
                 for (int j = 0; j < cached_input.getCols(); ++j) {
                     grad_activation.data[i][j] = (cached_input.data[i][j] > 0) ? grad_output.data[i][j] : 0.01 * grad_output.data[i][j];
@@ -85,13 +82,10 @@ cout << "cached_input: " << cached_input.getRows() << " " << cached_input.getCol
                     grad_biases.data[0][j] += grad_output.data[i][j];
                 }
             }
-cout << "weights: " << weights.getRows() << " " << weights.getCols() << endl;
-cout << "biases: " << biases.getRows() << " " << biases.getCols() << endl;
             // Paso 3: Actualización de pesos y sesgos
             weights = weights - grad_weights.scalar_mul(learning_rate);
             biases = biases - grad_biases.scalar_mul(learning_rate);
-cout << "weights: " << weights.getRows() << " " << weights.getCols() << endl;
-cout << "biases: " << biases.getRows() << " " << biases.getCols() << endl;
+
             // Paso 4: Gradiente de entrada para la siguiente capa
             Matrix grad_input = grad_activation * weights.transpose(); // (batch_size, hidden_size) * (hidden_size, input_size)
             return grad_input;
