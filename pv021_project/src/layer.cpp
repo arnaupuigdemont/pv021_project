@@ -68,6 +68,7 @@
 cout << "grad_output: " << grad_output.getRows() << " " << grad_output.getCols() << endl;
             // Paso 1: Derivada de activación Leaky ReLU
             Matrix grad_activation(cached_input.getRows(), cached_input.getCols());
+cout << "grad_activation: " << grad_activation.getRows() << " " << grad_activation.getCols() << endl;
 cout << "cached_input: " << cached_input.getRows() << " " << cached_input.getCols() << endl;
             for (int i = 0; i < cached_input.getRows(); ++i) {
                 for (int j = 0; j < cached_input.getCols(); ++j) {
