@@ -138,6 +138,9 @@
                 }
             }
 
+            // Añadir regularización L2 al gradiente de los pesos
+            grad_weights = grad_weights + weights.scalar_mul(lambda);
+
             // Paso 3: Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
             v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
