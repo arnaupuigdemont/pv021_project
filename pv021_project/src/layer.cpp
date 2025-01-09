@@ -157,20 +157,6 @@
             weights = weights - (m_weights_hat / (v_weights_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
             biases = biases - (m_biases_hat / (v_biases_hat.sqrt() + epsilon)).scalar_mul(learning_rate);
 
-cout << "grad_output: " << grad_output.getRows() << "x" << grad_output.getCols() << endl;
-cout << "weights: " << weights.getRows() << "x" << weights.getCols() << endl;
-cout << "grad_activation: " << grad_activation.getRows() << "x" << grad_activation.getCols() << endl;
-cout << "grad_weights: " << grad_weights.getRows() << "x" << grad_weights.getCols() << endl;
-cout << "grad_biases: " << grad_biases.getRows() << "x" << grad_biases.getCols() << endl;
-cout << "m_weights: " << m_weights.getRows() << "x" << m_weights.getCols() << endl;
-cout << "v_weights: " << v_weights.getRows() << "x" << v_weights.getCols() << endl;
-cout << "m_biases: " << m_biases.getRows() << "x" << m_biases.getCols() << endl;
-cout << "v_biases: " << v_biases.getRows() << "x" << v_biases.getCols() << endl;
-cout << "m_weights_hat: " << m_weights_hat.getRows() << "x" << m_weights_hat.getCols() << endl;
-cout << "v_weights_hat: " << v_weights_hat.getRows() << "x" << v_weights_hat.getCols() << endl;
-cout << "m_biases_hat: " << m_biases_hat.getRows() << "x" << m_biases_hat.getCols() << endl;
-cout << "v_biases_hat: " << v_biases_hat.getRows() << "x" << v_biases_hat.getCols() << endl;
-
             // Gradiente para la capa anterior
             Matrix grad_input = grad_activation * weights.transpose();
 
