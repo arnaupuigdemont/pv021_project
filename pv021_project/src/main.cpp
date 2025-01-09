@@ -118,7 +118,8 @@ int main() {
                     }
                 }
                 grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
-
+                std::cout << "Gradient max: " << *max_element(grad_output.data[0].begin(), grad_output.data[0].end()) 
+                << ", Gradient min: " << *min_element(grad_output.data[0].begin(), grad_output.data[0].end()) << std::endl;
                 //BACKPROPAGATION 
                 //Matrix grad = output_layer.backward_output(grad_output, learning_rate);
                 //grad = hidden_layer2.backward_relu(grad, learning_rate);
