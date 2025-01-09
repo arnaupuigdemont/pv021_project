@@ -124,8 +124,11 @@ int main() {
                 //grad = input_layer.backward_relu(grad, learning_rate);
 
                 //ADAM
+                cout << 1 << endl;  
                 Matrix grad = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
+                cout << 2 << endl;
                 grad = hidden_layer2.backward_ADAM_relu(grad, learning_rate, lambda);
+                cout << 3 << endl;
                 grad = hidden_layer1.backward_ADAM(grad, learning_rate, lambda);
                 grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
             }
