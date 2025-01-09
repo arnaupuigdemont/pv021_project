@@ -87,12 +87,7 @@ int main() {
                 Matrix output = output_layer.forward_softmax(hidden3);
 
                 // Loss
-                double batch_loss = 0.0;
-                for (int i = 0; i < batch_size; ++i) {
-                    batch_loss += output.cross_entropy_loss(
-                        Matrix({output.data[i]}), Matrix({batch_labels.data[i]})
-                    );
-                }
+                double batch_loss = output.cross_entropy_loss(output, batch_labels);
                 total_loss += batch_loss;
 
                 // Track accuracy
