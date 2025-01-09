@@ -260,7 +260,7 @@
             Matrix result(input.getRows(), input.getCols());
             for (int i = 0; i < input.getRows(); ++i)
                 for (int j = 0; j < input.getCols(); ++j)
-                    result.data[i][j] = (input.data[i][j] > 0) ? input.data[i][j] : 0.01 * input.data[i][j];
+                    result.data[i][j] = (input.data[i][j] > 0) ? input.data[i][j] : 0.1 * input.data[i][j];
             return result;
         }
 

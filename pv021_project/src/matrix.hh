@@ -15,6 +15,7 @@ class Matrix {
         vector<vector<double>> data;
 
         //CONSTRUCTOR
+        Matrix() = default;
         Matrix(int rows, int cols);  
         Matrix(int rows, int cols, double val);
         static Matrix Random(int rows, int cols);

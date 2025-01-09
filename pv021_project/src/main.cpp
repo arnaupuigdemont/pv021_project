@@ -15,7 +15,7 @@
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
-const int EPOCHS = 40; 
+const int EPOCHS = 20; 
 double initial_rate = 0.001; 
 double decay_rate = 0.8; 
 const int BATCH_SIZE = 128; 
@@ -57,7 +57,7 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
             
-           if(epoch % 5 == 0) double learning_rate = initial_rate * std::exp(-decay_rate * epoch);
+           if(epoch % 5 == 0) learning_rate = initial_rate * std::exp(-decay_rate * epoch);
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
