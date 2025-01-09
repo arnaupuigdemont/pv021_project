@@ -127,7 +127,7 @@
             t++;
 
             // Paso 1: Derivada de activación
-            Matrix grad_activation = cached_input.hadamard(leaky_relu_derivative(grad_output));
+            Matrix grad_activation = grad_output.hadamard(leaky_relu_derivative(cached_input));
 
             // Paso 2: Gradientes para pesos y sesgos
             Matrix grad_weights = cached_input.transpose() * grad_activation;
