@@ -5,9 +5,9 @@
         Layer::Layer(int input_size, int output_size) 
             : weights(Matrix::HeIni(input_size, output_size, input_size)), 
                 biases(Matrix(1, output_size, 0.01)), 
-                m_weights(input_size, output_size),    
+                m_weights(input_size, output_size),
+                m_biases(1, output_size),    
                 v_weights(input_size, output_size),
-                m_biases(1, output_size),
                 v_biases(1, output_size),
                 momentum_weights(input_size, output_size),
                 momentum_biases(1, output_size),                             
@@ -151,7 +151,7 @@
             // Corrección de sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
-            
+
             Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));  
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
 
