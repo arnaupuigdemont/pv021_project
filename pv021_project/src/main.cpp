@@ -18,7 +18,7 @@ const int OUTPUT_SIZE = 10;
 const int EPOCHS = 18; 
 double initial_rate = 0.0001; 
 double decay_rate = 0.2; 
-const int BATCH_SIZE = 256; 
+const int BATCH_SIZE = 64; 
 int lambda = 0.0;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -57,7 +57,7 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
             
-           if(epoch % 10 == 0) learning_rate = initial_rate * std::exp(-decay_rate * epoch);
+            //if(epoch % 10 == 0) learning_rate /= initial_rate ;
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
