@@ -56,7 +56,7 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
             
-            double learning_rate = initial_rate * std::exp(-decay_rate * epoch);
+           // double learning_rate = initial_rate * std::exp(-decay_rate * epoch);
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;

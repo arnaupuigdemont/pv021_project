@@ -228,8 +228,8 @@
                 double sum = 0.0;
                 for (int j = 0; j < input.getCols(); ++j) {
                     // Aplicar recorte para evitar problemas numéricos
-                    double clipped_val = max(-20.0, std::min(input.data[i][j] - max_val, 20.0));
-                    double exp_val = exp(clipped_val);
+                    //double clipped_val = max(-20.0, std::min(input.data[i][j] - max_val, 20.0));
+                    double exp_val = exp(input.data[i][j]);
                     sum += exp_val;
                     result.data[i][j] = exp_val;
                 }
