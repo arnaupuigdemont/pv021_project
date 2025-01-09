@@ -46,8 +46,9 @@ int main() {
 
     //CREATE LAYERS
         Layer input_layer(784, 512);
-        Layer hidden_layer1(512, 128);
-        Layer hidden_layer2(128, 64);
+        Layer hidden_layer1(512, 256);
+        Layer hidden_layer2(256, 128);
+        Layer hiddden_layer3(128, 64);
         Layer output_layer(64, 10);
 
     //TRAINING 
@@ -84,7 +85,8 @@ int main() {
                 Matrix input = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-                Matrix output = output_layer.forward_softmax(hidden2);
+                Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
+                Matrix output = output_layer.forward_softmax(hidden3);
 
                 // Loss
                 double batch_loss = 0.0;
@@ -125,6 +127,7 @@ int main() {
 
                 //ADAM
                 Matrix grad = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
+                grad = hiddden_layer3.backward_ADAM_relu(grad, learning_rate, lambda);
                 grad = hidden_layer2.backward_ADAM_relu(grad, learning_rate, lambda);
                 grad = hidden_layer1.backward_ADAM(grad, learning_rate, lambda);
                 grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
@@ -148,7 +151,8 @@ int main() {
             Matrix input = input_layer.forward_leaky_relu(Matrix({test_data.data[i]}));
             Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
             Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-            predictions.data[i] = output_layer.forward_softmax(hidden2).data[0];
+            Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
+            predictions.data[i] = output_layer.forward_softmax(hidden3).data[0];
         }
 
         auto total_end = std::chrono::high_resolution_clock::now();
