@@ -105,7 +105,6 @@ int main() {
 
                 // Backward pass
                 Matrix grad_output = output;
-                grad_output.print();
                 for (int i = 0; i < batch_size; ++i) {
                     for (int j = 0; j < grad_output.getCols(); ++j) {
                         grad_output.data[i][j] -= batch_labels.data[i][j];
