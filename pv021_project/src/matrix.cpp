@@ -189,15 +189,15 @@
             double epsilon = 1e-9; // Evitar log(0)
             double loss = 0.0;
 
-            for (int i = 0; i < output.getRows(); ++i) { // Iterar por cada fila (ejemplo)
+            for (int i = 0; i < output.getRows(); ++i) {
                 for (int j = 0; j < output.getCols(); ++j) {
-                    if (label.data[i][j] > 0) { // Considerar solo la clase verdadera
+                    if (label.data[i][j] > 0) { // Solo para la clase verdadera
                         loss -= label.data[i][j] * log(output.data[i][j] + epsilon);
                     }
                 }
             }
 
-            return loss / output.getRows(); // Retornar la pérdida promedio por ejemplo
+            return loss / output.getRows(); // Promedio por el tamaño del batch
         }
 
         Matrix Matrix::hadamard(const Matrix &other) const {

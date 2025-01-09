@@ -143,14 +143,16 @@
 
             // Paso 3: Actualización de Adam
             m_weights = m_weights.scalar_mul(beta1) + grad_weights.scalar_mul(1 - beta1);
-            v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);
             m_biases = m_biases.scalar_mul(beta1) + grad_biases.scalar_mul(1 - beta1);
+            
+            v_weights = v_weights.scalar_mul(beta2) + grad_weights.hadamard(grad_weights).scalar_mul(1 - beta2);      
             v_biases = v_biases.scalar_mul(beta2) + grad_biases.hadamard(grad_biases).scalar_mul(1 - beta2);
 
             // Corrección de sesgo
             Matrix m_weights_hat = m_weights.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
-            Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
             Matrix m_biases_hat = m_biases.scalar_mul(1.0 / (1.0 - pow(beta1, t)));
+            
+            Matrix v_weights_hat = v_weights.scalar_mul(1.0 / (1.0 - pow(beta2, t)));  
             Matrix v_biases_hat = v_biases.scalar_mul(1.0 / (1.0 - pow(beta2, t)));
 
             // Actualización de parámetros
