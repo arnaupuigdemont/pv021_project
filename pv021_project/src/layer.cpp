@@ -9,10 +9,9 @@
                 m_biases(1, output_size),    
                 v_weights(input_size, output_size),
                 v_biases(1, output_size),
-                momentum_weights(input_size, output_size),
-                momentum_biases(1, output_size),                             
+                momentum_weights(input_size, output_size, 0.0),
+                momentum_biases(1, output_size, 0.0),                             
                 cached_input(Matrix(0, 0)) {}
-
 
         Matrix Layer::forward_relu(const Matrix &input) {
             cached_input = input;
@@ -206,6 +205,60 @@
             return grad_input;
         }
 
+        Matrix Layer::backward_SGD_momentum_output(const Matrix &grad_output, double learning_rate, double lambda) {
+
+            Matrix grad_weights = cached_input.transpose() * grad_output;
+            Matrix grad_biases(1, grad_output.getCols());
+            for (int j = 0; j < grad_output.getCols(); ++j) {
+                double sum_grad = 0.0;
+                for (int i = 0; i < grad_output.getRows(); ++i) {
+                    sum_grad += grad_output.data[i][j];
+                }
+                grad_biases.data[0][j] = sum_grad;
+            }
+
+            if (lambda > 0.0) {
+                grad_weights = grad_weights + weights.scalar_mul(lambda);
+            }
+
+            momentum_weights = momentum_weights.scalar_mul(momentum) - grad_weights.scalar_mul(learning_rate);
+            weights = weights + momentum_weights;
+
+            momentum_biases = momentum_biases.scalar_mul(momentum) - grad_biases.scalar_mul(learning_rate);
+            biases = biases + momentum_biases;
+
+            Matrix grad_input = grad_output * weights.transpose();
+            return grad_input;
+        }  
+
+        Matrix Layer::backward_SGD_momentum_relu(const Matrix &grad_output, double learning_rate, double lambda) {
+
+            Matrix grad_activation = grad_output.hadamard(leaky_relu_derivative(cached_input));
+
+            Matrix grad_weights = cached_input.transpose() * grad_activation;
+            Matrix grad_biases(1, grad_activation.getCols());
+            for (int j = 0; j < grad_activation.getCols(); ++j) {
+                double sum_grad = 0.0;
+                for (int i = 0; i < grad_activation.getRows(); ++i) {
+                    sum_grad += grad_activation.data[i][j];
+                }
+                grad_biases.data[0][j] = sum_grad;
+            }
+
+            if (lambda > 0.0) {
+                grad_weights = grad_weights + weights.scalar_mul(lambda);
+            }
+
+            momentum_weights = momentum_weights.scalar_mul(momentum) - grad_weights.scalar_mul(learning_rate);
+            weights = weights + momentum_weights;
+
+            momentum_biases = momentum_biases.scalar_mul(momentum) - grad_biases.scalar_mul(learning_rate);
+            biases = biases + momentum_biases;
+
+            Matrix grad_input = grad_activation * weights.transpose();
+            return grad_input;
+        }
+
         Matrix Layer::getWeights() {
             return weights;
         }
@@ -213,6 +266,7 @@
         Matrix Layer::getBiases() {
             return biases;
         }
+    
     //PRIVATE
 
         Matrix Layer::relu(const Matrix &input) {
@@ -222,7 +276,6 @@
                     result.data[i][j] = max(0.0, input.data[i][j]);
             return result;
         }
-
 
         Matrix Layer::softmax(const Matrix &input) {
             Matrix result(input.getRows(), input.getCols());

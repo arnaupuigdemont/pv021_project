@@ -16,7 +16,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 18; 
-double initial_rate = 0.0003; 
+double initial_rate = 0.0002; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 128; 
 int lambda = 0.0;
@@ -57,7 +57,7 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
             
-            //if(epoch % 10 == 0) learning_rate /= initial_rate ;
+            if(epoch % 10 == 0) learning_rate /= initial_rate ;
             std::cout << "Learning rate: " << learning_rate << std::endl;
 
             double total_loss = 0.0;
@@ -116,16 +116,24 @@ int main() {
                 
                 //BACKPROPAGATION 
                 //Matrix grad = output_layer.backward_output(grad_output, learning_rate);
+                //grad = hiddden_layer3.backward_relu(grad, learning_rate);
                 //grad = hidden_layer2.backward_relu(grad, learning_rate);
                 //grad = hidden_layer1.backward_relu(grad, learning_rate);
                 //grad = input_layer.backward_relu(grad, learning_rate);
 
                 //ADAM
-                Matrix grad = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
+                //Matrix grad = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
                 //grad = hiddden_layer3.backward_ADAM_relu(grad, learning_rate, lambda);
                 //grad = hidden_layer2.backward_ADAM_relu(grad, learning_rate, lambda);
-                grad = hidden_layer1.backward_ADAM_relu(grad, learning_rate, lambda);
-                grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
+                //grad = hidden_layer1.backward_ADAM_relu(grad, learning_rate, lambda);
+                //grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
+
+                //SGD with momentum
+                Matrix grad = output_layer.backward_SGD_momentum_output(grad_output, learning_rate, lambda);
+                //grad = hiddden_layer3.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+                //grad = hidden_layer2.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+                grad = hidden_layer1.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+                grad = input_layer.backward_SGD_momentum_relu(grad, learning_rate, lambda);
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
