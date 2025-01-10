@@ -16,9 +16,9 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
-double initial_rate = 0.005; 
+double initial_rate = 0.01; 
 double decay_rate = 0.2; 
-const int BATCH_SIZE = 128; 
+const int BATCH_SIZE = 256; 
 int lambda = 0.0;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -45,11 +45,11 @@ int main() {
         test_data.normalize();
 
     //CREATE LAYERS
-        Layer input_layer(784, 512);
-        Layer hidden_layer1(512, 256);
-        //Layer hidden_layer2(256, 128);
+        Layer input_layer(784, 256);
+        Layer hidden_layer1(256, 128);
+        Layer hidden_layer2(128, 64);
         //Layer hiddden_layer3(128, 64);
-        Layer output_layer(256, 10);
+        Layer output_layer(64, 10);
 
     //TRAINING 
         double learning_rate = initial_rate;
@@ -84,9 +84,9 @@ int main() {
 
                 Matrix input = input_layer.forward_leaky_relu(batch_inputs);
                 Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
-               // Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
+                Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                // Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
-                Matrix output = output_layer.forward_softmax(hidden1);
+                Matrix output = output_layer.forward_softmax(hidden2);
 
                 // Loss
                 double batch_loss = output.cross_entropy_loss(output, batch_labels);
@@ -131,7 +131,7 @@ int main() {
                 //SGD with momentum
                 Matrix grad = output_layer.backward_SGD_momentum_output(grad_output, learning_rate, lambda);
                 //grad = hiddden_layer3.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-                //grad = hidden_layer2.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+                grad = hidden_layer2.backward_SGD_momentum_relu(grad, learning_rate, lambda);
                 grad = hidden_layer1.backward_SGD_momentum_relu(grad, learning_rate, lambda);
                 grad = input_layer.backward_SGD_momentum_relu(grad, learning_rate, lambda);
             }
@@ -153,9 +153,9 @@ int main() {
             
             Matrix input = input_layer.forward_leaky_relu(Matrix({test_data.data[i]}));
             Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
-            //Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
+            Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
             //Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
-            predictions.data[i] = output_layer.forward_softmax(hidden1).data[0];
+            predictions.data[i] = output_layer.forward_softmax(hidden2).data[0];
         }
 
         auto total_end = std::chrono::high_resolution_clock::now();
