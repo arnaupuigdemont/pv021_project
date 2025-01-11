@@ -118,82 +118,14 @@ vector matrix::col( int n ) const {
 
 // ================[ activation functions and their derivatives ]================
 
+// ----------------------------[ leakyReLU ]---------------------------------
 
-// --------------------------[ sigmoid ]-----------------------------
-
-valueType sigmoid(valueType x) {
-    return (valueType)1.0 / ((valueType)1.0 + std::exp(-x));
-}
-
-
-vector sigmoid(const vector &inputVector) {
-    
-    int dimension = inputVector.dimension();
-    std::vector<valueType> result(dimension);
-	
-	for (int i = 0; i < dimension; ++i) {
-		result[i] = sigmoid(inputVector[i]);
-	}
- 
-    return vector(result);
-}
-
-
-vector sigmoidDerivative_fromInnerPotential(const vector &inputVector) {
-	
-	int dimension = inputVector.dimension();
-    std::vector<valueType> result(dimension);
-	
-	for (int i = 0; i < dimension; ++i) {
-		valueType y = sigmoid(inputVector[i]);
-		result[i] = y * (1 - y);
-	}
- 
-    return vector(result);
-}
-
-
-vector sigmoidDerivative_fromValues(const vector &inputVector) {
-	
-	int dimension = inputVector.dimension();
-    std::vector<valueType> result(dimension);
-	
-	for (int i = 0; i < dimension; ++i) {
-		valueType y = inputVector[i];
-		result[i] = y * (1 - y);
-	}
- 
-    return vector(result);
-}
-
-
-// ----------------------------[ reLU & leakyReLU ]---------------------------------
-
-valueType reLu(valueType x) {
-	if (x < 0) {
-		return 0;
-	}	
-	return x;    
-}
 
 valueType leakyReLu(valueType x, float alpha) {
     if (x < 0) {
         return x * alpha;
     }
     return x;
-}
-
-
-vector reLu(const vector &inputVector) {
-	
-	int dimension = inputVector.dimension();
-    std::vector<valueType> result(dimension);
-	
-	for (int i = 0; i < dimension; ++i) {
-		result[i] = reLu(inputVector[i]) ;
-	}
- 
-    return vector(result);
 }
 
 
@@ -207,19 +139,6 @@ vector leakyReLu(const vector &inputVector, float alpha) {
 	}
 
     return vector(result);
-}
-
-
-vector reLuDerivative(const vector &inputVector) {
-	
-	int dimension = inputVector.dimension();
-    std::vector<valueType> result(dimension);
-	
-	for (int i = 0; i < dimension; ++i) {
-		result[i] = (inputVector[i] <= 0) ? 0 : 1;
-	}
- 
-    return vector(result);	
 }
 
 

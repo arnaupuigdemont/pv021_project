@@ -1,173 +1,27 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <random>
-
-#include <chrono>
-
-#include "matrix.hh"
-#include "dataset.hh"
-#include "layer.hh"
-#include "batchNorm.hh"
-
-using namespace std;
-
-const int OUTPUT_SIZE = 10;
-const int EPOCHS = 10; 
-const double initial_rate = 0.001; 
-double decay_rate = 0.2; 
-const int BATCH_SIZE = 128; 
-int lambda = 0.0;
-
-Matrix to_one_hot(int label, int num_classes) {
-    std::vector<double> one_hot(num_classes, 0.0);
-    one_hot[label] = 1.0; // Set the correct class index to 1.0
-    return Matrix({one_hot});
-}
+#include "dataset.hpp"
+#include "network.hpp"
+#include "tests.hpp"
 
 int main() {
 
-    auto total_start = std::chrono::high_resolution_clock::now();
+    CSVReader reader;
+    auto trainValues = reader.readCSVValues("../data/fashion_mnist_train_vectors.csv");
+    auto trainLabels = reader.readCSVLabels("../data/fashion_mnist_train_labels.csv");
+    
 
-    // LOAD DATA
-        Dataset dataset;
+    MLP network(784);
+    network.addLayer(128, activations::_leakyReLu);
+    network.addLayer(64, activations::_leakyReLu);
+    network.addLayer(10, activations::_softmax);
 
-        Matrix train_data = dataset.read_csv("data/fashion_mnist_train_vectors.csv");
-        Matrix train_labels = dataset.read_labels("data/fashion_mnist_train_labels.csv");
 
-        Matrix test_data = dataset.read_csv("data/fashion_mnist_test_vectors.csv");
-        Matrix test_labels = dataset.read_labels("data/fashion_mnist_test_labels.csv");
+    network.train(trainValues, trainLabels, 0.001, 15, 512);
 
-    //NORMALIZE DATA MIN MAX
-        train_data.normalize();
-        test_data.normalize();
 
-    //CREATE LAYERS
-        cout << "Creating layers..." << endl;
-        Layer input_layer(784, 1024);
-        Layer hidden_layer1(1024, 256);
-        Layer hidden_layer2(256, 64);
-        Layer output_layer(64, 10);
-
-    //TRAINING 
-        double learning_rate = initial_rate;
-        for (int epoch = 0; epoch < EPOCHS; ++epoch) {
-
-            auto epoch_start = std::chrono::high_resolution_clock::now();
-            
-            std::cout << "Learning rate: " << initial_rate << std::endl;
-
-            double total_loss = 0.0;
-            int correct_predictions = 0;
-
-            vector<int> indices(train_data.getRows());
-            iota(indices.begin(), indices.end(), 0); 
-            random_shuffle(indices.begin(), indices.end());
-
-            // Iterate over all training samples
-            for (int batch_start = 0; batch_start < train_data.getRows(); batch_start += BATCH_SIZE) {
-
-                int batch_end = min(batch_start + BATCH_SIZE, train_data.getRows());
-                int batch_size = batch_end - batch_start; 
-
-                Matrix batch_inputs(batch_size, train_data.getCols());
-                Matrix batch_labels(batch_size, OUTPUT_SIZE);
-
-                for (int i = 0; i < batch_size; ++i) {
-                    int data_index = indices[batch_start + i];
-                    batch_inputs.data[i] = train_data.data[data_index];
-                    batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
-                }
-
-                Matrix input = input_layer.forward_leaky_relu(batch_inputs);
-                input.apply_dropout(0.8);
-                Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
-                hidden1.apply_dropout(0.8);
-                Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-                //Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
-                Matrix output = output_layer.forward_softmax(hidden2);
-
-                // Loss
-                double batch_loss = output.cross_entropy_loss(output, batch_labels);
-                total_loss += batch_loss;
-
-                // Track accuracy
-                for (int i = 0; i < batch_size; ++i) {
-                    int predicted_label = distance(
-                        output.data[i].begin(), max_element(output.data[i].begin(), output.data[i].end())
-                    );
-                    int true_label = distance(
-                        batch_labels.data[i].begin(), max_element(batch_labels.data[i].begin(), batch_labels.data[i].end())
-                    );
-                    if (predicted_label == true_label) {
-                        ++correct_predictions;
-                    }
-                }
-
-                // Backward pass
-                Matrix grad_output = output;
-                for (int i = 0; i < batch_size; ++i) {
-                    for (int j = 0; j < grad_output.getCols(); ++j) {
-                        grad_output.data[i][j] -= batch_labels.data[i][j];
-                    }
-                }
-                grad_output = grad_output / batch_size; // Normalizar gradientes por tamaño del batch
-                
-                //BACKPROPAGATION 
-                //Matrix grad = output_layer.backward_output(grad_output, learning_rate);
-                //grad = hiddden_layer3.backward_relu(grad, learning_rate);
-                //grad = hidden_layer2.backward_relu(grad, learning_rate);
-                //grad = hidden_layer1.backward_relu(grad, learning_rate);
-                //grad = input_layer.backward_relu(grad, learning_rate);
-
-                //ADAM
-                Matrix grad = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
-                //grad = hiddden_layer3.backward_ADAM_relu(grad, learning_rate, lambda);
-                grad = hidden_layer2.backward_ADAM_relu(grad, learning_rate, lambda);
-                grad = hidden_layer1.backward_ADAM_relu(grad, learning_rate, lambda);
-                grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
-
-                //SGD with momentum
-                //Matrix grad = output_layer.backward_SGD_momentum_output(grad_output, learning_rate, lambda);
-                //grad = hiddden_layer3.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-                //grad = hidden_layer2.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-                //grad = hidden_layer1.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-                //grad = input_layer.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-            
-            }
-
-            auto epoch_end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> epoch_duration = epoch_end - epoch_start;
-
-            // Log epoch stats
-            std::cout << "Epoch " << epoch + 1 << "/" << EPOCHS 
-                    << " - Loss: " << total_loss / train_data.getRows()
-                    << ", Accuracy: " << 100.0 * correct_predictions / train_data.getRows() << "%" << 
-                    " duration: " << epoch_duration.count() << " seconds" << endl;
-
-        }
-    //TESTING
-        Matrix predictions(test_data.getRows(), 10);
-
-        for (int i = 0; i < test_data.getRows(); ++i) {
-            
-            Matrix input = input_layer.forward_leaky_relu(Matrix({test_data.data[i]}));
-            Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
-            Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-            //Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
-            predictions.data[i] = output_layer.forward_softmax(hidden2).data[0];
-        }
-
-        auto total_end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> total_duration = total_end - total_start;
-        std::cout << "Tiempo total de entrenamiento y testing: " << total_duration.count() << " segundos\n";
-
-        // Calcular Accuracy
-        double accuracy = dataset.calculate_accuracy(predictions, test_labels);
-        std::cout << "Accuracy on test set: " << accuracy << "%" << endl;
+    auto testValues = reader.readCSVValues("../data/fashion_mnist_test_vectors.csv");
+    auto predictedTestLabels = network.predict(testValues);   
+	reader.exportResults("../actualPredictions", predictedTestLabels);
 
     return 0;
 }
+

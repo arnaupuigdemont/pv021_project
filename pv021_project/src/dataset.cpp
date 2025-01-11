@@ -1,125 +1,195 @@
-#include "dataset.hh"
+#include "dataset.hpp"
+#include <fstream>  // ifstream, ofstream
+#include <string>   // stoi
+#include <iostream>
+#include <cmath>
 
-        //CONSTRUCTOR
-        Dataset::Dataset() {}
 
-        Matrix Dataset::read_csv(const string &filename) {
-            std::cout << "Reading vectors from " << filename << " ..." << std::endl;
-            std::ifstream file(filename);
-            if (!file.is_open()) {
-                std::cerr << "Error: Could not open file " << filename << std::endl;
-                return Matrix(0, 0);
-            }
-            std::string line;
-            std::vector<std::vector<double>> data;
-            while (std::getline(file, line)) {
-                std::stringstream lineStream(line);
-                std::string cell;
-                std::vector<double> row;
-                while (std::getline(lineStream, cell, ',')) {
-                    try {
-                        row.push_back(std::stod(cell));
-                    } catch (const std::invalid_argument &e) {
-                        std::cerr << "Error: Invalid data '" << cell << "' in file " << filename << std::endl;
-                        return Matrix(0, 0);
-                    } catch (const std::out_of_range &e) {
-                        std::cerr << "Error: Data out of range '" << cell << "' in file " << filename << std::endl;
-                        return Matrix(0, 0);
-                    }
-                }
-                data.push_back(row);
-            }
-            if (data.empty()) {
-                std::cerr << filename << " is empty or could not be read." << std::endl;
-                return Matrix(0, 0);
-            } else {
-                std::cout << "Successfully read " << data.size() << " rows from " << filename << std::endl;
-            }
-            return Matrix(data);
-        }
+/* Generic function for transforming a single row/line into
+ * a vector of given type. */
+template <typename T>
+std::vector<T> readRow(const std::string &line, char sep) {
+	
+	std::vector<T> row;
 
-        Matrix Dataset::read_labels(const string &filename) {
-            std::cout << "Reading labels from " << filename << " ..." << std::endl;
-            std::ifstream file(filename);
-            if (!file.is_open()) {
-                std::cerr << "Error: Could not open file " << filename << std::endl;
-                return Matrix(0, 0);
-            }
-            std::string line;
-            std::vector<std::vector<double>> data;
-            while (std::getline(file, line)) {
-                try {
-                    std::vector<double> row(1, std::stod(line)); // Store each label as a single-row matrix
-                    data.push_back(row);
-                } catch (const std::invalid_argument &e) {
-                    std::cerr << "Error: Invalid data '" << line << "' in file " << filename << std::endl;
-                    return Matrix(0, 0);
-                } catch (const std::out_of_range &e) {
-                    std::cerr << "Error: Data out of range '" << line << "' in file " << filename << std::endl;
-                    return Matrix(0, 0);
-                }
-            }
-            if (data.empty()) {
-                std::cerr << filename << " is empty or could not be read." << std::endl;
-                return Matrix(0, 0);
-            } else {
-                std::cout << "Successfully read " << data.size() << " labels from " << filename << std::endl;
-            }
-            return Matrix(data);
-        }
-
-        void Dataset::write_predictions(const string& filename, const vector<int>& predictions) {
-
-        
-        cout << "Writing predictions to " << filename << " ..." << endl;
-        ofstream file(filename);
-        for (int val : predictions) {
-            file << val << endl;
-        }
-        file.close();
+    if (line.empty()) {
+		T error = -1;
+        return {error};
     }
 
-        double Dataset::calculate_accuracy(const Matrix &predictions, const Matrix &labels) {
-            int correct_predictions = 0;
+    size_t index = 0;
+    char c;
+    std::string currentString;
+    T currentValue;
 
-            for (int i = 0; i < labels.getRows(); ++i) {
-                // Índice de la clase predicha
-                int predicted_label = distance(predictions.data[i].begin(), 
-                                            max_element(predictions.data[i].begin(), predictions.data[i].end()));
-
-                // Índice de la clase verdadera
-                int true_label = static_cast<int>(labels.data[i][0]); // Assuming labels are indices of classes
-
-                if (predicted_label == true_label) {
-                    ++correct_predictions;
-                }
-            }
-
-            return 100.0 * correct_predictions / labels.getRows(); // Accuracy en porcentaje
+    while (index < line.length()) {
+        c = line[index];
+        if (c == sep) {
+            currentValue = std::stoi(currentString);
+            row.emplace_back(currentValue);
+            currentString = "";
+        } else {
+            currentString += c;
         }
 
-        vector<pair<Matrix, Matrix>> Dataset::create_batches(const Matrix &data, const Matrix &labels, int batch_size) {
-            vector<pair<Matrix, Matrix>> batches;
-            int total_samples = data.getRows();
+        ++index;
+    }
 
-            for (int i = 0; i < total_samples; i += batch_size) {
-                int end = min(i + batch_size, total_samples); // Asegura que no exceda el tamaño total
-                
-                // Crear matrices para el batch actual
-                int current_batch_size = end - i;
-                Matrix batch_data(current_batch_size, data.getCols());
-                Matrix batch_labels(current_batch_size, labels.getCols());
-                
-                // Copiar los datos correspondientes
-                for (int j = 0; j < current_batch_size; ++j) {
-                    batch_data.data[j] = data.data[i + j];
-                    batch_labels.data[j] = labels.data[i + j];
-                }
+    if (!currentString.empty()) {
+        currentValue = std::stoi(currentString);
+        row.emplace_back(currentValue);
+    }
+    
+    return row;
+}
 
-                // Agregar el batch a la lista
-                batches.emplace_back(batch_data, batch_labels);
-            }
+/* Generic function for retrieving maximum value
+ * of a given type from a vector. */
+template <typename T>
+T getMaxValue(const std::vector<T> &v) {
+	
+	T max = -INFINITY;
+	
+	for (size_t i = 0; i < v.size(); ++i) {
+		if (v[i] > max) {
+			max = v[i];
+		}
+	}
+	
+	return max;
+}
 
-            return batches;
-        }
 
+/* Generic function for retrieving minimum value
+ * of a given type from a vector. */
+template <typename T>
+T getMinValue(const std::vector<T> &v) {
+	
+	T min = INFINITY;
+	
+	for (size_t i = 0; i < v.size(); ++i) {
+		if (v[i] < min) {
+			min = v[i];
+		}
+	}
+	
+	return min;
+}
+
+
+// -----------------------------------[ labels ]----------------------------------------
+
+/* Can be easily adjusted to parse different datasets */
+int CSVReader::readRowLabels(const std::string &line) const {
+	
+	std::vector<int> row = readRow<int>(line, _sep);	
+    return row.front();
+}
+
+
+std::vector<int> CSVReader::readCSVLabels(const std::string &filepath) {
+
+    std::vector<int> values;
+    std::ifstream is(filepath);
+    std::string line;
+
+    while (std::getline(is, line)) {
+        values.emplace_back(readRowLabels(line));
+    }
+    is.close();
+    return values;
+}
+
+
+
+// ------------------------------[ values ]---------------------------------------
+
+vector CSVReader::readRowValues(const std::string &line) const {
+	
+	std::vector<valueType> row = readRow<valueType>(line, _sep);	
+	return vector(row);
+}	
+
+
+std::vector<vector> CSVReader::readCSVValues(const std::string &filepath) {
+	
+	std::vector<vector> values;
+	std::ifstream is(filepath);
+	std::string line;
+		
+	while (std::getline(is, line)) {
+		values.emplace_back(readRowValues(line));
+	}
+	is.close();
+	
+	normalizeValues(values);
+		
+	return values;
+}
+
+
+// ---------------------------------[ normalization, scaling ]---------------------------------------
+
+void CSVReader::normalizeValues(std::vector<vector> &values) const {
+		
+	for (size_t col = 0; col < values[0].size(); ++col) {
+		valueType sum = 0.0;
+		valueType mean = 0.0;
+		valueType variance = 0.0;
+		valueType stddev = 0.0;
+		
+		for (size_t row = 0; row < values.size(); ++row) {
+			sum += values[row][col];
+		}
+        
+		mean = sum / values.size();
+		for (size_t row = 0; row < values.size(); ++row) {
+			variance += std::pow(values[row][col] - mean, 2);
+		}
+		variance = variance / values.size();
+		stddev = std::sqrt(variance);
+
+		for (size_t row = 0; row < values.size(); ++row) {
+			values[row][col] = (values[row][col] - mean) / stddev;
+		}
+	}
+}
+
+
+// -----------------------------[ other functions / methods ]-----------------------------------
+
+/* Used to export predictions/labels */
+void CSVReader::exportResults(const std::string &filepath, const std::vector<int> &results) {
+	std::ofstream os(filepath);
+	for (const auto &value : results) {
+		os << value << std::endl;
+	}
+	os.close();
+}
+
+
+/* Can be used 'internally' to display model accuracy by comparing expected labels
+ * and actual labels, similarly to python_evaluator. */
+void displayAccuracy(const std::string &expectedValuesPath, const std::string &actualValuesPath) {
+	
+	CSVReader reader;	
+	auto expectedLabels = reader.readCSVLabels(expectedValuesPath);
+	auto actualLabels = reader.readCSVLabels(actualValuesPath);
+	
+	if (expectedLabels.size() != actualLabels.size()) {
+		std::cout << "Files specified by filepaths have different size." << std::endl;
+		return;
+	}
+	
+	size_t size = expectedLabels.size();
+	int correct = 0;
+	
+	for (size_t i = 0; i < size; ++i) {
+		if (expectedLabels[i] == actualLabels[i]) {
+			++correct;
+		}
+	}
+	
+	double acc = (double)correct / size * 100;
+	printf("Accuracy of the model is: %d / %ld = %.2f %%\n", correct, size, acc);	
+}

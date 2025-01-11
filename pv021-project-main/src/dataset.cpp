@@ -1,4 +1,4 @@
-#include "IOUtils.hpp"
+#include "dataset.hpp"
 #include <fstream>  // ifstream, ofstream
 #include <string>   // stoi
 #include <iostream>
@@ -111,7 +111,7 @@ vector CSVReader::readRowValues(const std::string &line) const {
 }	
 
 
-std::vector<vector> CSVReader::readCSVValues(const std::string &filepath, normalization norm) {
+std::vector<vector> CSVReader::readCSVValues(const std::string &filepath) {
 	
 	std::vector<vector> values;
 	std::ifstream is(filepath);
@@ -122,7 +122,7 @@ std::vector<vector> CSVReader::readCSVValues(const std::string &filepath, normal
 	}
 	is.close();
 	
-	normalizeValues(norm, values);
+	normalizeValues(values);
 		
 	return values;
 }
@@ -130,34 +130,8 @@ std::vector<vector> CSVReader::readCSVValues(const std::string &filepath, normal
 
 // ---------------------------------[ normalization, scaling ]---------------------------------------
 
-void CSVReader::normalizeValues(normalization norm, std::vector<vector> &values) const {
-	
-	switch (norm) {
-		case normalization::_basicNormalize:
-			basicNormalize(values);
-			break;
-		case normalization::_halfNormalize:
-			halfNormalize(values);
-			break;
-		case normalization::_standardNormalize:
-			standardNormalize(values);
-			break;
-		case normalization::_smallNormalize:
-			smallNormalize(values);
-			break;
-		case normalization::_minMaxNormalize:
-			minMaxNormalize(values);
-			break;
-		default:
-			// do nothing
-			break;
-	}
-}
-
-
-/* Implementation of a StandardScaler */
-void CSVReader::standardNormalize(std::vector<vector> &values) const {
-
+void CSVReader::normalizeValues(std::vector<vector> &values) const {
+		
 	for (size_t col = 0; col < values[0].size(); ++col) {
 		valueType sum = 0.0;
 		valueType mean = 0.0;
@@ -179,72 +153,6 @@ void CSVReader::standardNormalize(std::vector<vector> &values) const {
 			values[row][col] = (values[row][col] - mean) / stddev;
 		}
 	}
-	
-}
-
-
-/* Normalizing by squeezing pixel values into range [-0.5 ; 0.5] */
-void CSVReader::halfNormalize(std::vector<vector> &values) const {	
-	for (size_t i = 0; i < values.size(); ++i) {
-		for (size_t j = 0; j < values[0].size(); ++j) {
-			values[i][j] = (values[i][j] - 127.5) / 127.5;
-		}	
-	}
-}
-
-
-/* Normalizing by squeezing pixel values into range [0 ; 1] */
-void CSVReader::basicNormalize(std::vector<vector> &values) const {    
-    for (size_t i = 0; i < values.size(); ++i) {
-		for (size_t j = 0; j < values[0].size(); ++j) {
-			values[i][j] = values[i][j] / 255;
-		}	
-	}
-}
-
-
-/* Implementation of a MinMaxScaler with range [-0.5 ; 0.5].
- * Note: Can be implemented by calling minMaxNormalize and then iterating
- * over all values again and subtracting 0.5, which is slightly 
- * less effective, however. */
-void CSVReader::smallNormalize(std::vector<vector> &values) const {
-	
-	for (size_t col = 0; col < values[0].size(); ++col) {
-		
-		std::vector<valueType> column(values.size());
-		
-		for (size_t row = 0; row < values.size(); ++row) {
-			column[row] = values[row][col];
-		}
-				
-		auto maxVal = getMaxValue<valueType>(column);
-		auto minVal = getMinValue<valueType>(column);
-
-		for (size_t row = 0; row < values.size(); ++row) {
-			values[row][col] = ((values[row][col] - minVal) / (maxVal - minVal)) - 0.5;
-		}   
-	}	   
-}
-
-
-/* Implementation of a MinMaxScaler with range [0 ; 1]  */
-void CSVReader::minMaxNormalize(std::vector<vector> &values) const {
-	
-    for (size_t col = 0; col < values[0].size(); ++col) {
-		
-		std::vector<valueType> column(values.size());
-		
-		for (size_t row = 0; row < values.size(); ++row) {
-			column[row] = values[row][col];
-		}
-				
-		auto maxVal = getMaxValue<valueType>(column);
-		auto minVal = getMinValue<valueType>(column);
-
-		for (size_t row = 0; row < values.size(); ++row) {
-			values[row][col] = (values[row][col] - minVal) / (maxVal - minVal);
-		}   
-	}	   
 }
 
 

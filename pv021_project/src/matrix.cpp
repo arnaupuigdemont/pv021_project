@@ -1,249 +1,219 @@
-#include "matrix.hh"
+/* implementation of methods for matrix and vector */
+#include <cmath>
+#include <iostream>
+#include "matrix.hpp"
 
-        //CONSTRUCTOR
-        Matrix::Matrix(int rows, int cols) {
-            data.resize(rows, vector<double>(cols, 0.0));
+
+// ----------------------------[ vector ]-------------------------------
+
+// a and b are expected to have the same dimension
+vector plusMinusVectors( const vector &a, const vector &b, int sign ) {
+	int dimension = a.dimension();
+	std::vector<valueType> newValues(dimension);
+
+	for (int i = 0; i < dimension; ++i) {
+		newValues[i] = a[i] + (b[i] * sign);
+	}
+
+	return vector(newValues);	
+}
+
+
+vector operator+( const vector &a, const vector &b ) {
+	return plusMinusVectors(a, b, 1);
+}
+
+
+vector operator-( const vector &a, const vector &b ) {
+	return plusMinusVectors(a, b, -1);
+}
+
+
+vector operator*( const vector &a, valueType scalar ) {	
+	int dimension = a.dimension();
+	std::vector<valueType> newValues(dimension);
+
+	for (int i = 0; i < dimension; ++i) {
+		newValues[i] = a[i] * scalar;
+	}
+	
+	return vector(newValues);	
+}
+
+
+vector operator*( valueType scalar, const vector &a ) {
+	return a * scalar;
+}
+
+
+// a and b are expected to have the same dimension
+valueType operator*( const vector &a, const vector &b ) {
+	int dimension = a.dimension();
+	valueType dotProduct = 0;
+
+	for (int i = 0; i < dimension; ++i) {
+		dotProduct += a[i] * b[i];
+	}
+		
+	return dotProduct;
+}
+
+
+// ---------------------------- MATRIX -----------------------------------------------------
+
+
+// a and b are expected to have the same dimensions
+matrix operator+( const matrix &a, const matrix &b ) {
+	
+	int rows = a.rows();
+	int cols = a.cols();
+	matrix newMatrix(rows, cols);
+
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0 ; j < cols; ++j) {
+			newMatrix[i][j] = a[i][j] + b[i][j];
+		}
+	}
+
+	return newMatrix;
+}
+
+
+vector operator*( const matrix &m, const vector &v ) {
+	vector result(m.rows());
+	for (int i = 0; i < m.rows(); ++i) {
+		result[i] = m.row(i) * v;
+	}
+	
+	return result;
+}
+
+
+vector operator*( const vector &v, const matrix &m ) {
+	vector result(m.cols());
+	int i;
+#pragma omp parallel for num_threads(16) default(shared) private(i)
+    for (i = 0; i < m.cols(); ++i) {
+		result[i] = v * m.col(i);
+	}
+	
+	return result;
+}
+
+
+vector matrix::row( int n ) const {
+	return _values[n];
+}
+
+
+vector matrix::col( int n ) const {
+	vector newColumn(_rows);
+
+	for (int i = 0; i < _rows; ++i) {
+		newColumn[i] = _values[i][n]; 
+	}
+	return newColumn;
+}
+
+
+// ================[ activation functions and their derivatives ]================
+
+// ----------------------------[ leakyReLU ]---------------------------------
+
+
+valueType leakyReLu(valueType x, float alpha) {
+    if (x < 0) {
+        return x * alpha;
+    }
+    return x;
+}
+
+
+vector leakyReLu(const vector &inputVector, float alpha) {
+
+	int dimension = inputVector.dimension();
+    std::vector<valueType> result(dimension);
+
+	for (int i = 0; i < dimension; ++i) {
+		result[i] = leakyReLu(inputVector[i], alpha) ;
+	}
+
+    return vector(result);
+}
+
+
+vector leakyReLuDerivative(const vector &inputVector, float alpha) {
+
+	int dimension = inputVector.dimension();
+    std::vector<valueType> result(dimension);
+
+	for (int i = 0; i < dimension; ++i) {
+		result[i] = (inputVector[i] <= 0) ? alpha : 1;
+	}
+
+    return vector(result);
+}
+
+
+
+// ----------------------------[ softmax ]-------------------------------
+
+/* Implementation of a numerically stable softmax */
+vector softmax(const vector &inputVector) {
+
+    valueType maxValue = -INFINITY;
+    for (size_t i = 0; i < inputVector.size(); i++) {
+        if (inputVector[i] > maxValue) {
+            maxValue = inputVector[i];
         }
+    }
 
-        Matrix::Matrix(int rows, int cols, double val) {
-            data.resize(rows, vector<double>(cols, val));
-        }
+    if (maxValue < 0) {
+        maxValue *= -1.0;
+    }
 
-        Matrix Matrix::Random(int rows, int cols) {
-            Matrix mat(rows, cols);
-            mt19937 gen(0);
-            uniform_real_distribution<> dis(-0.1, 0.1);
+    valueType sum = 0.0;
+    for (size_t i = 0; i < inputVector.size(); i++) {
+        sum += expf(inputVector[i] - maxValue);
+    }
 
-            for (int i = 0; i < rows; ++i)
-                for (int j = 0; j < cols; ++j)
-                    mat.data[i][j] = dis(gen);
-            return mat;
-        }
+    vector outputVector(inputVector.size());
 
-        Matrix::Matrix(const std::vector<std::vector<double>> &data) : data(data) {}
+    valueType offset = maxValue + logf(sum);
+    for (size_t i = 0; i < inputVector.size(); ++i) {
+        outputVector[i] = expf(inputVector[i] - offset);
+    }
 
-        int Matrix::getRows() const { return data.size(); }
-        int Matrix::getCols() const { return data[0].size(); }
+    return outputVector;
+}
 
-        //OPERATORS
-        Matrix Matrix::operator+(const Matrix &other) const {
-            int r = getRows(), c = getCols();
-            Matrix result(r, c);
-            for (int i = 0; i < r; ++i)
-                for (int j = 0; j < c; ++j)
-                    result.data[i][j] = data[i][j] + other.data[i][j];
-            return result;
-        }
 
-        Matrix Matrix::operator+(double scalar) const {
-            Matrix result(getRows(), getCols()); 
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    result.data[i][j] = data[i][j] + scalar; 
-                }
-            }
-            return result;
-        }
+vector softmaxDerivative(const vector &inputVector) {
 
-        Matrix Matrix::operator-(const Matrix &other) const {
-            int r = getRows(), c = getCols();
-            Matrix result(r, c);
-            for (int i = 0; i < r; ++i)
-                for (int j = 0; j < c; ++j)
-                    result.data[i][j] = data[i][j] - other.data[i][j];
-            return result;
-        }
+    std::vector<valueType> numberVector;
+    numberVector.resize(inputVector.size());
 
-        Matrix Matrix::operator*(const Matrix &other) const {
-            int r1 = getRows(), c1 = getCols();
-            int c2 = other.getCols();
-            Matrix result(r1, c2);
-            for (int i = 0; i < r1; ++i) {
-                for (int k = 0; k < c1; ++k) {
-                    for (int j = 0; j < c2; ++j) {
-                        result.data[i][j] += data[i][k] * other.data[k][j];
-                    }
-                }
-            }
-            return result;
-        }
+    auto resultIt = numberVector.begin();
+    for (auto it = inputVector.getValues().begin(); it != inputVector.getValues().end(); it++, resultIt++) {
+        *resultIt = *it * (1 - *it);
+    }
 
-        Matrix Matrix::operator*(double scalar) const {
-            Matrix result(getRows(), getCols());
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    result.data[i][j] = data[i][j] * scalar;
-                }
-            }
-            return result;
-        }
+    return vector(numberVector);
+}
 
-        Matrix Matrix::transpose() const {
-            int r = getRows(), c = getCols();
-            Matrix result(c, r);
-            for (int i = 0; i < r; ++i)
-                for (int j = 0; j < c; ++j)
-                    result.data[j][i] = data[i][j];
-            return result;
-        }
 
-        Matrix Matrix::scalar_mul(double scalar) const {
-            int r = getRows(), c = getCols();
-            Matrix result(r, c);
-            for (int i = 0; i < r; ++i)
-                for (int j = 0; j < c; ++j)
-                    result.data[i][j] = data[i][j] * scalar;
-            return result;
-        }
+// -----------------------[ other functions ]---------------------------
 
-        Matrix Matrix::operator/(const Matrix &other) const {
-            Matrix result = *this;
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    result.data[i][j] /= other.data[i][j];
-                }
-            }
-            return result;
-        }
+void printVector(const vector &vec) {
+    for (int i = 0; i < vec.dimension(); ++i) {
+        std::cout << vec[i] << " ";
+    }
+    std::cout << std::endl;
+}
 
-        Matrix Matrix::operator/(double scalar) const {
 
-            Matrix result = *this;
-
-            for (auto& row : result.data) {
-                for (auto& elem : row) {
-                    elem /= scalar;
-                }
-            }
-            return result;
-        }
-
-        Matrix Matrix::apply_dropout(double keep_prob) {
-            Matrix result(getRows(), getCols());
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_real_distribution<> dis(0.0, 1.0);
-
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    result.data[i][j] = (dis(gen) < keep_prob) ? data[i][j] / keep_prob : 0.0;
-                }
-            }
-
-            return result;
-        }
-
-        Matrix Matrix::broadcast_biases(const Matrix &res, const Matrix &biases) {
-            if (biases.getRows() != 1 || biases.getCols() != res.getCols()) {
-                throw std::invalid_argument("Bias dimensions are incompatible with result matrix");
-            }
-
-            Matrix result = res; // Copia la matriz original
-            for (int i = 0; i < res.getRows(); ++i) {
-                for (int j = 0; j < res.getCols(); ++j) {
-                    result.data[i][j] += biases.data[0][j]; // Suma el sesgo correspondiente
-                }
-            }
-            return result;
-        }
-
-        Matrix Matrix::Xavier(int rows, int cols, int input_size) {
-            Matrix mat(rows, cols);
-            double limit = std::sqrt(1.0 / input_size); 
-            random_device rd;
-            mt19937 gen(rd());
-            uniform_real_distribution<> dis(-limit, limit);
-
-            for (int i = 0; i < rows; ++i)
-                for (int j = 0; j < cols; ++j)
-                    mat.data[i][j] = dis(gen);
-
-            return mat;
-        }
-
-        Matrix Matrix::HeIni(int rows, int cols, int input_size) {
-            Matrix mat(rows, cols);
-            double limit = std::sqrt(2.0 / input_size); 
-            random_device rd;
-            mt19937 gen(0);
-            uniform_real_distribution<> dis(-limit, limit);
-
-            for (int i = 0; i < rows; ++i)
-                for (int j = 0; j < cols; ++j)
-                    mat.data[i][j] = dis(gen);
-
-            return mat;
-        }
-
-        void Matrix::normalize() {
-            int r = getRows(), c = getCols();
-
-            for (int i = 0; i < r; ++i)
-                for (int j = 0; j < c; ++j) {
-                    data[i][j] /= 255.0;
-                }
-            
-        }
-
-        double Matrix::cross_entropy_loss(const Matrix &output, const Matrix &label) {
-            double epsilon = 1e-9; // Evitar log(0)
-            double loss = 0.0;
-
-            for (int i = 0; i < output.getRows(); ++i) {
-                for (int j = 0; j < output.getCols(); ++j) {
-                    if (label.data[i][j] > 0) { // Solo para la clase verdadera
-                        loss -= label.data[i][j] * log(output.data[i][j] + epsilon);
-                    }
-                }
-            }
-
-            return loss; // Promedio por el tamaño del batch
-        }
-
-        Matrix Matrix::hadamard(const Matrix &other) const {
-
-            Matrix result(getRows(), getCols());
-
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    result.data[i][j] = data[i][j] * other.data[i][j];
-                }
-            }
-
-            return result;
-        }
-
-        Matrix Matrix::sqrt() const {
-
-            Matrix result(getRows(), getCols());
-
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    if (data[i][j] < 0) {
-                        throw std::domain_error("Negative number.");
-                    }
-                    result.data[i][j] = std::sqrt(data[i][j]);
-                }
-            }
-
-            return result;
-        }
-
-        void Matrix::print() {
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    cout << data[i][j] << " ";
-                }
-                cout << endl;
-            }
-        }
-
-        Matrix Matrix::clip_gradients(double min_val, double max_val) {
-            Matrix clipped = *this; // Create a copy of the matrix
-            for (int i = 0; i < getRows(); ++i) {
-                for (int j = 0; j < getCols(); ++j) {
-                    clipped.data[i][j] = std::max(min_val, std::min(clipped.data[i][j], max_val));
-                }
-            }
-            return clipped;
-        }
+void printMatrix(const matrix &m) {
+	for (int i = 0; i < m.rows(); ++i) {
+		printVector(m[i]);
+	}
+}

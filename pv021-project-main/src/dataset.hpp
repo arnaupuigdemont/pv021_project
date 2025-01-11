@@ -1,17 +1,9 @@
-#ifndef PV021_FASHIONMNIST_PROJECT_IOUTILS_HPP
-#define PV021_FASHIONMNIST_PROJECT_IOUTILS_HPP
+#ifndef DATASET_HH
+#define DATAST_HH
 
 #include "matrix.hpp"
 #include <vector>
 #include <string>
-
-enum class normalization {
-	_basicNormalize,
-	_halfNormalize,
-	_smallNormalize,
-	_minMaxNormalize,
-	_standardNormalize
-};
 
 class CSVReader {
 		
@@ -19,19 +11,14 @@ class CSVReader {
 	vector readRowValues(const std::string &line) const;
     int readRowLabels(const std::string &line) const;
 
-	void normalizeValues(normalization norm, std::vector<vector> &values) const;
-		
-    void basicNormalize(std::vector<vector> &values) const;
-    void halfNormalize(std::vector<vector> &values) const;
-    void smallNormalize(std::vector<vector> &values) const;
-    void minMaxNormalize(std::vector<vector> &values) const;
+	void normalizeValues(std::vector<vector> &values) const;
     void standardNormalize(std::vector<vector> &values) const;
 
 public:
 
 	CSVReader(char sep = ',') : _sep(sep) {}	
 	
-	std::vector<vector> readCSVValues(const std::string &filepath, normalization norm = normalization::_standardNormalize);
+	std::vector<vector> readCSVValues(const std::string &filepath);
     std::vector<int> readCSVLabels(const std::string &filepath);
     void exportResults(const std::string &filepath, const std::vector<int> &results);
 };
