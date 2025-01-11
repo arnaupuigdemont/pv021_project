@@ -23,7 +23,7 @@ int main() {
     std::cout << "Predicting..." << std::endl;
     auto testValues = reader.readCSVValues("data/fashion_mnist_test_vectors.csv");
     auto predictedTestLabels = network.predict(testValues);   
-	reader.exportResults("../actualPredictions", predictedTestLabels);
+	reader.exportResults("/actualPredictions.csv", predictedTestLabels);
 
     return 0;
 }

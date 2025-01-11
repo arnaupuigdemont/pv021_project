@@ -17,7 +17,6 @@ void MLP::train(const std::vector<vector> &inputValues, const std::vector<int> &
 	int n_examples = inputValues.size();
 	int batchCount = n_examples / batchSize;
 	
-	// vector of indices that is shuffled and used to choose training examples
 	std::vector<int> indexes(n_examples);
 	for (int i = 0; i < n_examples; ++i) {
 		indexes[i] = i;
