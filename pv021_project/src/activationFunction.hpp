@@ -2,7 +2,7 @@
 #define ACTIVATION_FUNCTION_HH
 #include "vector.hpp"
 
-class ACtivationFunction {
+class ActivationFunction {
 
 // Leaky ReLU activation function applied element-wise on a single value.
 valueType leakyReLu(valueType x, float alpha);
