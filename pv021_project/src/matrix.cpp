@@ -41,7 +41,7 @@ Vector operator*(const Vector &v, const Matrix &m) {
 }
 
 // ====================================================================
-// Matrix Row and Column Getters
+// Matrix Row and Column Setters
 // ====================================================================
 Vector Matrix::row(int i) const {
     Vector r(cols());
@@ -157,5 +157,14 @@ Vector softmaxDerivative(const Vector &inputVector) {
     }
     return Vector(deriv);
 }
+
+ // Return the number of columns.
+    int Matrix::cols() const { return _cols; }
+    // Return the number of rows.
+    int Matrix::rows() const { return _rows; }
+    // Returns the number of rows.
+    size_t Matrix::size() const { return _rows; }
+
+    const std::vector<Vector>& Matrix::getData() const { return _rowsData; }
 
 

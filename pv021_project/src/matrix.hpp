@@ -35,12 +35,14 @@ public:
     Vector col(int index) const;
 
     // Return the number of columns.
-    int cols() const { return _cols; }
+    int cols() const;
+    // Return the number of rows.
+    int rows() const;
     // Returns the number of rows.
-    size_t size() const { return _rows; }
+    size_t size() const;
 
     // Return the underlying data.
-    const std::vector<Vector>& getData() const { return _rowsData; }
+    const std::vector<Vector>& getData() const;
 };
 
 
