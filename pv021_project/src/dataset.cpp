@@ -80,14 +80,14 @@ T getMinValue(const std::vector<T> &v) {
 // -----------------------------------[ labels ]----------------------------------------
 
 /* Can be easily adjusted to parse different datasets */
-int CSVReader::readRowLabels(const std::string &line) const {
+int dataset::readRowLabels(const std::string &line) const {
 	
 	std::vector<int> row = readRow<int>(line, _sep);	
     return row.front();
 }
 
 
-std::vector<int> CSVReader::readCSVLabels(const std::string &filepath) {
+std::vector<int> dataset::readCSVLabels(const std::string &filepath) {
 
     std::vector<int> values;
     std::ifstream is(filepath);
@@ -104,14 +104,14 @@ std::vector<int> CSVReader::readCSVLabels(const std::string &filepath) {
 
 // ------------------------------[ values ]---------------------------------------
 
-vector CSVReader::readRowValues(const std::string &line) const {
+vector dataset::readRowValues(const std::string &line) const {
 	
 	std::vector<valueType> row = readRow<valueType>(line, _sep);	
 	return vector(row);
 }	
 
 
-std::vector<vector> CSVReader::readCSVValues(const std::string &filepath) {
+std::vector<vector> dataset::readCSVValues(const std::string &filepath) {
 	
 	std::vector<vector> values;
 	std::ifstream is(filepath);
@@ -130,7 +130,7 @@ std::vector<vector> CSVReader::readCSVValues(const std::string &filepath) {
 
 // ---------------------------------[ normalization, scaling ]---------------------------------------
 
-void CSVReader::normalizeValues(std::vector<vector> &values) const {
+void dataset::normalizeValues(std::vector<vector> &values) const {
 		
 	for (size_t col = 0; col < values[0].size(); ++col) {
 		valueType sum = 0.0;
@@ -159,7 +159,7 @@ void CSVReader::normalizeValues(std::vector<vector> &values) const {
 // -----------------------------[ other functions / methods ]-----------------------------------
 
 /* Used to export predictions/labels */
-void CSVReader::exportResults(const std::string &filepath, const std::vector<int> &results) {
+void dataset::exportResults(const std::string &filepath, const std::vector<int> &results) {
 	std::ofstream os(filepath);
 	for (const auto &value : results) {
 		os << value << std::endl;
@@ -172,7 +172,7 @@ void CSVReader::exportResults(const std::string &filepath, const std::vector<int
  * and actual labels, similarly to python_evaluator. */
 void displayAccuracy(const std::string &expectedValuesPath, const std::string &actualValuesPath) {
 	
-	CSVReader reader;	
+	dataset reader;	
 	auto expectedLabels = reader.readCSVLabels(expectedValuesPath);
 	auto actualLabels = reader.readCSVLabels(actualValuesPath);
 	

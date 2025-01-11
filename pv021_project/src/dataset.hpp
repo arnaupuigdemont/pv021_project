@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-class CSVReader {
+class dataset {
 		
 	char _sep;
 	vector readRowValues(const std::string &line) const;
@@ -16,7 +16,7 @@ class CSVReader {
 
 public:
 
-	CSVReader(char sep = ',') : _sep(sep) {}	
+	dataset(char sep = ',') : _sep(sep) {}	
 	
 	std::vector<vector> readCSVValues(const std::string &filepath);
     std::vector<int> readCSVLabels(const std::string &filepath);
