@@ -17,7 +17,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
-double initial_rate = 0.0001; 
+double initial_rate = 0.001; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 128; 
 int lambda = 0.0;
@@ -46,10 +46,10 @@ int main() {
         test_data.normalize();
 
     //CREATE LAYERS
-        Layer input_layer(784, 256);
-        BatchNorm batch_norm(256);
+        Layer input_layer(784, 512);
+        BatchNorm batch_norm(512);
 
-        Layer hidden_layer1(256, 128);
+        Layer hidden_layer1(512, 128);
         BatchNorm batch_norm1(128);
 
         Layer hidden_layer2(128, 64);
