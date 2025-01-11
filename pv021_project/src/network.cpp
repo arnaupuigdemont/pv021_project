@@ -133,7 +133,7 @@ void MLP::backPropagate(size_t targetLabel) {
     
     // Compute delta at the output layer as: delta = output - expected.
     // Se usa un bucle para modificar directamente el vector de deltas.
-    for (int i = 0; i < outputLayer.size(); ++i) {
+    for (size_t i = 0; i < outputLayer.size(); ++i) {
         outputLayer._deltas[i] = outputLayer._outputs[i] - expected[i];
     }
     
@@ -145,15 +145,11 @@ void MLP::backPropagate(size_t targetLabel) {
         Layer &nextLayer    = _layerStack[layerIdx + 1];
 
         // Para cada neurona de la capa actual, calcular el error acumulado a partir de la siguiente capa.
-        for (int i = 0; i < currentLayer.size(); ++i) {
-            // Usamos una lambda para acumular el error ponderado de la siguiente capa.
-            auto accumulateDelta = [&nextLayer, i](valueType sum, valueType delta, valueType weight) -> valueType {
-                return sum + delta * weight;
-            };
+        for (size_t i = 0; i < currentLayer.size(); ++i) {
 
             // Empleamos un bucle simple para acumular los deltas.
             valueType accumulatedError = 0.0;
-            for (int j = 0; j < nextLayer.size(); ++j) {
+            for (size_t j = 0; j < nextLayer.size(); ++j) {
                 accumulatedError += nextLayer._deltas[j] * nextLayer._weights[i][j];
             }
             // Multiplicar el error acumulado por la derivada de la activación de la neurona actual.
