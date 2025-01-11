@@ -16,7 +16,7 @@ void MLP::train(const std::vector<Vector> &trainData,
                 int epochs,
                 int batchSize) {
     // Establecer la tasa de aprendizaje global
-    _lr = lr;
+    this->_lr = lr;
     
     int totalSamples = trainData.size();
     int numBatches = totalSamples / batchSize;
@@ -52,10 +52,8 @@ void MLP::train(const std::vector<Vector> &trainData,
             _trainLabels = currentBatchLabels;
             
             // Calcular el "globalStep" (por ejemplo, para actualizar gradientes)
-            int globalStep = epoch * numBatches + batch + 1;
-            
-            // Actualizar pesos usando los datos acumulados del batch
-            updateWeights(globalStep);
+            _globalStep++;
+            updateWeights(_globalStep);
         }
     }
 }

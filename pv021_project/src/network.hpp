@@ -14,6 +14,8 @@ class MLP {
         std::vector<Vector> _trainData;
         std::vector<int>    _trainLabels;
 
+        int _globalStep = 0;
+
         std::vector<Layer> _layerStack; // Stack of layers
 
         int _inputSize;   // Input size
