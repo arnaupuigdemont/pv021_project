@@ -17,7 +17,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
-double initial_rate = 0.001; 
+const double initial_rate = 0.001; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 128; 
 int lambda = 0.0;
@@ -58,7 +58,7 @@ int main() {
         Layer output_layer(64, 10);
 
     //TRAINING 
-        double learning_rate = initial_rate;
+        //double learning_rate = initial_rate;
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
