@@ -66,12 +66,4 @@ Vector leakyReLuDerivative(const Vector &inputVector, float alpha);
 // (Often this is computed together with the loss, but here it is defined as a separate function.)
 Vector softmaxDerivative(const Vector &inputVector);
 
-// ====================================================================
-// Additional Overloaded Utility Functions
-// ====================================================================
-
-// Utility function for combining vectors with a sign factor.
-// 'sign' should be either +1 or -1.
-Vector plusMinusVectors(const Vector &a, const Vector &b, int sign);
-
 #endif

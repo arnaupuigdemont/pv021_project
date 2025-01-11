@@ -41,4 +41,6 @@ public:
     void emplace_back(valueType value) { _data.emplace_back(value); }
     const std::vector<valueType>& getData() const { return _data; }
 };
+Vector plusMinusVectors(const Vector &a, const Vector &b, int sign);
+
 #endif
