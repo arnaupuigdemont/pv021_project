@@ -20,21 +20,21 @@ private:
 
     bool output;
 
-    Matrix _outputs;           // antes _values
-    Matrix _valDerivs;         // antes _valuesDerivatives
+    Vector _outputs;           // antes _values
+    Vector _valDerivs;         // antes _valuesDerivatives
 
     Matrix _weights;
-    Matrix _bias;
+    Vector _bias;
 
     Matrix _grads;             // antes _gradients
-    Matrix _biasGrads;         // antes _biasGradients
+    Vector _biasGrads;         // antes _biasGradients
 
-    Matrix _deltas;
+    Vector _deltas;
 
     Matrix _m_w_adam;
     Matrix _v_w_adam;
-    Matrix _m_b_adam;
-    Matrix _v_b_adam;
+    Vector _m_b_adam;
+    Vector _v_b_adam;
 
     const valueType beta1 = 0.9;
     const valueType beta2 = 0.999;
@@ -58,25 +58,25 @@ public:
     Layer(int inDim, int outDim, bool output)
       : 
         output(output),
-        _outputs(1, outDim),
-        _valDerivs(1, outDim),
+        _outputs(outDim),
+        _valDerivs(outDim),
         _weights(initWeights(inDim, outDim, output)),
-        _bias(1, initBias(outDim)),
+        _bias(initBias(outDim)),
         _grads(inDim, outDim),
-        _biasGrads(1, outDim),
-        _deltas(1, outDim),
+        _biasGrads(outDim),
+        _deltas(outDim),
         _m_w_adam(inDim, outDim),
         _v_w_adam(inDim, outDim),
-        _m_b_adam(1, outDim),
-        _v_b_adam(1, outDim),
+        _m_b_adam(outDim),
+        _v_b_adam(outDim),
 		_sgdVelocity(inDim, outDim),
 		_sgdBiasVelocity(outDim),      
         _dimension(outDim),
         _leakyAlpha(0.01) {}
 
     const Matrix& getWeights() const { return _weights; }
-    const Matrix& getBias()    const { return _bias; }
-    const Matrix& getOutputs() const { return _outputs; }
+    const Vector& getBias()    const { return _bias; }
+    const Vector& getOutputs() const { return _outputs; }
 
     int getDimension() const { return _dimension; }
     size_t size()      const { return static_cast<size_t>(_dimension); }

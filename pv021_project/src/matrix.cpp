@@ -22,6 +22,16 @@ Matrix operator+(const Matrix &A, const Matrix &B) {
     return sum;
 }
 
+Matrix operator-(const Matrix &A, const Matrix &B) {
+    Matrix diff(A.rows(), A.cols());
+    for (int i = 0; i < A.rows(); ++i) {
+        for (int j = 0; j < A.cols(); ++j) {
+            diff[i][j] = A[i][j] - B[i][j];
+        }
+    }
+    return diff;
+}
+
 Vector operator*(const Matrix &m, const Vector &v) {
     Vector result(m.rows());
     for (int i = 0; i < m.rows(); ++i) {

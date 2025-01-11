@@ -20,8 +20,6 @@ public:
     explicit Matrix(const std::vector<Vector> &rowsData)
         : _rows(rowsData.size()), _cols(rowsData[0].size()), _rowsData(rowsData) {}
 
-    Matrix(int rows, const Vector& vec);
-
     // Overloaded operators for matrix arithmetic.
     friend Matrix operator+(const Matrix &a, const Matrix &b);
     friend Vector operator*(const Matrix &m, const Vector &v);
