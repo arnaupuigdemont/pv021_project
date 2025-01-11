@@ -1,87 +1,62 @@
 #include "network.hpp"
 #include "matrix.hpp"
 #include <vector>
-#include <algorithm>
 #include <random>
-#include <iostream>
+#include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <chrono>
 
 // =================================================
 // MLP: Entrenamiento
 // =================================================
 void MLP::train(const std::vector<Vector> &trainData,
-                const std::vector<int> &trainLabels,
+                const std::vector<int>    &trainLabels,
                 valueType lr,
                 int epochs,
                 int batchSize) {
+    // Establecer la tasa de aprendizaje global
     _lr = lr;
-    int totalSamples = static_cast<int>(trainData.size());
+    
+    int totalSamples = trainData.size();
     int numBatches = totalSamples / batchSize;
-
-    // Emparejar datos y etiquetas
-    std::vector<std::pair<Vector,int>> dataset;
-    dataset.reserve(totalSamples);
+    
+    // Generar vector de índices [0, 1, ..., totalSamples-1]
+    std::vector<int> indices(totalSamples);
     for (int i = 0; i < totalSamples; ++i) {
-        dataset.emplace_back(trainData[i], trainLabels[i]);
+        indices[i] = i;
     }
-
-    // Bucle principal de entrenamiento
+    
+    // Iterar sobre las épocas
     for (int epoch = 0; epoch < epochs; ++epoch) {
-        std::cout << "Epoch " << (epoch + 1) << " / " << epochs << std::endl;
-
-        // Mezclar datos
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::shuffle(dataset.begin(), dataset.end(), gen);
-
-        // Entrenar por lotes (batch)
-        for (int b = 0; b < numBatches; ++b) {
-            int batchStart = b * batchSize;
-            int batchEnd = batchStart + batchSize;
-
-            // Acumular gradientes
-            for (int idx = batchStart; idx < batchEnd; ++idx) {
-                const auto &sample = dataset[idx].first;
-                int label = dataset[idx].second;
-
-                feedForward(sample);    // Propagación hacia adelante
-                backPropagate(label);   // Retropropagación
-
-                // Acumular gradientes en cada capa
-                for (size_t layerIdx = 0; layerIdx < _layerStack.size(); ++layerIdx) {
-                    Layer &layer = _layerStack[layerIdx];
-                    const Vector &belowValues = (layerIdx == 0)
-                        ? sample
-                        : _layerStack[layerIdx - 1]._outputs;
-
-                    for (int row = 0; row < layer._weights.rows(); ++row) {
-                        for (int col = 0; col < layer._weights.cols(); ++col) {
-                            layer._grads[row][col] += layer._deltas[col] * belowValues[row];
-                        }
-                    }
-                    for (size_t neuron = 0; neuron < layer.size(); ++neuron) {
-                        layer._biasGrads[neuron] += layer._deltas[neuron];
-                    }
-                }
+        std::cout << "Epoch " << epoch + 1 << " / " << epochs << std::endl;
+        
+        // Mezclar índices de forma determinista (usar semilla fija para reproducibilidad)
+        std::mt19937 rng(0);
+        std::shuffle(indices.begin(), indices.end(), rng);
+        
+        // Procesar cada mini-batch
+        for (int batch = 0; batch < numBatches; ++batch) {
+            // Crear mini-batch para datos y etiquetas
+            std::vector<Vector> currentBatchData(batchSize);
+            std::vector<int>    currentBatchLabels(batchSize);
+            
+            for (int i = 0; i < batchSize; ++i) {
+                int dataIndex = indices[batch * batchSize + i];
+                currentBatchData[i]   = trainData[dataIndex];
+                currentBatchLabels[i] = trainLabels[dataIndex];
             }
-
-            // Actualizar parámetros (pesos y bias) en cada capa
-            for (auto &layer : _layerStack) {
-                for (int row = 0; row < layer._weights.rows(); ++row) {
-                    for (int col = 0; col < layer._weights.cols(); ++col) {
-                        // Regularización L2 (si se usa)
-                        layer._grads[row][col] += regLambda * layer._weights[row][col];
-                        layer._weights[row][col] -= (lr / batchSize) * layer._grads[row][col];
-                        layer._grads[row][col] = 0.0;
-                    }
-                }
-                for (size_t neuron = 0; neuron < layer.size(); ++neuron) {
-                    layer._bias[neuron] -= (lr / batchSize) * layer._biasGrads[neuron];
-                    layer._biasGrads[neuron] = 0.0;
-                }
-            }
+            
+            // Almacenar el batch actual en las variables internas del MLP
+            _trainData   = currentBatchData;
+            _trainLabels = currentBatchLabels;
+            
+            // Calcular el "globalStep" (por ejemplo, para actualizar gradientes)
+            int globalStep = epoch * numBatches + batch + 1;
+            
+            // Actualizar pesos usando los datos acumulados del batch
+            updateWeights(globalStep);
         }
-        // (Opcional) Mostrar métricas de entrenamiento
     }
 }
 
@@ -216,7 +191,7 @@ void MLP::updateWeights(int globalStep) {
         }
 
         // Actualizar biases (usualmente sin regularización)
-        for (int i = 0; i < layer._bias.size(); ++i) {
+        for (size_t i = 0; i < layer._bias.size(); ++i) {
             //updateBiasSGD(i, globalStep, layer);
 			updateBiasAdam(i, globalStep, layer);
             layer._biasGrads[i] = 0;
