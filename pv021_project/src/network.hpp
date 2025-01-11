@@ -65,7 +65,7 @@ public:
 
 class MLP {
 
-	const double lambda = 0.001;
+	const double lambda = 0.01;
 
 	std::vector<vector> _inputValues;
 	std::vector<int> _inputLabels;

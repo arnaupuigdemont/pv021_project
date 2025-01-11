@@ -18,7 +18,7 @@ int main() {
     network.addLayer(10, activations::_softmax);
 
     std::cout << "Training..." << std::endl;
-    network.train(trainValues, trainLabels, 0.001, 15, 256);
+    network.train(trainValues, trainLabels, 0.001, 15, 128);
 
     std::cout << "Predicting..." << std::endl;
     auto testValues = reader.readCSVValues("data/fashion_mnist_test_vectors.csv");
