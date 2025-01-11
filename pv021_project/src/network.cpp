@@ -7,9 +7,9 @@
 #include <iostream>
 #include <chrono>
  
-// =================================================
-// MLP: Entrenamiento
-// =================================================
+/**
+ * @brief train the network using the given data
+ */
 void MLP::train(const std::vector<Vector> &trainData,
                 const std::vector<int>    &trainLabels,
                 valueType lr,
@@ -61,9 +61,9 @@ void MLP::train(const std::vector<Vector> &trainData,
 }
 
 
-// =================================================
-// MLP: Predicción
-// =================================================
+/**
+ * @brief predict the labels for the given data
+ */
 std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
     std::vector<int> predictedLabels;
 
@@ -90,9 +90,9 @@ std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
 }
 
 
-// =================================================
-// MLP: Añadir capa
-// =================================================
+/**
+ * @brief add a new layer to the network
+ */
 void MLP::addLayer(int outDim) {
     int inDim;
     if (_layerStack.empty()) {
@@ -103,6 +103,9 @@ void MLP::addLayer(int outDim) {
     _layerStack.emplace_back(inDim, outDim, false);
 }
 
+/**
+ * @brief add a new output layer to the network
+ */
 void MLP::addOutputLayer(int outDim) {
 	int inDim;
 	if (_layerStack.empty()) {
@@ -113,9 +116,9 @@ void MLP::addOutputLayer(int outDim) {
 	_layerStack.emplace_back(inDim, outDim, true);
 }
 
-// =================================================
-// MLP: Retropropagación
-// =================================================
+/**
+ * @brief one-hot encoding
+ */
 Vector oneHot(size_t targetLabel, int dimension) {
     std::vector<valueType> encoding(dimension, 0.0);
     if (targetLabel < static_cast<size_t>(dimension)) {
@@ -124,6 +127,9 @@ Vector oneHot(size_t targetLabel, int dimension) {
     return Vector(encoding);
 }
 
+/**
+ * @brief backpropagate the error through the network
+ */
 void MLP::backPropagate(size_t targetLabel) {
     // ----- Step 1: Compute error at the output layer using one-hot encoding -----
 
@@ -137,7 +143,6 @@ void MLP::backPropagate(size_t targetLabel) {
         outputLayer._deltas[i] = outputLayer._outputs[i] - expected[i];
     }
     
-    // ----- Step 2: Backpropagate error through hidden layers -----
     // Iterate from the second-last layer down to the first.
     // Instead of usar bucles anidados de forma clásica, usamos una lambda para procesar cada capa.
     for (int layerIdx = static_cast<int>(_layerStack.size()) - 2; layerIdx >= 0; --layerIdx) {
@@ -159,11 +164,11 @@ void MLP::backPropagate(size_t targetLabel) {
 }
 
 
-// =================================================
-// MLP: Actualizar pesos
-// =================================================
+/**
+ * @brief update the weights of the network using the accumulated gradients
+ */
 void MLP::updateWeights(int globalStep) {
-    // Phase 1: Accumulate gradients over each sample in the mini-batch.
+    //Accumulate gradients over each sample in the mini-batch.
     for (size_t sampleIdx = 0; sampleIdx < _trainData.size(); ++sampleIdx) {
         // Retrieve the current input sample and its label.
         const Vector &currentSample = _trainData[sampleIdx];
@@ -196,7 +201,7 @@ void MLP::updateWeights(int globalStep) {
         }
     }
 
-    // Phase 2: Update the parameters (weights and biases) for each layer.
+    //Update the parameters (weights and biases) for each layer.
     for (auto &layer : _layerStack) {
         // Update weights.
         #pragma omp parallel for num_threads(16)
@@ -223,9 +228,9 @@ void MLP::updateWeights(int globalStep) {
 }
 
 
-// =================================================
-// MLP: Forward Pass
-// =================================================
+/**
+ * @brief feed the input through the network
+ */
 void MLP::feedForward(const Vector &inputVec) {
     Vector preActivation;  // 'rawZ': salida de la operación lineal
 
@@ -252,16 +257,16 @@ void MLP::feedForward(const Vector &inputVec) {
     }
 }
 
-// =================================================
-// MLP: Obtener salida final de la red
-// =================================================
+/**
+ * @brief get the output of the network
+ */
 Vector MLP::getMLPOutput() {
     return _layerStack.back()._outputs;
 }
 
-// =================================================
-// Adam en Pesos
-// =================================================
+/**
+ * @brief update the weights using the Adam optimizer
+ */
 void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const {
 
     // 1. Extraer el gradiente actual
@@ -284,9 +289,9 @@ void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const {
 }
 
 
-// =================================================
-// Adam en Bias
-// =================================================
+/**
+ * @brief update the bias using the Adam optimizer
+ */
 void MLP::updateBiasAdam(int idx, int step, Layer &layer) const {
     // Constantes de Adam para el bias
     const valueType beta1 = 0.9;
@@ -308,9 +313,9 @@ void MLP::updateBiasAdam(int idx, int step, Layer &layer) const {
 }
 
 
-// =================================================
-// MLP: Actualizar Pesos con SGD
-// =================================================
+/**
+ * @brief update the weights using the SGD optimizer
+ */
 void MLP::updateWeightSGD(int row, int col, int step, Layer &layer) const {
     // Constante de momentum (puedes definirla globalmente o como atributo)
     const valueType momentum = 0.9;
@@ -330,6 +335,9 @@ void MLP::updateWeightSGD(int row, int col, int step, Layer &layer) const {
     layer._weights[row][col] += layer._sgdVelocity[row][col];
 }
 
+/**
+ * @brief update the bias using the SGD optimizer
+ */
 void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
     const valueType momentum = 0.9;
 
@@ -345,9 +353,9 @@ void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
     layer._bias[idx] += layer._sgdBiasVelocity[idx];
 }
 
-// =================================================
-// MLP: Ajustar la alpha de LeakyReLU
-// =================================================
+/**
+ * @brief set the alpha value for the LeakyReLU activation function
+ */
 void MLP::setLeakyReLUAlpha(valueType alpha) {
     for (auto &layer : _layerStack) {
         layer._leakyAlpha = alpha;

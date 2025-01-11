@@ -9,9 +9,9 @@
 #include <omp.h>
 
 
-// ====================================================================
-// Overloaded Operators for Matrix
-// ====================================================================
+/**
+ * @brief operator+ sum of two vectors
+ */
 Matrix operator+(const Matrix &A, const Matrix &B) {
     Matrix sum(A.rows(), A.cols());
     for (int i = 0; i < A.rows(); ++i) {
@@ -22,6 +22,9 @@ Matrix operator+(const Matrix &A, const Matrix &B) {
     return sum;
 }
 
+/**
+ * @brief operator* matrix-vector multiplication
+ */
 Vector operator*(const Matrix &m, const Vector &v) {
     Vector result(m.rows());
     for (int i = 0; i < m.rows(); ++i) {
@@ -30,6 +33,9 @@ Vector operator*(const Matrix &m, const Vector &v) {
     return result;
 }
 
+/**
+ * @brief operator* vector-matrix multiplication
+ */
 Vector operator*(const Vector &v, const Matrix &m) {
     Vector result(m.cols());
 #pragma omp parallel for num_threads(16)
@@ -41,9 +47,6 @@ Vector operator*(const Vector &v, const Matrix &m) {
     return result;
 }
 
-// ====================================================================
-// Matrix Row and Column Setters
-// ====================================================================
 Vector Matrix::row(int i) const {
     Vector r(cols());
     for (int j = 0; j < cols(); ++j) {
@@ -61,12 +64,12 @@ Vector Matrix::col(int j) const {
 }
 
  // Return the number of columns.
-    int Matrix::cols() const { return _cols; }
-    // Return the number of rows.
-    int Matrix::rows() const { return _rows; }
-    // Returns the number of rows.
-    size_t Matrix::size() const { return _rows; }
+int Matrix::cols() const { return _cols; }
+// Return the number of rows.
+int Matrix::rows() const { return _rows; }
+// Returns the number of rows.
+size_t Matrix::size() const { return _rows; }
 
-    const std::vector<Vector>& Matrix::getData() const { return _rowsData; }
+const std::vector<Vector>& Matrix::getData() const { return _rowsData; }
 
 

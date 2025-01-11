@@ -4,6 +4,9 @@
 #include <iostream>
 #include <cmath>
 
+/**
+ * @brief read a row from a string
+ */
 template <typename T>
 std::vector<T> readRow(const std::string &line, char sep) {
     std::vector<T> row;
@@ -37,6 +40,9 @@ std::vector<T> readRow(const std::string &line, char sep) {
     return row;
 }
 
+/**
+ * @brief read labels from a file
+ */
 std::vector<int> dataset::readLabels(const std::string &filepath) {
     std::vector<int> values;
     std::ifstream is(filepath);
@@ -57,6 +63,9 @@ std::vector<int> dataset::readLabels(const std::string &filepath) {
     return values;
 }
 
+/**
+ * @brief read values from a file
+ */
 std::vector<Vector> dataset::readValues(const std::string &filepath) 
 {
     std::vector<Vector> values;
@@ -83,6 +92,9 @@ std::vector<Vector> dataset::readValues(const std::string &filepath)
     return values;
 }
 
+/**
+ * @brief Normalize values
+ */
 void dataset::normalizeValues(std::vector<Vector> &values) const {
     if (values.empty()) return; 
 
@@ -113,7 +125,9 @@ void dataset::normalizeValues(std::vector<Vector> &values) const {
     }
 }
 
-
+/**
+ * @brief write results to a file
+ */
 void dataset::writeResults(const std::string &filepath, const std::vector<int> &results) {
 	std::ofstream os(filepath);
 	for (const auto &value : results) {
