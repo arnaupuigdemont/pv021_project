@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iostream>
 #include <chrono>
-
+ 
 // =================================================
 // MLP: Entrenamiento
 // =================================================

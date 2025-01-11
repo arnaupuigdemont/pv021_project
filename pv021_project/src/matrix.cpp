@@ -7,6 +7,7 @@
 #include "vector.hpp"
 #include <omp.h>
 
+Matrix::Matrix(int rows, const Vector& vec) : _rows(rows), _cols(vec.size()), _rowsData(rows, vec) {}
 
 // ====================================================================
 // Overloaded Operators for Matrix
