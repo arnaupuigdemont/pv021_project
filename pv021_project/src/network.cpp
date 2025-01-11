@@ -1,309 +1,362 @@
 #include "network.hpp"
 #include "matrix.hpp"
 #include <vector>
-#include <random>  
-#include <algorithm>  
-#include <cmath>  
+#include <random>
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <chrono>
 
+// =================================================
+// MLP: Entrenamiento
+// =================================================
+void MLP::train(const std::vector<vector> &trainData,
+                const std::vector<int>    &trainLabels,
+                valueType lr,
+                int epochs,
+                int batchSize)
+{
+    _lr = lr;  // antes _learningRate = learningRate
 
-void MLP::train(const std::vector<vector> &inputValues, const std::vector<int> &inputLabels, valueType learningRate, int epochs, int batchSize) {
+    std::vector<vector> miniBatchData(batchSize);
+    std::vector<int>    miniBatchLabels(batchSize);
 
-	_learningRate = learningRate;
+    int totalSamples = trainData.size();
+    int batchCount   = totalSamples / batchSize;
 
-	std::vector<vector> batchValues(batchSize);
-	std::vector<int> batchLabels(batchSize);	
+    // Generar índices [0..totalSamples-1]
+    std::vector<int> indices(totalSamples);
+    for (int i = 0; i < totalSamples; ++i) {
+        indices[i] = i;
+    }
 
-	int n_examples = inputValues.size();
-	int batchCount = n_examples / batchSize;
-	
-	std::vector<int> indexes(n_examples);
-	for (int i = 0; i < n_examples; ++i) {
-		indexes[i] = i;
-	}
+    for (int e = 0; e < epochs; ++e) {
 
-    for (int i = 0; i < epochs; ++i) {
+        std::cout << "Epoch " << e + 1 << " / " << epochs << std::endl;
 
-		std::cout << "Epoch " << i + 1 << " / " << epochs << std::endl;
-
+        // Barajar índices de forma determinista (puedes usar semilla variable si deseas aleatoriedad real)
         std::random_device rd;
-		std::mt19937 generator(0);
-		std::shuffle(indexes.begin(), indexes.end(), generator);        
-        
-		for (int j = 0; j < batchCount; ++j) {
-			
-			for (int k = 0; k < batchSize; ++k) {
-				int index = indexes[j*batchSize + k];
-				batchValues[k] = inputValues[index];
-				batchLabels[k] = inputLabels[index];
-			}
+        std::mt19937 generator(0);
+        std::shuffle(indices.begin(), indices.end(), generator);
 
-			_inputValues = batchValues;
-			_inputLabels = batchLabels;
+        // Iterar en batches
+        for (int b = 0; b < batchCount; ++b) {
+            for (int k = 0; k < batchSize; ++k) {
+                int idx = indices[b * batchSize + k];
+                miniBatchData[k]   = trainData[idx];
+                miniBatchLabels[k] = trainLabels[idx];
+            }
 
-			updateWeights(i * batchCount + j + 1);
-		}
-	}
+            // Guardamos el batch actual para el paso de update
+            _trainData   = miniBatchData;   // antes _inputValues
+            _trainLabels = miniBatchLabels; // antes _inputLabels
+
+            // step = e * batchCount + b + 1
+            updateWeights(e * batchCount + b + 1);
+        }
+    }
 }
 
-std::vector<int> MLP::predict(const std::vector<vector> &testValues) {
-
+// =================================================
+// MLP: Predicción
+// =================================================
+std::vector<int> MLP::predict(const std::vector<vector> &testData)
+{
     std::vector<int> predictions;
-    vector currentMLPOutput;
+    vector netOutput;
 
-    for (const auto& input : testValues) {
+    for (const auto &inputVec : testData) {
+        feedForward(inputVec);    // antes feedForward
+        netOutput = getMLPOutput();  // antes getMLPOutput
 
-        feedForward(input);
-        currentMLPOutput = getMLPOutput();
-		
-        valueType maxValue = -1;
-        int currentPrediction = 0;
-
-        for (size_t i = 0; i < currentMLPOutput.size(); ++i) {
-			if (currentMLPOutput[i] >= maxValue) {
-                maxValue = currentMLPOutput[i];
-                currentPrediction = i;
-			}
-		}
-		predictions.emplace_back(currentPrediction);
+        // Tomar argmax
+        valueType maxVal = -1e9;
+        int bestIndex    = 0;
+        for (size_t i = 0; i < netOutput.size(); ++i) {
+            if (netOutput[i] >= maxVal) {
+                maxVal    = netOutput[i];
+                bestIndex = i;
+            }
+        }
+        predictions.push_back(bestIndex);
     }
 
     return predictions;
 }
 
-
-vector MLP::getMLPOutput() {
-    return _layers.back().getValues();
+// =================================================
+// MLP: Añadir capa
+// =================================================
+void MLP::addLayer(int outDim, ActivationType actFunc)
+{
+    int inDim;
+    if (_layerStack.empty()) {
+        inDim = _inputSize;  // antes _inputDimension
+    } else {
+        inDim = _layerStack.back().getDimension();
+    }
+    _layerStack.emplace_back(inDim, outDim, actFunc);
 }
 
+// =================================================
+// MLP: Retropropagación
+// =================================================
+void MLP::backPropagate(size_t labelIdx)
+{
+    // 1) Capa de salida (one-hot)
+    Layer &lastLayer = _layerStack.back();
+    for (size_t i = 0; i < lastLayer.size(); ++i) {
 
+        valueType labelOneHot = (labelIdx == i) ? 1.0 : 0.0;
+        lastLayer._deltas[i]  = lastLayer._outputs[i] - labelOneHot;
+    }
 
-void MLP::addLayer(int dimension, activations activationFunction) {
+    // 2) Capas intermedias (propagar deltas hacia atrás)
+    for (int l = static_cast<int>(_layerStack.size()) - 2; l >= 0; --l) {
+        Layer &curLayer  = _layerStack[l];
+        Layer &nextLayer = _layerStack[l + 1];
 
-    int oldDimension;
-	if (_layers.empty()) {
-		oldDimension = _inputDimension;
-	} else {
-		oldDimension = _layers.back().dimension();
-	}
-
-	_layers.emplace_back(oldDimension, dimension, activationFunction);
+        for (size_t i = 0; i < curLayer.size(); ++i) {
+            valueType sumDeltas = 0.0;
+            for (size_t j = 0; j < nextLayer.size(); ++j) {
+                sumDeltas += nextLayer._deltas[j] * nextLayer._weights[i][j];
+            }
+            // Multiplicar por la derivada de la activación
+            curLayer._deltas[i] = sumDeltas * curLayer._valDerivs[i];
+        }
+    }
 }
 
+// =================================================
+// MLP: Actualizar pesos
+// =================================================
+void MLP::updateWeights(int step)
+{
+    // 1) Para cada muestra en el batch => forward + backward
+    for (size_t k = 0; k < _trainData.size(); ++k) {
+        auto &sample = _trainData[k];
+        auto  label  = _trainLabels[k];
 
-void MLP::backPropagate(size_t inputLabel) {
+        feedForward(sample);
+        backPropagate(label);
 
-    for (size_t i = 0; i < _layers.back().size(); ++i) {
-		
-		valueType inputLabelHotEncoded;
-		if (inputLabel == i) {
-			inputLabelHotEncoded = 1.0;
-		} else {
-			inputLabelHotEncoded = 0.0;
-		}
+        // Acumular gradientes (sin actualizar aún)
+        for (size_t l = 0; l < _layerStack.size(); ++l) {
+            Layer &layer = _layerStack[l];
 
-		_layers.back()._deltas[i] = _layers.back()._values[i] - inputLabelHotEncoded;		
-	}
-				
-	for (int l = (int)_layers.size() - 2; l >= 0; --l) {
-		for (size_t i = 0; i < _layers[l].size(); ++i) {  
-			valueType deltasSum = 0;
-			for (size_t j = 0; j < _layers[l+1].size(); ++j) {											
-				deltasSum += _layers[l+1]._deltas[j] * _layers[l+1]._weights[i][j];
-			}
-			_layers[l]._deltas[i] = deltasSum * _layers[l]._valuesDerivatives[i];
-		}
-	}
+            const vector &belowOutputs = (l == 0)
+                                         ? sample
+                                         : _layerStack[l - 1]._outputs;
+
+            for (int i = 0; i < layer._weights.rows(); ++i) {
+                for (int j = 0; j < layer._weights.cols(); ++j) {
+                    layer._grads[i][j] += layer._deltas[j] * belowOutputs[i];
+                }
+            }
+            for (size_t j = 0; j < layer.size(); ++j) {
+                layer._biasGrads[j] += layer._deltas[j];
+            }
+        }
+    }
+
+    // 2) Aplicar Adam + limpiar gradientes
+    for (auto &layer : _layerStack) {
+
+#pragma omp parallel for num_threads(16)
+        for (int i = 0; i < layer._weights.rows(); ++i) {
+            for (int j = 0; j < layer._weights.cols(); ++j) {
+                // L2 regularization
+                layer._grads[i][j] += regLambda * layer._weights[i][j];
+
+                // Actualizar con Adam
+                updateWeightAdam(i, j, step, layer);
+
+                // Limpiar grad acumulado
+                layer._grads[i][j] = 0;
+            }
+        }
+
+        // Bias (normalmente sin regularizar)
+        for (size_t i = 0; i < layer._bias.size(); ++i) {
+            updateBiasAdam(i, step, layer);
+            layer._biasGrads[i] = 0;
+        }
+    }
 }
 
+// =================================================
+// MLP: Forward Pass
+// =================================================
+void MLP::feedForward(const vector &inputVec)
+{
+    vector rawZ;
+    for (size_t i = 0; i < _layerStack.size(); ++i) {
+        Layer &layer = _layerStack[i];
 
-void MLP::updateWeights(int step) {
+        if (i == 0) {
+            // Primera capa
+            rawZ = (inputVec * layer._weights) + layer._bias;
+        } else {
+            Layer &prevLayer = _layerStack[i - 1];
+            rawZ = (prevLayer._outputs * layer._weights) + layer._bias;
+        }
 
-	for (size_t k = 0; k < _inputValues.size(); ++k) {
-		
-		auto inputValue = _inputValues[k];
-		auto inputLabel = _inputLabels[k];
-		feedForward(inputValue);
-		backPropagate(inputLabel);
-
-		for (size_t l = 0; l < _layers.size(); ++l) {
-
-			auto layerBelowValues = (l == 0) ? inputValue : _layers[l - 1]._values;
-			
-            for (int i = 0; i < _layers[l]._weights.rows(); ++i) {				
-				for (int j = 0; j < _layers[l]._weights.cols(); ++j) {							
-                    _layers[l]._gradients[i][j] += _layers[l]._deltas[j] * layerBelowValues[i];					
-				}
-			}
-			
-			for (size_t j = 0; j < _layers[l].size(); ++j) {
-				_layers[l]._biasGradients[j] += _layers[l]._deltas[j]; 
-			}
-		}
-	}
-
-	for (auto &layer : _layers) {
-		
-		#pragma omp parallel for num_threads(16)
-		for (int i = 0; i < layer._weights.rows(); ++i) {
-			for (int j = 0; j < layer._weights.cols(); ++j) {
-
-				layer._gradients[i][j] += lambda * layer._weights[i][j];
-
-				updateWeightAdam(i, j, step, layer);
-				layer._gradients[i][j] = 0;
-			}
-		}
-
-		for (size_t i = 0; i < layer._bias.size(); ++i) {
-			updateBiasAdam(i, step, layer);
-			layer._biasGradients[i] = 0;
-		}
-	}
+        // Aplicar activación
+        layer._outputs    = layer.applyActivation(rawZ);
+        // Guardar derivadas para backprop
+        layer._valDerivs  = layer.applyActivationDeriv(rawZ);
+    }
 }
 
-
-void MLP::feedForward(const vector &input) {
-
-	vector innerPotential;
-	for (size_t i = 0; i < _layers.size(); ++i) {
-
-		if (i == 0) {
-			innerPotential = (input * _layers[i]._weights) + _layers[i]._bias;
-		} else {
-			innerPotential = (_layers[i-1]._values * _layers[i]._weights) + _layers[i]._bias;
-		}
-		
-		_layers[i]._values = _layers[i].useActivationFunction(innerPotential);
-		_layers[i]._valuesDerivatives = _layers[i].useDerivedActivationFunction(innerPotential);		
-	}	
+// =================================================
+// MLP: Obtener salida final de la red
+// =================================================
+vector MLP::getMLPOutput()
+{
+    return _layerStack.back()._outputs;
 }
 
+// =================================================
+// Adam en Pesos
+// =================================================
+void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const
+{
+    valueType beta1    = 0.9;
+    valueType beta2    = 0.999;
+    valueType eps      = 1e-8;
 
-initialization getInitializationByActivation(activations activationFunction) {
+    valueType b1t      = std::pow(beta1, step);
+    valueType b2t      = std::pow(beta2, step);
 
-	switch (activationFunction) {
-        case activations::_leakyReLu:
-			return initialization::he;
+    valueType grad     = layer._grads[row][col];
 
-		case activations::_softmax:
+    // Actualizar momentos
+    layer._adamFirstMoment[row][col] =
+        beta1 * layer._adamFirstMoment[row][col] + (1 - beta1) * grad;
+
+    layer._adamSecondMoment[row][col] =
+        beta2 * layer._adamSecondMoment[row][col] + (1 - beta2) * (grad * grad);
+
+    // Corrección de sesgo
+    valueType mHat = layer._adamFirstMoment[row][col] / (1 - b1t);
+    valueType vHat = layer._adamSecondMoment[row][col] / (1 - b2t);
+
+    // Actualización
+    layer._weights[row][col] -= _lr * mHat / (std::sqrt(vHat) + eps);
+}
+
+// =================================================
+// Adam en Bias
+// =================================================
+void MLP::updateBiasAdam(int idx, int step, Layer &layer) const
+{
+    valueType beta1 = 0.9;
+    valueType beta2 = 0.999;
+    valueType eps   = 1e-8;
+
+    valueType b1t   = std::pow(beta1, step);
+    valueType b2t   = std::pow(beta2, step);
+
+    valueType grad  = layer._biasGrads[idx];
+
+    layer._adamBiasFirstMom[idx] =
+        beta1 * layer._adamBiasFirstMom[idx] + (1 - beta1) * grad;
+
+    layer._adamBiasSecondMom[idx] =
+        beta2 * layer._adamBiasSecondMom[idx] + (1 - beta2) * (grad * grad);
+
+    valueType mHat = layer._adamBiasFirstMom[idx]     / (1 - b1t);
+    valueType vHat = layer._adamBiasSecondMom[idx]    / (1 - b2t);
+
+    layer._bias[idx] -= _lr * mHat / (std::sqrt(vHat) + eps);
+}
+
+// =================================================
+// Layer: Usar Función de Activación
+// =================================================
+vector Layer::applyActivation(const vector &zVec)
+{
+    switch (_actType) {
+        case ActivationType::LeakyReLU:
+            return leakyReLu(zVec, _leakyAlpha);
+        case ActivationType::Softmax:
+            return softmax(zVec);
         default:
-			return initialization::glorot;
-	}
-}
-
-
-matrix initializeWeights(int n, int m, activations activationFunction, bool uniformDistribution) {
-
-	matrix weights(n, m);
-
-	initialization init = getInitializationByActivation(activationFunction);
-	valueType multiplier = (uniformDistribution) ? 3.0 : 1.0;
-	valueType upperBound;
-
-	switch (init) {
-		case initialization::glorot:
-			upperBound = std::sqrt(multiplier * 2.0 / (n + m));
-            break;
-        case initialization::he:
-            upperBound = std::sqrt(multiplier * 2.0 / n);
-            break;
+            return vector(zVec.size());
     }
-	valueType lowerBound = -upperBound;
-
-	std::random_device rd;
-	std::mt19937 generator(0);
-	std::uniform_real_distribution<valueType> distribution(lowerBound, upperBound);
-
-	for (int i = 0; i < n; ++i) {
-		for (int j = 0; j < m; ++j) {
-			weights[i][j] = distribution(generator);
-		}
-	}
-
-	return weights;
 }
 
-
-vector initializeBias(int dimension) {
-
-    vector bias(dimension); 
-    return bias;
-}
-
-
-void MLP::updateWeightAdam(int i, int j, int step, Layer& layer) const {
-
-	valueType beta_1 = 0.9;
-	valueType beta_2 = 0.999;
-	valueType epsilon = 1e-8;  
-
-	valueType beta_1_t = std::pow(beta_1, step);
-	valueType beta_2_t = std::pow(beta_2, step);
-
-	valueType gradient = layer._gradients[i][j];
-
-	layer._adamFirstMoment[i][j] = (beta_1) * layer._adamFirstMoment[i][j] + (1 - beta_1) * gradient;
-	layer._adamSecondMoment[i][j] = (beta_2) * layer._adamSecondMoment[i][j] + (1 - beta_2) * (gradient * gradient);
-
-	auto biasCorrectedPastGradient = layer._adamFirstMoment[i][j] / (1 - beta_1_t);
-	auto biasCorrectedPastSquaredGradient = layer._adamSecondMoment[i][j] / (1 - beta_2_t);
-
-    layer._weights[i][j] -= _learningRate / (std::sqrt(biasCorrectedPastSquaredGradient) + epsilon) * biasCorrectedPastGradient;
-}
-	
-void MLP::updateBiasAdam(int i, int step, Layer& layer) const {
-
-	valueType beta_1 = 0.9;
-	valueType beta_2 = 0.999;
-	valueType epsilon = 1e-8;
-	valueType beta_1_t = std::pow(beta_1, step);
-	valueType beta_2_t = std::pow(beta_2, step);
-	
-	valueType gradient = layer._biasGradients[i];
-	
-	layer._adamBiasFirstMoment[i] = (beta_1) * layer._adamBiasFirstMoment[i] + (1 - beta_1) * gradient;
-    layer._adamBiasSecondMoment[i] = (beta_2) * layer._adamBiasSecondMoment[i] + (1 - beta_2) * (gradient * gradient);
-
-    auto biasCorrectedPastGradient = layer._adamBiasFirstMoment[i] / (1 - beta_1_t);
-    auto biasCorrectedPastSquaredGradient = layer._adamBiasSecondMoment[i] / (1 - beta_2_t);
-
-    layer._bias[i] -= _learningRate / (std::sqrt(biasCorrectedPastSquaredGradient) + epsilon) * biasCorrectedPastGradient;
-}
-
-vector Layer::useActivationFunction(const vector &vec) {
-
-    switch (_activationFunction) {
-
-	    case activations::_leakyReLu:
-            return leakyReLu(vec, _leakyReLUAlpha);
-		case activations::_softmax:		    
-			return softmax(vec);
-		default:
-			return vector(vec.size());
-	}
-}
-
-vector Layer::useDerivedActivationFunction(const vector &vec) {
-
-    switch (_activationFunction) {
-        
-        case activations::_leakyReLu:
-            return leakyReLuDerivative(vec, _leakyReLUAlpha);
-        case activations::_softmax:
-            return softmaxDerivative(_values);
+// =================================================
+// Layer: Usar Derivada de la Activación
+// =================================================
+vector Layer::applyActivationDeriv(const vector &zVec)
+{
+    switch (_actType) {
+        case ActivationType::LeakyReLU:
+            return leakyReLuDerivative(zVec, _leakyAlpha);
+        case ActivationType::Softmax:
+            return softmaxDerivative(_outputs);
         default:
-            return vector(vec.size());
+            return vector(zVec.size());
     }
 }
 
-
-void MLP::setLeakyReLUAlpha(valueType alpha) {
-
-    for (auto &layer : _layers) {
-        layer._leakyReLUAlpha = alpha;
+// =================================================
+// MLP: Ajustar la alpha de LeakyReLU
+// =================================================
+void MLP::setLeakyReLUAlpha(valueType alpha)
+{
+    for (auto &layer : _layerStack) {
+        layer._leakyAlpha = alpha;
     }
 }
 
+// =================================================
+// getWeightInitByActivation + initWeights + initBias
+// =================================================
+WeightInitType getWeightInitByActivation(ActivationType actFunc)
+{
+    switch (actFunc) {
+        case ActivationType::LeakyReLU:
+            return WeightInitType::He;
+        case ActivationType::Softmax:
+        default:
+            return WeightInitType::Glorot;
+    }
+}
 
+matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist)
+{
+    matrix w(inDim, outDim);
+    WeightInitType winit = getWeightInitByActivation(actFunc);
+
+    valueType factor = (uniformDist) ? 3.0 : 1.0;
+    valueType bound;
+    switch (winit) {
+        case WeightInitType::Glorot:
+            bound = std::sqrt(factor * 2.0 / (inDim + outDim));
+            break;
+        case WeightInitType::He:
+            bound = std::sqrt(factor * 2.0 / inDim);
+            break;
+    }
+    valueType minVal = -bound;
+    valueType maxVal =  bound;
+
+    std::mt19937 gen(0);
+    std::uniform_real_distribution<valueType> dist(minVal, maxVal);
+
+    for (int i = 0; i < inDim; ++i) {
+        for (int j = 0; j < outDim; ++j) {
+            w[i][j] = dist(gen);
+        }
+    }
+    return w;
+}
+
+vector initBias(int dim)
+{
+    // Inicializamos en 0
+    vector b(dim);
+    return b;
+}
