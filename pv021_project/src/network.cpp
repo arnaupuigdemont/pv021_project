@@ -27,7 +27,9 @@ void MLP::train(const std::vector<vector> &inputValues, const std::vector<int> &
 
 		std::cout << "Epoch " << i + 1 << " / " << epochs << std::endl;
 
-        shuffleIndexes(indexes);        
+        std::random_device rd;
+		std::mt19937 generator(0);
+		std::shuffle(indexes.begin(), indexes.end(), generator);        
         
 		for (int j = 0; j < batchCount; ++j) {
 			
@@ -69,15 +71,6 @@ std::vector<int> MLP::predict(const std::vector<vector> &testValues) {
 
     return predictions;
 }
-
-
-void shuffleIndexes(std::vector<int> &indexes) {
-
-	std::random_device rd;
-	std::mt19937 generator(0);
-	std::shuffle(indexes.begin(), indexes.end(), generator);
-}
-
 
 
 vector MLP::getMLPOutput() {
@@ -157,7 +150,7 @@ void MLP::updateWeights(int step) {
 			for (int j = 0; j < layer._weights.cols(); ++j) {
 
 				layer._gradients[i][j] += lambda * layer._weights[i][j];
-				
+
 				updateWeightAdam(i, j, step, layer);
 				layer._gradients[i][j] = 0;
 			}

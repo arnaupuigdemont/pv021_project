@@ -4,14 +4,11 @@
 #include <iostream>
 #include <cmath>
 
-
 template <typename T>
 std::vector<T> readRow(const std::string &line, char sep) {
-	
-	std::vector<T> row;
-
+    std::vector<T> row;
     if (line.empty()) {
-		T error = -1;
+        T error = -1;
         return {error};
     }
 
@@ -25,11 +22,10 @@ std::vector<T> readRow(const std::string &line, char sep) {
         if (c == sep) {
             currentValue = std::stoi(currentString);
             row.emplace_back(currentValue);
-            currentString = "";
+            currentString.clear();
         } else {
             currentString += c;
         }
-
         ++index;
     }
 
@@ -37,62 +33,64 @@ std::vector<T> readRow(const std::string &line, char sep) {
         currentValue = std::stoi(currentString);
         row.emplace_back(currentValue);
     }
-    
+
     return row;
 }
 
-
-int dataset::readRowLabels(const std::string &line) const {
-	
-	std::vector<int> row = readRow<int>(line, _sep);	
-    return row.front();
-}
-
-
 std::vector<int> dataset::readLabels(const std::string &filepath) {
-
     std::vector<int> values;
     std::ifstream is(filepath);
     std::string line;
 
-    while (std::getline(is, line)) {
-        values.emplace_back(readRowLabels(line));
+    if (!is.is_open()) {
+        throw std::runtime_error("No se pudo abrir el archivo de labels: " + filepath);
     }
+
+    while (std::getline(is, line)) {
+        // Invocar readRow<int>(...)
+        auto row = readRow<int>(line, _sep);  
+        // Asumimos que la etiqueta está en row.front()
+        values.push_back(row.front());
+    }
+
     is.close();
     return values;
 }
 
-vector dataset::readRowValues(const std::string &line) const {
-	
-	std::vector<valueType> row = readRow<valueType>(line, _sep);	
-	return vector(row);
-}	
+std::vector<vector> dataset::readValues(const std::string &filepath) 
+{
+    std::vector<vector> values;
+    std::ifstream is(filepath);
+    std::string line;
 
+    if (!is.is_open()) {
+        throw std::runtime_error("No se pudo abrir el fichero: " + filepath);
+    }
 
-std::vector<vector> dataset::readValues(const std::string &filepath) {
-	
-	std::vector<vector> values;
-	std::ifstream is(filepath);
-	std::string line;
-		
-	while (std::getline(is, line)) {
-		values.emplace_back(readRowValues(line));
-	}
-	is.close();
-	
-	normalizeValues(values);
-		
-	return values;
+    // Leer cada línea del archivo
+    while (std::getline(is, line)) {
+        // Leer la fila “in situ” con readRow<valueType>(...),
+        // y la emplaces como ‘vector’.
+        values.emplace_back(
+            readRow<valueType>(line, _sep)  // Devuelve std::vector<valueType>
+        );
+    }
+    is.close();
+
+    // Llamamos a la función que normaliza los datos
+    normalizeValues(values);
+
+    return values;
 }
 
 void dataset::normalizeValues(std::vector<vector> &values) const {
-    if (values.empty()) return; // Si no hay datos, salir
+    if (values.empty()) return; 
 
     size_t rows = values.size();
     size_t cols = values[0].size();
 
     for (size_t col = 0; col < cols; ++col) {
-        // 1. Calcular suma y suma de cuadrados en una sola pasada
+
         double sum = 0.0;
         double sum_sq = 0.0;
         for (size_t row = 0; row < rows; ++row) {
@@ -101,18 +99,14 @@ void dataset::normalizeValues(std::vector<vector> &values) const {
             sum_sq  += x * x;
         }
 
-        // 2. Calcular media y desviación estándar
         double mean = sum / rows;
-        // var = E(x^2) - (E(x))^2
         double variance = (sum_sq / rows) - (mean * mean);
         double stddev   = std::sqrt(variance);
 
-        // (Opcional) Si stddev es 0 (o muy pequeña), podría causar NaN; manejarlo
         if (stddev < 1e-12) {
-            stddev = 1.0; // Evitar división por 0, por ejemplo
+            stddev = 1.0; 
         }
 
-        // 3. Normalizar
         for (size_t row = 0; row < rows; ++row) {
             values[row][col] = (values[row][col] - mean) / stddev;
         }

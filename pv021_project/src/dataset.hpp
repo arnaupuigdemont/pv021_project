@@ -8,7 +8,6 @@
 class dataset {
 		
 	char _sep;
-	vector readRowValues(const std::string &line) const;
     int readRowLabels(const std::string &line) const;
 
 	void normalizeValues(std::vector<vector> &values) const;
