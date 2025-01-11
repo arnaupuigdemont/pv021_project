@@ -192,7 +192,8 @@ void MLP::updateWeights(int globalStep) {
 
         // Actualizar biases (usualmente sin regularización)
         for (size_t i = 0; i < layer._bias.size(); ++i) {
-            updateBiasSGD(i, globalStep, layer);
+            //updateBiasSGD(i, globalStep, layer);
+			updateBiasAdam(i, globalStep, layer);
             layer._biasGrads[i] = 0;
         }
     }
