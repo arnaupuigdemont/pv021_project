@@ -5,57 +5,36 @@
 // Layer: Usar Función de Activación
 // =================================================
 Vector Layer::applyActivation(const Vector &zVec) {
-    switch (_actType) {
-        case ActivationType::LeakyReLU:
-            return leakyReLu(zVec, _leakyAlpha);
-        case ActivationType::Softmax:
-            return softmax(zVec);
-        default:
-            return Vector(zVec.size());
-    }
+    return leakyReLu(zVec, _leakyAlpha);
+}
+
+Vector Layer::applyActivationOutput(const Vector &zVec) {
+    return softmax(zVec);
 }
 
 // =================================================
 // Layer: Usar Derivada de la Activación
 // =================================================
 Vector Layer::applyActivationDeriv(const Vector &zVec) {
-    switch (_actType) {
-        case ActivationType::LeakyReLU:
-            return leakyReLuDerivative(zVec, _leakyAlpha);
-        case ActivationType::Softmax:
-            return softmaxDerivative(_outputs);
-        default:
-            return Vector(zVec.size());
-    }
+    return leakyReLuDerivative(zVec, _leakyAlpha);
 }
 
-// =================================================
-// getWeightInitByActivation + initWeights + initBias
-// =================================================
-WeightInitType getWeightInitByActivation(ActivationType actFunc) {
-    switch (actFunc) {
-        case ActivationType::LeakyReLU:
-            return WeightInitType::He;
-        case ActivationType::Softmax:
-        default:
-            return WeightInitType::Glorot;
-    }
+Vector Layer::applyActivationDerivOutput(const Vector &zVec) {
+    return softmaxDerivative(zVec);
 }
 
-Matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist) {
+Matrix initWeights(int inDim, int outDim, bool output, bool uniformDist) {
     Matrix weights(inDim, outDim);
-    WeightInitType initType = getWeightInitByActivation(actFunc);
-
+    
     valueType scaleFactor = (uniformDist) ? 3.0 : 1.0;
     valueType bound;
-    switch (initType) {
-        case WeightInitType::Glorot:
-            bound = std::sqrt(scaleFactor * 2.0 / (inDim + outDim));
-            break;
-        case WeightInitType::He:
-            bound = std::sqrt(scaleFactor * 2.0 / inDim);
-            break;
+    
+    if(output) {
+        bound = std::sqrt(scaleFactor * 2.0 / (inDim + outDim));
+    } else {
+        bound = std::sqrt(scaleFactor * 2.0 / inDim);
     }
+
     valueType minVal = -bound;
     valueType maxVal = bound;
 

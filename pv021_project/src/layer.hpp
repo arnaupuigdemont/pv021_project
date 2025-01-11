@@ -6,17 +6,8 @@
 #include <vector>
 #include <cstddef>
 
-// Renombramos 'activations' a 'ActivationType'
-enum class ActivationType { LeakyReLU, Softmax };
-
-// Renombramos 'initialization' a 'WeightInitType'
-enum class WeightInitType { He, Glorot };
-
-// Renombramos la función 'getInitializationByActivation' a 'getWeightInitByActivation'
-WeightInitType getWeightInitByActivation(ActivationType actFunc);
-
 // Renombramos la función 'initializeWeights' a 'initWeights'
-Matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true);
+Matrix initWeights(int inDim, int outDim, bool output, bool uniformDist = true);
 
 // Renombramos la función 'initializeBias' a 'initBias'
 Vector initBias(int dimension);
@@ -26,6 +17,9 @@ class Layer {
     friend class MLP; // MLP puede acceder a sus miembros privados
 
 private:
+
+    bool output;
+
     Vector _outputs;           // antes _values
     Vector _valDerivs;         // antes _valuesDerivatives
 
@@ -49,21 +43,22 @@ private:
 	Matrix _sgdVelocity;
 	Vector _sgdBiasVelocity;
 
-    int    _dimension;
-    ActivationType _actType;   // antes _activationFunction
+    int    _dimension;  // antes _activationFunction
 
     valueType _leakyAlpha;     // antes _leakyReLUAlpha
 
     // Renombramos 'useActivationFunction' y 'useDerivedActivationFunction'
     // a algo más directo: 'applyActivation' y 'applyActivationDeriv'
     Vector applyActivation(const Vector &inputVec);
+    Vector applyActivationOutput(const Vector &inputVec);
     Vector applyActivationDeriv(const Vector &inputVec);
+    Vector applyActivationDerivOutput(const Vector &inputVec);
 
 public:
-    Layer(int inDim, int outDim, ActivationType actFunc)
+    Layer(int inDim, int outDim, bool output)
       : _outputs(outDim),
         _valDerivs(outDim),
-        _weights(initWeights(inDim, outDim, actFunc)),
+        _weights(initWeights(inDim, outDim, output)),
         _bias(initBias(outDim)),
         _grads(inDim, outDim),
         _biasGrads(outDim),
@@ -75,7 +70,7 @@ public:
 		_sgdVelocity(inDim, outDim),
 		_sgdBiasVelocity(outDim),      
         _dimension(outDim),
-        _actType(actFunc),
+        output(output),
         _leakyAlpha(0.01) {}
 
     const Matrix& getWeights() const { return _weights; }

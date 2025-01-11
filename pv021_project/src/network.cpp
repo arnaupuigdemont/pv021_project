@@ -94,14 +94,24 @@ std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
 // =================================================
 // MLP: Añadir capa
 // =================================================
-void MLP::addLayer(int outDim, ActivationType actFunc) {
+void MLP::addLayer(int outDim) {
     int inDim;
     if (_layerStack.empty()) {
         inDim = _inputSize;  // antes _inputDimension
     } else {
         inDim = _layerStack.back().getDimension();
     }
-    _layerStack.emplace_back(inDim, outDim, actFunc);
+    _layerStack.emplace_back(inDim, outDim, false);
+}
+
+void MLP::addOutputLayer(int outDim) {
+	int inDim;
+	if (_layerStack.empty()) {
+		inDim = _inputSize;  // antes _inputDimension
+	} else {
+		inDim = _layerStack.back().getDimension();
+	}
+	_layerStack.emplace_back(inDim, outDim, true);
 }
 
 // =================================================
@@ -219,11 +229,15 @@ void MLP::feedForward(const Vector &inputVec) {
         }
 
         // Aplicar la activación y guardar resultados
+		if(!currentLayer.output) {
         currentLayer._outputs   = currentLayer.applyActivation(preActivation);
         currentLayer._valDerivs = currentLayer.applyActivationDeriv(preActivation);
+		} else {
+		currentLayer._outputs   = currentLayer.applyActivationOutput(preActivation);
+		currentLayer._valDerivs = currentLayer.applyActivationDerivOutput(preActivation);
+		}
     }
 }
-
 
 // =================================================
 // MLP: Obtener salida final de la red

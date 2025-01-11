@@ -5,50 +5,37 @@
 #include "matrix.hpp"
 #include <vector>
 
-/* 
- * Clase principal "MLP". 
- * - lambda -> regLambda
- * - _inputValues -> _trainData
- * - _inputLabels -> _trainLabels
- * - _layers      -> _layerStack
- * - _inputDimension -> _inputSize
- * - _learningRate   -> _lr
- */
+
 class MLP {
 
 private:
-    const double regLambda = 0.1;  // antes lambda
+    const double regLambda = 0.1;  
 
     std::vector<Vector> _trainData;
     std::vector<int>    _trainLabels;
 
-    std::vector<Layer>  _layerStack;
+    std::vector<Layer> _layerStack; // Stack of layers
 
-    int       _inputSize;   // antes _inputDimension
-    valueType _lr;          // antes _learningRate
+    int _inputSize;   // Input size
+    valueType _lr;    // Learning rate
 
-    // Reordenamos las funciones:
-    // 1) feedForward
-    // 2) backPropagate
-    // 3) updateWeights
-    // 4) setLeakyReLUAlpha
-    // 5) (Luego las que actualizan pesos con Adam, etc.)
+    void feedForward(const Vector &singleInput); // Forward pass
+    void backPropagate(size_t labelIndex); // Backward pass
+    void updateWeights(int globalStep); // Update weights
 
-    void feedForward(const Vector &singleInput);
-    void backPropagate(size_t labelIndex);
-    void updateWeights(int globalStep);
+    void setLeakyReLUAlpha(valueType alpha); // Set alpha for LeakyReLU
 
-    void setLeakyReLUAlpha(valueType alpha);
-
-    // Actualizaciones concretas para Adam (privadas):
+    // Adam weight update
     void updateWeightAdam(int row, int col, int step, Layer &layer) const;
+    // Adam bias update
     void updateBiasAdam(int idx, int step, Layer &layer) const;
 
-	// Actualizaciones concretas para SGD (privadas):
-	void updateWeightSGD(int row, int col, int step, Layer &layer) const;
-	void updateBiasSGD(int idx, int step, Layer &layer) const;
+    // SGD weight update
+    void updateWeightSGD(int row, int col, int step, Layer &layer) const;
+    // SGD bias update
+    void updateBiasSGD(int idx, int step, Layer &layer) const;
 
-    // Para recuperar la salida final del MLP en feed-forward
+    // Get final MLP output
     Vector getMLPOutput();
 
 public:
@@ -58,19 +45,18 @@ public:
         _inputSize(inputDim),
         _lr(0.01) {}
 
-    // Añadir capa: 
-    void addLayer(int outDim, ActivationType actFunc);
+    // Add layer
+    void addLayer(int outDim);
+	void addOutputLayer(int outDim);
 
-    // Obtener capas:
-    const std::vector<Layer>& getLayers() { return _layerStack; }
-
-    // Entrenar y predecir
-    void train(const std::vector<Vector> &data,
-               const std::vector<int> &labels,
-               valueType learningRate,
+    // Train the network
+    void train(const std::vector<Vector> &trainData,
+               const std::vector<int> &trainLabels,
+               valueType lr,
                int epochs,
                int batchSize);
 
+    // Predict labels for test data
     std::vector<int> predict(const std::vector<Vector> &testData);  
 };
 
