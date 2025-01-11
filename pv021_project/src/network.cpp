@@ -116,30 +116,48 @@ void MLP::addOutputLayer(int outDim) {
 // =================================================
 // MLP: Retropropagación
 // =================================================
-void MLP::backPropagate(size_t targetLabel) {
-    // Paso 1: Calcular el error en la capa de salida (codificación one‑hot)
-    Layer &outputLayer = _layerStack.back();
-    for (size_t i = 0; i < outputLayer.size(); ++i) {
-        // Si el índice coincide con targetLabel, se espera 1.0; en caso contrario, 0.0.
-        valueType expected = (targetLabel == i) ? 1.0 : 0.0;
-        // La delta es la diferencia entre la salida real y la esperada.
-        outputLayer._deltas[i] = outputLayer._outputs[i] - expected;
+Vector oneHot(size_t targetLabel, int dimension) {
+    std::vector<valueType> encoding(dimension, 0.0);
+    if (targetLabel < static_cast<size_t>(dimension)) {
+        encoding[targetLabel] = 1.0;
     }
+    return Vector(encoding);
+}
 
-    // Paso 2: Retropropagar el error a través de las capas ocultas
-    // Se recorre desde la penúltima capa hasta la primera (en orden inverso)
-    for (int l = static_cast<int>(_layerStack.size()) - 2; l >= 0; --l) {
-        Layer &currentLayer = _layerStack[l];
-        Layer &nextLayer    = _layerStack[l + 1];
+void MLP::backPropagate(size_t targetLabel) {
+    // ----- Step 1: Compute error at the output layer using one-hot encoding -----
 
-        for (size_t i = 0; i < currentLayer.size(); ++i) {
-            valueType deltaSum = 0.0;
-            // Sumar la contribución de los deltas de la siguiente capa ponderados por sus pesos
-            for (size_t j = 0; j < nextLayer.size(); ++j) {
-                deltaSum += nextLayer._deltas[j] * nextLayer._weights[i][j];
+    Layer &outputLayer = _layerStack.back();
+    // Create the expected (one-hot) vector
+    Vector expected = oneHot(targetLabel, outputLayer.size());
+    
+    // Compute delta at the output layer as: delta = output - expected.
+    // Se usa un bucle para modificar directamente el vector de deltas.
+    for (int i = 0; i < outputLayer.size(); ++i) {
+        outputLayer._deltas[i] = outputLayer._outputs[i] - expected[i];
+    }
+    
+    // ----- Step 2: Backpropagate error through hidden layers -----
+    // Iterate from the second-last layer down to the first.
+    // Instead of usar bucles anidados de forma clásica, usamos una lambda para procesar cada capa.
+    for (int layerIdx = static_cast<int>(_layerStack.size()) - 2; layerIdx >= 0; --layerIdx) {
+        Layer &currentLayer = _layerStack[layerIdx];
+        Layer &nextLayer    = _layerStack[layerIdx + 1];
+
+        // Para cada neurona de la capa actual, calcular el error acumulado a partir de la siguiente capa.
+        for (int i = 0; i < currentLayer.size(); ++i) {
+            // Usamos una lambda para acumular el error ponderado de la siguiente capa.
+            auto accumulateDelta = [&nextLayer, i](valueType sum, valueType delta, valueType weight) -> valueType {
+                return sum + delta * weight;
+            };
+
+            // Empleamos un bucle simple para acumular los deltas.
+            valueType accumulatedError = 0.0;
+            for (int j = 0; j < nextLayer.size(); ++j) {
+                accumulatedError += nextLayer._deltas[j] * nextLayer._weights[i][j];
             }
-            // Multiplicar la suma de deltas por la derivada de la activación de la neurona actual
-            currentLayer._deltas[i] = deltaSum * currentLayer._valDerivs[i];
+            // Multiplicar el error acumulado por la derivada de la activación de la neurona actual.
+            currentLayer._deltas[i] = accumulatedError * currentLayer._valDerivs[i];
         }
     }
 }
