@@ -1,179 +1,213 @@
 #include <cmath>
+#include <limits>
 #include <iostream>
 #include "matrix.hpp"
 
-vector plusMinusVectors( const vector &a, const vector &b, int sign ) {
-	int dimension = a.dimension();
-	std::vector<valueType> newValues(dimension);
-
-	for (int i = 0; i < dimension; ++i) {
-		newValues[i] = a[i] + (b[i] * sign);
-	}
-
-	return vector(newValues);	
-}
-
-
-vector operator+( const vector &a, const vector &b ) {
-	return plusMinusVectors(a, b, 1);
-}
-
-
-vector operator-( const vector &a, const vector &b ) {
-	return plusMinusVectors(a, b, -1);
-}
-
-
-vector operator*( const vector &a, valueType scalar ) {	
-	int dimension = a.dimension();
-	std::vector<valueType> newValues(dimension);
-
-	for (int i = 0; i < dimension; ++i) {
-		newValues[i] = a[i] * scalar;
-	}
-	
-	return vector(newValues);	
-}
-
-
-vector operator*( valueType scalar, const vector &a ) {
-	return a * scalar;
-}
-
-valueType operator*( const vector &a, const vector &b ) {
-	int dimension = a.dimension();
-	valueType dotProduct = 0;
-
-	for (int i = 0; i < dimension; ++i) {
-		dotProduct += a[i] * b[i];
-	}
-		
-	return dotProduct;
-}
-
-matrix operator+( const matrix &a, const matrix &b ) {
-	
-	int rows = a.rows();
-	int cols = a.cols();
-	matrix newMatrix(rows, cols);
-
-	for (int i = 0; i < rows; ++i) {
-		for (int j = 0 ; j < cols; ++j) {
-			newMatrix[i][j] = a[i][j] + b[i][j];
-		}
-	}
-
-	return newMatrix;
-}
-
-
-vector operator*( const matrix &m, const vector &v ) {
-	vector result(m.rows());
-	for (int i = 0; i < m.rows(); ++i) {
-		result[i] = m.row(i) * v;
-	}
-	
-	return result;
-}
-
-
-vector operator*( const vector &v, const matrix &m ) {
-	vector result(m.cols());
-	int i;
-#pragma omp parallel for num_threads(16) default(shared) private(i)
-    for (i = 0; i < m.cols(); ++i) {
-		result[i] = v * m.col(i);
-	}
-	
-	return result;
-}
-
-
-vector matrix::row( int n ) const {
-	return _values[n];
-}
-
-
-vector matrix::col( int n ) const {
-	vector newColumn(_rows);
-
-	for (int i = 0; i < _rows; ++i) {
-		newColumn[i] = _values[i][n]; 
-	}
-	return newColumn;
-}
-
-valueType leakyReLu(valueType x, float alpha) {
-    if (x < 0) {
-        return x * alpha;
+// ====================================================================
+// Utility Function: plusMinusVectors
+// ====================================================================
+/**
+ * @brief Element-wise operation: a + (sign * b).
+ *
+ * @param a First vector.
+ * @param b Second vector.
+ * @param sign Use 1 for addition, -1 for subtraction.
+ * @return Vector resulting from a + sign * b.
+ */
+Vector plusMinusVectors(const Vector &a, const Vector &b, int sign) {
+    int dim = a.size();
+    std::vector<valueType> resultValues(dim);
+    for (int i = 0; i < dim; ++i) {
+        resultValues[i] = a[i] + (b[i] * sign);
     }
-    return x;
+    return Vector(resultValues);
 }
 
-
-vector leakyReLu(const vector &inputVector, float alpha) {
-
-	int dimension = inputVector.dimension();
-    std::vector<valueType> result(dimension);
-
-	for (int i = 0; i < dimension; ++i) {
-		result[i] = leakyReLu(inputVector[i], alpha) ;
-	}
-
-    return vector(result);
+// ====================================================================
+// Overloaded Operators for Vector
+// ====================================================================
+Vector operator+(const Vector &a, const Vector &b) {
+    return plusMinusVectors(a, b, 1);
 }
 
-
-vector leakyReLuDerivative(const vector &inputVector, float alpha) {
-
-	int dimension = inputVector.dimension();
-    std::vector<valueType> result(dimension);
-
-	for (int i = 0; i < dimension; ++i) {
-		result[i] = (inputVector[i] <= 0) ? alpha : 1;
-	}
-
-    return vector(result);
+Vector operator-(const Vector &a, const Vector &b) {
+    return plusMinusVectors(a, b, -1);
 }
 
-vector softmax(const vector &inputVector) {
+Vector operator*(const Vector &a, valueType scalar) {
+    int dim = a.size();
+    std::vector<valueType> newValues(dim);
+    for (int i = 0; i < dim; ++i) {
+        newValues[i] = a[i] * scalar;
+    }
+    return Vector(newValues);
+}
 
-    valueType maxValue = -INFINITY;
-    for (size_t i = 0; i < inputVector.size(); i++) {
+Vector operator*(valueType scalar, const Vector &a) {
+    return a * scalar;
+}
+
+// Dot product operator.
+valueType operator*(const Vector &a, const Vector &b) {
+    int dim = a.size();
+    valueType dotProduct = 0;
+    for (int i = 0; i < dim; ++i) {
+        dotProduct += a[i] * b[i];
+    }
+    return dotProduct;
+}
+
+// ====================================================================
+// Overloaded Operators for Matrix
+// ====================================================================
+Matrix operator+(const Matrix &A, const Matrix &B) {
+    int rows = A.rows();
+    int cols = A.cols();
+    Matrix result(rows, cols);
+    for (int i = 0; i < rows; ++i)
+        for (int j = 0; j < cols; ++j)
+            result[i][j] = A[i][j] + B[i][j];
+    return result;
+}
+
+Vector operator*(const Matrix &m, const Vector &v) {
+    Vector result(m.rows());
+    for (int i = 0; i < m.rows(); ++i) {
+        result[i] = m.row(i) * v;
+    }
+    return result;
+}
+
+Vector operator*(const Vector &v, const Matrix &m) {
+    Vector result(m.cols());
+#pragma omp parallel for num_threads(16)
+    for (int i = 0; i < m.cols(); ++i) {
+        result[i] = v * m.col(i);
+    }
+    return result;
+}
+
+// ====================================================================
+// Matrix Row and Column Getters
+// ====================================================================
+Vector Matrix::row(int index) const {
+    return _rowsData[index];
+}
+
+Vector Matrix::col(int index) const {
+    Vector column(_rows);
+    for (int i = 0; i < _rows; ++i) {
+        column[i] = _rowsData[i][index];
+    }
+    return column;
+}
+
+// ====================================================================
+// Activation Functions
+// ====================================================================
+
+/**
+ * @brief Leaky ReLU applied on a single value.
+ *
+ * @param x Input value.
+ * @param alpha Slope for negative values.
+ * @return valueType Activated value.
+ */
+valueType leakyReLu(valueType x, float alpha) {
+    return (x < 0) ? (x * alpha) : x;
+}
+
+/**
+ * @brief Applies Leaky ReLU element-wise on a vector.
+ *
+ * @param inputVector Vector of input values.
+ * @param alpha Slope for negative values.
+ * @return Vector Activated vector.
+ */
+Vector leakyReLu(const Vector &inputVector, float alpha) {
+    int dim = inputVector.size();
+    std::vector<valueType> activated(dim);
+    for (int i = 0; i < dim; ++i) {
+        activated[i] = leakyReLu(inputVector[i], alpha);
+    }
+    return Vector(activated);
+}
+
+/**
+ * @brief Computes the element-wise derivative of the Leaky ReLU function.
+ *
+ * @param inputVector Vector of input values.
+ * @param alpha Slope for negative values.
+ * @return Vector Derivative vector.
+ */
+Vector leakyReLuDerivative(const Vector &inputVector, float alpha) {
+    int dim = inputVector.size();
+    std::vector<valueType> derivative(dim);
+    for (int i = 0; i < dim; ++i) {
+        derivative[i] = (inputVector[i] <= 0) ? alpha : 1.0;
+    }
+    return Vector(derivative);
+}
+
+/**
+ * @brief Computes the softmax of an input vector.
+ *
+ * @param inputVector Input vector.
+ * @return Vector Softmax probabilities.
+ */
+Vector softmax(const Vector &inputVector) {
+    int dim = inputVector.size();
+    valueType maxValue = -std::numeric_limits<valueType>::infinity();
+    // Find the maximum value (for numerical stability)
+    for (int i = 0; i < dim; ++i) {
         if (inputVector[i] > maxValue) {
             maxValue = inputVector[i];
         }
     }
 
-    if (maxValue < 0) {
-        maxValue *= -1.0;
+    // Compute exponential values and their sum
+    valueType expSum = 0.0;
+    std::vector<valueType> expValues(dim);
+    for (int i = 0; i < dim; ++i) {
+        expValues[i] = std::exp(inputVector[i] - maxValue);
+        expSum += expValues[i];
     }
 
-    valueType sum = 0.0;
-    for (size_t i = 0; i < inputVector.size(); i++) {
-        sum += expf(inputVector[i] - maxValue);
+    // Normalize to get softmax outputs.
+    std::vector<valueType> softmaxResult(dim);
+    for (int i = 0; i < dim; ++i) {
+        softmaxResult[i] = expValues[i] / expSum;
     }
-
-    vector outputVector(inputVector.size());
-
-    valueType offset = maxValue + logf(sum);
-    for (size_t i = 0; i < inputVector.size(); ++i) {
-        outputVector[i] = expf(inputVector[i] - offset);
-    }
-
-    return outputVector;
+    return Vector(softmaxResult);
 }
 
-
-vector softmaxDerivative(const vector &inputVector) {
-
-    std::vector<valueType> numberVector;
-    numberVector.resize(inputVector.size());
-
-    auto resultIt = numberVector.begin();
-    for (auto it = inputVector.getValues().begin(); it != inputVector.getValues().end(); it++, resultIt++) {
-        *resultIt = *it * (1 - *it);
+/**
+ * @brief Computes an approximate element-wise derivative of the softmax function.
+ *
+ * Note: Often computed jointly with the cross entropy loss.
+ *
+ * @param inputVector Vector containing softmax outputs.
+ * @return Vector Element-wise derivative values.
+ */
+Vector softmaxDerivative(const Vector &inputVector) {
+    int dim = inputVector.size();
+    std::vector<valueType> deriv(dim);
+    const std::vector<valueType>& data = inputVector.getData();
+    for (int i = 0; i < dim; ++i) {
+        deriv[i] = data[i] * (1 - data[i]);
     }
-
-    return vector(numberVector);
+    return Vector(deriv);
 }
+
+// ====================================================================
+// Overloaded Utility Function for Vectors
+// ====================================================================
+Vector plusMinusVectors(const Vector &a, const Vector &b, int sign) {
+    int dim = a.size();
+    std::vector<valueType> result(dim);
+    for (int i = 0; i < dim; ++i) {
+        result[i] = a[i] + (b[i] * sign);
+    }
+    return Vector(result);
+}
+
