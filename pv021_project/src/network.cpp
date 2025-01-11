@@ -10,7 +10,7 @@
 /**
  * @brief train the network using the given data
  */
-void MLP::train(const std::vector<Vector> &trainData,
+void Network::train(const std::vector<Vector> &trainData,
                 const std::vector<int>    &trainLabels,
                 valueType lr,
                 int epochs,
@@ -62,7 +62,7 @@ void MLP::train(const std::vector<Vector> &trainData,
 /**
  * @brief predict the labels for the given data
  */
-std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
+std::vector<int> Network::predict(const std::vector<Vector> &testData) {
     std::vector<int> predictedLabels;
 
     // For each sample in the test set:
@@ -91,7 +91,7 @@ std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
 /**
  * @brief add a new layer to the network
  */
-void MLP::addLayer(int outDim) {
+void Network::addLayer(int outDim) {
     int inDim;
     if (_layerStack.empty()) {
         inDim = _inputSize;  // antes _inputDimension
@@ -104,7 +104,7 @@ void MLP::addLayer(int outDim) {
 /**
  * @brief add a new output layer to the network
  */
-void MLP::addOutputLayer(int outDim) {
+void Network::addOutputLayer(int outDim) {
 	int inDim;
 	if (_layerStack.empty()) {
 		inDim = _inputSize;  // antes _inputDimension
@@ -128,7 +128,7 @@ Vector oneHot(size_t targetLabel, int dimension) {
 /**
  * @brief backpropagate the error through the network
  */
-void MLP::backPropagate(size_t targetLabel) {
+void Network::backPropagate(size_t targetLabel) {
     // ----- Step 1: Compute error at the output layer using one-hot encoding -----
 
     Layer &outputLayer = _layerStack.back();
@@ -165,7 +165,7 @@ void MLP::backPropagate(size_t targetLabel) {
 /**
  * @brief update the weights of the network using the accumulated gradients
  */
-void MLP::updateWeights(int globalStep) {
+void Network::updateWeights(int globalStep) {
     //Accumulate gradients over each sample in the mini-batch.
     for (size_t sampleIdx = 0; sampleIdx < _trainData.size(); ++sampleIdx) {
         // Retrieve the current input sample and its label.
@@ -229,7 +229,7 @@ void MLP::updateWeights(int globalStep) {
 /**
  * @brief feed the input through the network
  */
-void MLP::feedForward(const Vector &inputVec) {
+void Network::feedForward(const Vector &inputVec) {
     Vector preActivation;  // 'rawZ': salida de la operación lineal
 
     // Recorrer cada capa en el stack
@@ -258,7 +258,7 @@ void MLP::feedForward(const Vector &inputVec) {
 /**
  * @brief update the weights using the Adam optimizer
  */
-void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const {
+void Network::updateWeightAdam(int row, int col, int step, Layer &layer) const {
 
     // 1. Extraer el gradiente actual
     valueType grad = layer._grads[row][col];
@@ -283,7 +283,7 @@ void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const {
 /**
  * @brief update the bias using the Adam optimizer
  */
-void MLP::updateBiasAdam(int idx, int step, Layer &layer) const {
+void Network::updateBiasAdam(int idx, int step, Layer &layer) const {
     // Constantes de Adam para el bias
     const valueType beta1 = 0.9;
     const valueType beta2 = 0.999;
@@ -307,7 +307,7 @@ void MLP::updateBiasAdam(int idx, int step, Layer &layer) const {
 /**
  * @brief update the weights using the SGD optimizer
  */
-void MLP::updateWeightSGD(int row, int col, int step, Layer &layer) const {
+void Network::updateWeightSGD(int row, int col, int step, Layer &layer) const {
     // Constante de momentum (puedes definirla globalmente o como atributo)
     const valueType momentum = 0.9;
 
@@ -329,7 +329,7 @@ void MLP::updateWeightSGD(int row, int col, int step, Layer &layer) const {
 /**
  * @brief update the bias using the SGD optimizer
  */
-void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
+void Network::updateBiasSGD(int idx, int step, Layer &layer) const {
     const valueType momentum = 0.9;
 
     // Obtiene el gradiente del bias en la posición idx
@@ -347,7 +347,7 @@ void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
 /**
  * @brief set the alpha value for the LeakyReLU activation function
  */
-void MLP::setLeakyReLUAlpha(valueType alpha) {
+void Network::setLeakyReLUAlpha(valueType alpha) {
     for (auto &layer : _layerStack) {
         layer._leakyAlpha = alpha;
     }

@@ -14,7 +14,7 @@ Vector initBias(int dimension);
 
 class Layer {
 
-    friend class MLP; // MLP puede acceder a sus miembros privados
+    friend class Network; // MLP puede acceder a sus miembros privados
 
 private:
 

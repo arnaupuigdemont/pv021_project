@@ -16,7 +16,7 @@ int main() {
     auto testLabels = ds.readLabels("data/fashion_mnist_test_labels.csv");
     
     // create and train network
-    MLP nn(784);
+    Network nn(784);
     nn.addLayer(128);
     nn.addLayer(64);
     nn.addOutputLayer(10);

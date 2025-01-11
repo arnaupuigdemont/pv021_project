@@ -6,7 +6,7 @@
 #include <vector>
 
 
-class MLP {
+class Network {
 
     private:
         const double regLambda = 0.5;  
@@ -39,7 +39,7 @@ class MLP {
 
     public:
         // Constructor
-        explicit MLP(int inputSize)
+        explicit Network(int inputSize)
         : regLambda(0.1),
             _inputSize(inputSize),
             _lr(0.01) {}
