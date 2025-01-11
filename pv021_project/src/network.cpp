@@ -78,7 +78,7 @@ std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
         // Buscar el índice del elemento de mayor valor (argmax)
         valueType currentMax = -1e9;
         int predictedIndex = 0;
-        for (size_t i = 0; i < outputVector.size(); ++i) {
+        for (int i = 0; i < outputVector.size(); ++i) {
             if (outputVector[i] > currentMax) {
                 currentMax = outputVector[i];
                 predictedIndex = static_cast<int>(i);
@@ -191,7 +191,7 @@ void MLP::updateWeights(int globalStep) {
         }
 
         // Actualizar biases (usualmente sin regularización)
-        for (size_t i = 0; i < layer._bias.size(); ++i) {
+        for (int i = 0; i < layer._bias.size(); ++i) {
             //updateBiasSGD(i, globalStep, layer);
 			updateBiasAdam(i, globalStep, layer);
             layer._biasGrads[i] = 0;

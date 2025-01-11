@@ -4,26 +4,6 @@
 #include "matrix.hpp"
 
 // ====================================================================
-// Utility Function: plusMinusVectors
-// ====================================================================
-/**
- * @brief Element-wise operation: a + (sign * b).
- *
- * @param a First vector.
- * @param b Second vector.
- * @param sign Use 1 for addition, -1 for subtraction.
- * @return Vector resulting from a + sign * b.
- */
-Vector plusMinusVectors(const Vector &a, const Vector &b, int sign) {
-    int dim = a.size();
-    std::vector<valueType> resultValues(dim);
-    for (int i = 0; i < dim; ++i) {
-        resultValues[i] = a[i] + (b[i] * sign);
-    }
-    return Vector(resultValues);
-}
-
-// ====================================================================
 // Overloaded Operators for Vector
 // ====================================================================
 Vector operator+(const Vector &a, const Vector &b) {
