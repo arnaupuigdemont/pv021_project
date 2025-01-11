@@ -36,8 +36,6 @@ public:
 
     // Return the number of columns.
     int cols() const { return _cols; }
-    // Return the number of rows.
-    int rows() const { return _rows; }
     // Returns the number of rows.
     size_t size() const { return _rows; }
 
