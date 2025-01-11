@@ -17,11 +17,11 @@ int main() {
     network.addLayer(64, activations::_leakyReLu);
     network.addLayer(10, activations::_softmax);
 
-
+    std::cout << "Training..." << std::endl;
     network.train(trainValues, trainLabels, 0.001, 15, 512);
 
-
-    auto testValues = reader.readCSVValues("../data/fashion_mnist_test_vectors.csv");
+    std::cout << "Predicting..." << std::endl;
+    auto testValues = reader.readCSVValues("data/fashion_mnist_test_vectors.csv");
     auto predictedTestLabels = network.predict(testValues);   
 	reader.exportResults("../actualPredictions", predictedTestLabels);
 
