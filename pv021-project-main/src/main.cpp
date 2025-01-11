@@ -7,9 +7,9 @@ int main() {
     std::cout << "Starting..." << std::endl;
     dataset reader;
     std::cout << "Reading data..." << std::endl;
-    auto trainValues = reader.readCSVValues("../data/fashion_mnist_train_vectors.csv");
+    auto trainValues = reader.readCSVValues("data/fashion_mnist_train_vectors.csv");
     std::cout << "Reading labels..." << std::endl;
-    auto trainLabels = reader.readCSVLabels("../data/fashion_mnist_train_labels.csv");
+    auto trainLabels = reader.readCSVLabels("data/fashion_mnist_train_labels.csv");
     
 
     MLP network(784);
