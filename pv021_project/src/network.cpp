@@ -65,27 +65,31 @@ void MLP::train(const std::vector<vector> &trainData,
 // MLP: Predicción
 // =================================================
 std::vector<int> MLP::predict(const std::vector<vector> &testData) {
-    std::vector<int> predictions;
-    vector netOutput;
+    std::vector<int> predictedLabels;
 
-    for (const auto &inputVec : testData) {
-        feedForward(inputVec);    // antes feedForward
-        netOutput = getMLPOutput();  // antes getMLPOutput
+    // Para cada muestra en el conjunto de test
+    for (const auto &sample : testData) {
+        // Realiza el forward pass con la muestra
+        feedForward(sample);
 
-        // Tomar argmax
-        valueType maxVal = -1e9;
-        int bestIndex    = 0;
-        for (size_t i = 0; i < netOutput.size(); ++i) {
-            if (netOutput[i] >= maxVal) {
-                maxVal    = netOutput[i];
-                bestIndex = i;
+        // Recupera la salida final de la red
+        vector outputVector = getMLPOutput();
+
+        // Buscar el índice del elemento de mayor valor (argmax)
+        valueType currentMax = -1e9;
+        int predictedIndex = 0;
+        for (size_t i = 0; i < outputVector.size(); ++i) {
+            if (outputVector[i] > currentMax) {
+                currentMax = outputVector[i];
+                predictedIndex = static_cast<int>(i);
             }
         }
-        predictions.push_back(bestIndex);
+        predictedLabels.push_back(predictedIndex);
     }
-
-    return predictions;
+    
+    return predictedLabels;
 }
+
 
 // =================================================
 // MLP: Añadir capa
