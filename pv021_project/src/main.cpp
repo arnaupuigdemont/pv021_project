@@ -63,7 +63,7 @@ int main() {
 
             auto epoch_start = std::chrono::high_resolution_clock::now();
             
-            std::cout << "Learning rate: " << learning_rate << std::endl;
+            std::cout << "Learning rate: " << initial_rate << std::endl;
 
             double total_loss = 0.0;
             int correct_predictions = 0;
@@ -161,21 +161,21 @@ int main() {
                 //grad = input_layer.backward_SGD_momentum_relu(grad, learning_rate, lambda);
             
                 //BATCHNORM 
-                Matrix grad_out = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
+                Matrix grad_out = output_layer.backward_ADAM_output(grad_output, initial_rate, lambda);
                 // 5) batch_norm2 backward
-                Matrix grad_bn2 = batch_norm2.backward(grad_out, learning_rate);
+                Matrix grad_bn2 = batch_norm2.backward(grad_out, initial_rate);
                 Matrix grad_h2 = hidden_layer2.leaky_relu_backward(grad_bn2, bn_h2, 0.01); 
-                Matrix grad_a_h1 = hidden_layer2.backward_ADAM(grad_h2, learning_rate, lambda);
+                Matrix grad_a_h1 = hidden_layer2.backward_ADAM(grad_h2, initial_rate, lambda);
 
                 // 6) batch_norm1 backward
-                Matrix grad_bn1 = batch_norm1.backward(grad_a_h1, learning_rate);
+                Matrix grad_bn1 = batch_norm1.backward(grad_a_h1, initial_rate);
                 Matrix grad_h1 = hidden_layer1.leaky_relu_backward(grad_bn1, bn_h1, 0.01);
-                Matrix grad_a_inp = hidden_layer1.backward_ADAM(grad_h1, learning_rate, lambda);
+                Matrix grad_a_inp = hidden_layer1.backward_ADAM(grad_h1, initial_rate, lambda);
            
                 // 9) batch_norm backward
-                Matrix grad_bn_inp = batch_norm.backward(grad_a_inp, learning_rate);
+                Matrix grad_bn_inp = batch_norm.backward(grad_a_inp, initial_rate);
                 Matrix grad_z_inp = input_layer.leaky_relu_backward(grad_bn_inp, bn_inp, 0.01);
-                Matrix grad_in = input_layer.backward_ADAM(grad_z_inp, learning_rate, lambda);
+                Matrix grad_in = input_layer.backward_ADAM(grad_z_inp, initial_rate, lambda);
             
             }
 
