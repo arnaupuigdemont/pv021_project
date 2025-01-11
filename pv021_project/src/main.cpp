@@ -17,9 +17,9 @@ int main() {
     
     // create and train network
     MLP network(784);
-    network.addLayer(128, activations::_leakyReLu);
-    network.addLayer(64, activations::_leakyReLu);
-    network.addLayer(10, activations::_softmax);
+    network.addLayer(128, ActivationType::LeakyReLU);
+    network.addLayer(64, ActivationType::LeakyReLU);
+    network.addLayer(10, ActivationType::Softmax);
 
     std::cout << "Training..." << std::endl;
     network.train(trainValues, trainLabels, 0.001, 8, 64);
