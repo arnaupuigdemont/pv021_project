@@ -1,4 +1,7 @@
 #include "activationFunction.hpp"
+#include <algorithm>
+#include <cmath>
+#include <numeric>
 
 // ====================================================================
 // Activation Functions
@@ -32,69 +35,54 @@ Vector activationFunction::leakyReLu(const Vector &inputVector, float alpha) {
 }
 
 /**
- * @brief Computes the element-wise derivative of the Leaky ReLU function.
+ * @brief Applies the derivative of Leaky ReLU element-wise on a vector.
  *
  * @param inputVector Vector of input values.
  * @param alpha Slope for negative values.
  * @return Vector Derivative vector.
  */
 Vector activationFunction::leakyReLuDerivative(const Vector &inputVector, float alpha) {
-    int dim = inputVector.size();
-    std::vector<valueType> derivatives(dim);
-    
-    const std::vector<valueType>& data = inputVector.getData();
-    std::for_each(data.begin(), data.end(), 
-        [&, idx = 0](valueType x) mutable {
-            derivatives[idx] = (x <= 0) ? alpha : 1.0;
-            ++idx;
-        });
-    
-    return Vector(derivatives);
+    std::vector<valueType> data = inputVector.getData();
+    std::for_each(data.begin(), data.end(),
+                  [alpha](valueType &x) { x = (x < 0) ? alpha : 1.0; });
+    return Vector(data);
 }
 
 /**
- * @brief Computes the softmax of an input vector.
+ * @brief Applies softmax function on a vector.
  *
- * @param inputVector Input vector.
- * @return Vector Softmax probabilities.
+ * @param inputVector Vector of input values.
+ * @return Vector Softmax activated vector.
  */
 Vector activationFunction::softmax(const Vector &inputVector) {
-    int dim = inputVector.size();
-    const std::vector<valueType>& data = inputVector.getData();
-    
-    // Find the maximum element (for numerical stability)
+    std::vector<valueType> data = inputVector.getData();
     valueType maxVal = *std::max_element(data.begin(), data.end());
-    
-    // Compute exponentials in one pass using transform
-    std::vector<valueType> expValues(dim);
+
+    std::vector<valueType> expValues(data.size());
     std::transform(data.begin(), data.end(), expValues.begin(),
                    [maxVal](valueType x) { return std::exp(x - maxVal); });
-    
-    // Sum the exponential values using accumulate
+
     valueType sumExp = std::accumulate(expValues.begin(), expValues.end(), 0.0f);
-    
-    // Normalize each exponential by the sum
-    std::vector<valueType> softmaxResult(dim);
+
+    std::vector<valueType> softmaxResult(data.size());
     std::transform(expValues.begin(), expValues.end(), softmaxResult.begin(),
                    [sumExp](valueType x) { return x / sumExp; });
-    
+
     return Vector(softmaxResult);
 }
 
 /**
- * @brief Computes an approximate element-wise derivative of the softmax function.
+ * @brief Applies the derivative of softmax function on a vector.
  *
- * Note: Often computed jointly with the cross entropy loss.
- *
- * @param inputVector Vector containing softmax outputs.
- * @return Vector Element-wise derivative values.
+ * @param inputVector Vector of input values.
+ * @return Vector Derivative vector.
  */
 Vector activationFunction::softmaxDerivative(const Vector &inputVector) {
-    int dim = inputVector.size();
-    std::vector<valueType> deriv(dim);
-    const std::vector<valueType>& data = inputVector.getData();
-    for (int i = 0; i < dim; ++i) {
-        deriv[i] = data[i] * (1 - data[i]);
-    }
-    return Vector(deriv);
+    std::vector<valueType> data = inputVector.getData();
+    std::vector<valueType> result(data.size());
+
+    std::transform(data.begin(), data.end(), result.begin(),
+                   [](valueType x) { return x * (1 - x); });
+
+    return Vector(result);
 }
