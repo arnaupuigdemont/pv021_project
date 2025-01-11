@@ -1,6 +1,8 @@
 #include <cmath>
 #include <limits>
 #include <iostream>
+#include <numeric>
+#include <algorithm>
 #include "matrix.hpp"
 
 
@@ -90,11 +92,16 @@ Vector leakyReLu(const Vector &inputVector, float alpha) {
  */
 Vector leakyReLuDerivative(const Vector &inputVector, float alpha) {
     int dim = inputVector.size();
-    std::vector<valueType> derivative(dim);
-    for (int i = 0; i < dim; ++i) {
-        derivative[i] = (inputVector[i] <= 0) ? alpha : 1.0;
-    }
-    return Vector(derivative);
+    std::vector<valueType> derivatives(dim);
+    
+    const std::vector<valueType>& data = inputVector.getData();
+    std::for_each(data.begin(), data.end(), 
+        [&, idx = 0](valueType x) mutable {
+            derivatives[idx] = (x <= 0) ? alpha : 1.0;
+            ++idx;
+        });
+    
+    return Vector(derivatives);
 }
 
 /**
@@ -105,27 +112,24 @@ Vector leakyReLuDerivative(const Vector &inputVector, float alpha) {
  */
 Vector softmax(const Vector &inputVector) {
     int dim = inputVector.size();
-    valueType maxValue = -std::numeric_limits<valueType>::infinity();
-    // Find the maximum value (for numerical stability)
-    for (int i = 0; i < dim; ++i) {
-        if (inputVector[i] > maxValue) {
-            maxValue = inputVector[i];
-        }
-    }
-
-    // Compute exponential values and their sum
-    valueType expSum = 0.0;
+    const std::vector<valueType>& data = inputVector.getData();
+    
+    // Find the maximum element (for numerical stability)
+    valueType maxVal = *std::max_element(data.begin(), data.end());
+    
+    // Compute exponentials in one pass using transform
     std::vector<valueType> expValues(dim);
-    for (int i = 0; i < dim; ++i) {
-        expValues[i] = std::exp(inputVector[i] - maxValue);
-        expSum += expValues[i];
-    }
-
-    // Normalize to get softmax outputs.
+    std::transform(data.begin(), data.end(), expValues.begin(),
+                   [maxVal](valueType x) { return std::exp(x - maxVal); });
+    
+    // Sum the exponential values using accumulate
+    valueType sumExp = std::accumulate(expValues.begin(), expValues.end(), 0.0f);
+    
+    // Normalize each exponential by the sum
     std::vector<valueType> softmaxResult(dim);
-    for (int i = 0; i < dim; ++i) {
-        softmaxResult[i] = expValues[i] / expSum;
-    }
+    std::transform(expValues.begin(), expValues.end(), softmaxResult.begin(),
+                   [sumExp](valueType x) { return x / sumExp; });
+    
     return Vector(softmaxResult);
 }
 
