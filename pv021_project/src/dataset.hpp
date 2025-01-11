@@ -18,8 +18,8 @@ public:
 
 	dataset(char sep = ',') : _sep(sep) {}	
 	
-	std::vector<vector> readCSVValues(const std::string &filepath);
-    std::vector<int> readCSVLabels(const std::string &filepath);
-    void exportResults(const std::string &filepath, const std::vector<int> &results);
+	std::vector<vector> readValues(const std::string &filepath);
+    std::vector<int> readLabels(const std::string &filepath);
+    void writeResults(const std::string &filepath, const std::vector<int> &results);
 };
 #endif

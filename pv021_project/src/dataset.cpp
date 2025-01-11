@@ -41,33 +41,6 @@ std::vector<T> readRow(const std::string &line, char sep) {
     return row;
 }
 
-template <typename T>
-T getMaxValue(const std::vector<T> &v) {
-	
-	T max = -INFINITY;
-	
-	for (size_t i = 0; i < v.size(); ++i) {
-		if (v[i] > max) {
-			max = v[i];
-		}
-	}
-	
-	return max;
-}
-
-template <typename T>
-T getMinValue(const std::vector<T> &v) {
-	
-	T min = INFINITY;
-	
-	for (size_t i = 0; i < v.size(); ++i) {
-		if (v[i] < min) {
-			min = v[i];
-		}
-	}
-	
-	return min;
-}
 
 int dataset::readRowLabels(const std::string &line) const {
 	
@@ -76,7 +49,7 @@ int dataset::readRowLabels(const std::string &line) const {
 }
 
 
-std::vector<int> dataset::readCSVLabels(const std::string &filepath) {
+std::vector<int> dataset::readLabels(const std::string &filepath) {
 
     std::vector<int> values;
     std::ifstream is(filepath);
@@ -96,7 +69,7 @@ vector dataset::readRowValues(const std::string &line) const {
 }	
 
 
-std::vector<vector> dataset::readCSVValues(const std::string &filepath) {
+std::vector<vector> dataset::readValues(const std::string &filepath) {
 	
 	std::vector<vector> values;
 	std::ifstream is(filepath);
@@ -113,31 +86,41 @@ std::vector<vector> dataset::readCSVValues(const std::string &filepath) {
 }
 
 void dataset::normalizeValues(std::vector<vector> &values) const {
-		
-	for (size_t col = 0; col < values[0].size(); ++col) {
-		valueType sum = 0.0;
-		valueType mean = 0.0;
-		valueType variance = 0.0;
-		valueType stddev = 0.0;
-		
-		for (size_t row = 0; row < values.size(); ++row) {
-			sum += values[row][col];
-		}
-        
-		mean = sum / values.size();
-		for (size_t row = 0; row < values.size(); ++row) {
-			variance += std::pow(values[row][col] - mean, 2);
-		}
-		variance = variance / values.size();
-		stddev = std::sqrt(variance);
+    if (values.empty()) return; // Si no hay datos, salir
 
-		for (size_t row = 0; row < values.size(); ++row) {
-			values[row][col] = (values[row][col] - mean) / stddev;
-		}
-	}
+    size_t rows = values.size();
+    size_t cols = values[0].size();
+
+    for (size_t col = 0; col < cols; ++col) {
+        // 1. Calcular suma y suma de cuadrados en una sola pasada
+        double sum = 0.0;
+        double sum_sq = 0.0;
+        for (size_t row = 0; row < rows; ++row) {
+            double x = values[row][col];
+            sum     += x;
+            sum_sq  += x * x;
+        }
+
+        // 2. Calcular media y desviación estándar
+        double mean = sum / rows;
+        // var = E(x^2) - (E(x))^2
+        double variance = (sum_sq / rows) - (mean * mean);
+        double stddev   = std::sqrt(variance);
+
+        // (Opcional) Si stddev es 0 (o muy pequeña), podría causar NaN; manejarlo
+        if (stddev < 1e-12) {
+            stddev = 1.0; // Evitar división por 0, por ejemplo
+        }
+
+        // 3. Normalizar
+        for (size_t row = 0; row < rows; ++row) {
+            values[row][col] = (values[row][col] - mean) / stddev;
+        }
+    }
 }
 
-void dataset::exportResults(const std::string &filepath, const std::vector<int> &results) {
+
+void dataset::writeResults(const std::string &filepath, const std::vector<int> &results) {
 	std::ofstream os(filepath);
 	for (const auto &value : results) {
 		os << value << std::endl;
