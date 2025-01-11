@@ -42,7 +42,7 @@ WeightInitType getWeightInitByActivation(ActivationType actFunc) {
     }
 }
 
-Matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true) {
+Matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist) {
     Matrix weights(inDim, outDim);
     WeightInitType initType = getWeightInitByActivation(actFunc);
 
