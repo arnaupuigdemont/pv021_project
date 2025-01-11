@@ -236,28 +236,24 @@ Vector MLP::getMLPOutput() {
 // Adam en Pesos
 // =================================================
 void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const {
-    // Constantes del método Adam
-    const valueType beta1 = 0.9;
-    const valueType beta2 = 0.999;
-    const valueType eps   = 1e-8;
 
-    // 1. Extraer el gradiente actual del peso en (row, col)
+    // 1. Extraer el gradiente actual
     valueType grad = layer._grads[row][col];
 
-    // 2. Calcular los factores de corrección de sesgo (dependientes del paso)
-    valueType b1Correction = 1 - std::pow(beta1, step);
-    valueType b2Correction = 1 - std::pow(beta2, step);
+    // 2. Factores de corrección de sesgo
+    valueType b1Correction = 1 - std::pow(layer.beta1, step);
+    valueType b2Correction = 1 - std::pow(layer.beta2, step);
 
-    // 3. Actualizar los momentos acumulados para este peso
-    layer._adamFirstMoment[row][col] = beta1 * layer._adamFirstMoment[row][col] + (1 - beta1) * grad;
-    layer._adamSecondMoment[row][col] = beta2 * layer._adamSecondMoment[row][col] + (1 - beta2) * (grad * grad);
+    // 3. Actualizar momentos acumulados (m_w_adam, v_w_adam)
+    layer._m_w_adam[row][col] = layer.beta1 * layer._m_w_adam[row][col] + (1 - layer.beta1) * grad;
+    layer._v_w_adam[row][col] = layer.beta2 * layer._v_w_adam[row][col] + (1 - layer.beta2) * (grad * grad);
 
-    // 4. Calcular los momentos corregidos (mHat y vHat)
-    valueType mHat = layer._adamFirstMoment[row][col] / b1Correction;
-    valueType vHat = layer._adamSecondMoment[row][col] / b2Correction;
+    // 4. Corrección de sesgo
+    valueType mHat = layer._m_w_adam[row][col] / b1Correction;
+    valueType vHat = layer._v_w_adam[row][col] / b2Correction;
 
-    // 5. Actualizar el peso: restamos la corrección escalada
-    layer._weights[row][col] -= _lr * mHat / (std::sqrt(vHat) + eps);
+    // 5. Actualizar el peso
+    layer._weights[row][col] -= _lr * mHat / (std::sqrt(vHat) + layer.eps);
 }
 
 
@@ -270,22 +266,17 @@ void MLP::updateBiasAdam(int idx, int step, Layer &layer) const {
     const valueType beta2 = 0.999;
     const valueType eps   = 1e-8;
 
-    // 1. Obtener el gradiente del bias en la posición idx
     valueType grad = layer._biasGrads[idx];
-
-    // 2. Calcular los factores de corrección de sesgo
     valueType b1Correction = 1 - std::pow(beta1, step);
     valueType b2Correction = 1 - std::pow(beta2, step);
 
-    // 3. Actualizar los momentos del bias
-    layer._adamBiasFirstMom[idx]  = beta1 * layer._adamBiasFirstMom[idx]  + (1 - beta1) * grad;
-    layer._adamBiasSecondMom[idx] = beta2 * layer._adamBiasSecondMom[idx] + (1 - beta2) * (grad * grad);
+    // Momentos acumulados para bias (m_b_adam, v_b_adam)
+    layer._m_b_adam[idx] = beta1 * layer._m_b_adam[idx] + (1 - beta1) * grad;
+    layer._v_b_adam[idx] = beta2 * layer._v_b_adam[idx] + (1 - beta2) * (grad * grad);
 
-    // 4. Calcular los momentos corregidos
-    valueType mHat = layer._adamBiasFirstMom[idx]  / b1Correction;
-    valueType vHat = layer._adamBiasSecondMom[idx] / b2Correction;
+    valueType mHat = layer._m_b_adam[idx] / b1Correction;
+    valueType vHat = layer._v_b_adam[idx] / b2Correction;
 
-    // 5. Actualizar el bias: restar el término corregido
     layer._bias[idx] -= _lr * mHat / (std::sqrt(vHat) + eps);
 }
 
@@ -326,9 +317,6 @@ void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
     // bias = bias + v_bias
     layer._bias[idx] += layer._sgdBiasVelocity[idx];
 }
-
-
-
 
 // =================================================
 // MLP: Ajustar la alpha de LeakyReLU

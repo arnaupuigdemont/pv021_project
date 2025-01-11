@@ -37,10 +37,14 @@ private:
 
     Vector _deltas;
 
-    Matrix _adamFirstMoment;
-    Matrix _adamSecondMoment;
-    Vector _adamBiasFirstMom;
-    Vector _adamBiasSecondMom;
+    Matrix _m_w_adam;
+    Matrix _v_w_adam;
+    Vector _m_b_adam;
+    Vector _v_b_adam;
+
+    const valueType beta1 = 0.9;
+    const valueType beta2 = 0.999;
+    const valueType eps   = 1e-8;
 
 	Matrix _sgdVelocity;
 	Vector _sgdBiasVelocity;
@@ -64,12 +68,12 @@ public:
         _grads(inDim, outDim),
         _biasGrads(outDim),
         _deltas(outDim),
-        _adamFirstMoment(inDim, outDim),
-        _adamSecondMoment(inDim, outDim),
-        _adamBiasFirstMom(outDim),
-        _adamBiasSecondMom(outDim),
 		_sgdVelocity(inDim, outDim),
 		_sgdBiasVelocity(outDim),
+        _m_w_adam(inDim, outDim),
+        _v_w_adam(inDim, outDim),
+        _m_b_adam(outDim),
+        _v_b_adam(outDim),
         _dimension(outDim),
         _actType(actFunc),
         _leakyAlpha(0.01) {}
