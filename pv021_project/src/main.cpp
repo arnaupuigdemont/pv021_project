@@ -17,7 +17,7 @@ using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
-const double initial_rate = 0.0001; 
+const double initial_rate = 0.001; 
 double decay_rate = 0.2; 
 const int BATCH_SIZE = 128; 
 int lambda = 0.0;
@@ -83,7 +83,9 @@ int main() {
                 }
 
                 Matrix input = input_layer.forward_leaky_relu(batch_inputs);
+                input.apply_dropout(0.8);
                 Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
+                hidden1.apply_dropout(0.8);
                 Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
                 //Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
                 Matrix output = output_layer.forward_softmax(hidden2);
