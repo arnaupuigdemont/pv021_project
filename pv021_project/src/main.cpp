@@ -18,7 +18,7 @@ int main() {
     network.addLayer(10, activations::_softmax);
 
     std::cout << "Training..." << std::endl;
-    network.train(trainValues, trainLabels, 0.001, 5, 64);
+    network.train(trainValues, trainLabels, 0.001, 8, 128);
 
 
     std::cout << "Predicting..." << std::endl;
