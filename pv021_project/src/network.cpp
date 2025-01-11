@@ -4,6 +4,7 @@
 #include <random>  
 #include <algorithm>  
 #include <cmath>  
+#include <iostream>
 
 
 void MLP::train(const std::vector<vector> &inputValues, const std::vector<int> &inputLabels, valueType learningRate, int epochs, int batchSize) {
@@ -23,6 +24,9 @@ void MLP::train(const std::vector<vector> &inputValues, const std::vector<int> &
 	}
 
     for (int i = 0; i < epochs; ++i) {
+
+		std::cout << "Epoch " << i + 1 << " / " << epochs << std::endl;
+
         shuffleIndexes(indexes);        
         
 		for (int j = 0; j < batchCount; ++j) {
