@@ -16,18 +16,18 @@ int main() {
     auto testLabels = ds.readLabels("data/fashion_mnist_test_labels.csv");
     
     // create and train network
-    MLP network(784);
-    network.addLayer(128);
-    network.addLayer(64);
-    network.addOutputLayer(10);
+    MLP nn(784);
+    nn.addLayer(128);
+    nn.addLayer(64);
+    nn.addOutputLayer(10);
 
     std::cout << "Training..." << std::endl;
-    network.train(trainValues, trainLabels, 0.001, 8, 64);
+    nn.train(trainValues, trainLabels, 0.001, 8, 64);
 
     // predict and calculate accuracy
     std::cout << "Predicting..." << std::endl;
-    auto predictedTestLabels = network.predict(testValues);   
-    auto predictedTrainLabels = network.predict(trainValues);
+    auto predictedTestLabels = nn.predict(testValues);   
+    auto predictedTrainLabels = nn.predict(trainValues);
 	ds.writeResults("test_predictions.csv", predictedTestLabels);
     ds.writeResults("train_predictions.csv", predictedTrainLabels);
 

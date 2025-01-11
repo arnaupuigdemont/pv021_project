@@ -11,7 +11,7 @@ class Vector {
 
 public:
     // Default constructor.
-    Vector() = default;
+    Vector() = default; 
 
     // Constructs a vector of given size, with all elements initialized to 0.
     explicit Vector(int size)
