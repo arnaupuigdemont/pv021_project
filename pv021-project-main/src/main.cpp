@@ -1,11 +1,13 @@
 #include "dataset.hpp"
 #include "network.hpp"
-#include "tests.hpp"
+#include <iostream>
 
 int main() {
 
     CSVReader reader;
+    std::cout << "Reading data..." << std::endl;
     auto trainValues = reader.readCSVValues("../data/fashion_mnist_train_vectors.csv");
+    std::cout << "Reading labels..." << std::endl;
     auto trainLabels = reader.readCSVLabels("../data/fashion_mnist_train_labels.csv");
     
 
