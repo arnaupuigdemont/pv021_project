@@ -190,7 +190,7 @@ void MLP::updateWeights(int globalStep) {
                 }
             }
             // Accumulate bias gradients: biasGradient_j += delta_j
-            for (int j = 0; j < layer.size(); ++j) {
+            for (size_t j = 0; j < layer.size(); ++j) {
                 layer._biasGrads[j] += layer._deltas[j];
             }
         }
