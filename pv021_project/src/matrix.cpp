@@ -4,20 +4,21 @@
 #include <numeric>
 #include <algorithm>
 #include "matrix.hpp"
-
+#include "vector.hpp"
+#include <omp.h>
 
 
 // ====================================================================
 // Overloaded Operators for Matrix
 // ====================================================================
 Matrix operator+(const Matrix &A, const Matrix &B) {
-    int rows = A.rows();
-    int cols = A.cols();
-    Matrix result(rows, cols);
-    for (int i = 0; i < rows; ++i)
-        for (int j = 0; j < cols; ++j)
-            result[i][j] = A[i][j] + B[i][j];
-    return result;
+    Matrix sum(A.rows(), A.cols());
+    for (int i = 0; i < A.rows(); ++i) {
+        for (int j = 0; j < A.cols(); ++j) {
+            sum[i][j] = A[i][j] + B[i][j];
+        }
+    }
+    return sum;
 }
 
 Vector operator*(const Matrix &m, const Vector &v) {
@@ -31,8 +32,10 @@ Vector operator*(const Matrix &m, const Vector &v) {
 Vector operator*(const Vector &v, const Matrix &m) {
     Vector result(m.cols());
 #pragma omp parallel for num_threads(16)
-    for (int i = 0; i < m.cols(); ++i) {
-        result[i] = v * m.col(i);
+    for (int j = 0; j < m.cols(); ++j) {
+        // Multiplicamos el vector v por la columna j de la matriz m
+        // asumiendo que la función col(j) devuelve un Vector
+        result[j] = v * m.col(j);
     }
     return result;
 }
@@ -40,16 +43,20 @@ Vector operator*(const Vector &v, const Matrix &m) {
 // ====================================================================
 // Matrix Row and Column Getters
 // ====================================================================
-Vector Matrix::row(int index) const {
-    return _rowsData[index];
+Vector Matrix::row(int i) const {
+    Vector r(cols());
+    for (int j = 0; j < cols(); ++j) {
+        r[j] = (*this)[i][j];
+    }
+    return r;
 }
 
-Vector Matrix::col(int index) const {
-    Vector column(_rows);
-    for (int i = 0; i < _rows; ++i) {
-        column[i] = _rowsData[i][index];
+Vector Matrix::col(int j) const {
+    Vector c(rows());
+    for (int i = 0; i < rows(); ++i) {
+        c[i] = (*this)[i][j];
     }
-    return column;
+    return c;
 }
 
 // ====================================================================
