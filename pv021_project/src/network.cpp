@@ -14,54 +14,57 @@ void MLP::train(const std::vector<vector> &trainData,
                 const std::vector<int>    &trainLabels,
                 valueType lr,
                 int epochs,
-                int batchSize)
-{
-    _lr = lr;  // antes _learningRate = learningRate
-
-    std::vector<vector> miniBatchData(batchSize);
-    std::vector<int>    miniBatchLabels(batchSize);
-
+                int batchSize) {
+    // Establecer la tasa de aprendizaje global
+    _lr = lr;
+    
     int totalSamples = trainData.size();
-    int batchCount   = totalSamples / batchSize;
-
-    // Generar índices [0..totalSamples-1]
+    int numBatches = totalSamples / batchSize;
+    
+    // Generar vector de índices [0, 1, ..., totalSamples-1]
     std::vector<int> indices(totalSamples);
     for (int i = 0; i < totalSamples; ++i) {
         indices[i] = i;
     }
-
-    for (int e = 0; e < epochs; ++e) {
-
-        std::cout << "Epoch " << e + 1 << " / " << epochs << std::endl;
-
-        // Barajar índices de forma determinista (puedes usar semilla variable si deseas aleatoriedad real)
-        std::random_device rd;
-        std::mt19937 generator(0);
-        std::shuffle(indices.begin(), indices.end(), generator);
-
-        // Iterar en batches
-        for (int b = 0; b < batchCount; ++b) {
-            for (int k = 0; k < batchSize; ++k) {
-                int idx = indices[b * batchSize + k];
-                miniBatchData[k]   = trainData[idx];
-                miniBatchLabels[k] = trainLabels[idx];
+    
+    // Iterar sobre las épocas
+    for (int epoch = 0; epoch < epochs; ++epoch) {
+        std::cout << "Epoch " << epoch + 1 << " / " << epochs << std::endl;
+        
+        // Mezclar índices de forma determinista (usar semilla fija para reproducibilidad)
+        std::mt19937 rng(0);
+        std::shuffle(indices.begin(), indices.end(), rng);
+        
+        // Procesar cada mini-batch
+        for (int batch = 0; batch < numBatches; ++batch) {
+            // Crear mini-batch para datos y etiquetas
+            std::vector<vector> currentBatchData(batchSize);
+            std::vector<int>    currentBatchLabels(batchSize);
+            
+            for (int i = 0; i < batchSize; ++i) {
+                int dataIndex = indices[batch * batchSize + i];
+                currentBatchData[i]   = trainData[dataIndex];
+                currentBatchLabels[i] = trainLabels[dataIndex];
             }
-
-            // Guardamos el batch actual para el paso de update
-            _trainData   = miniBatchData;   // antes _inputValues
-            _trainLabels = miniBatchLabels; // antes _inputLabels
-
-            // step = e * batchCount + b + 1
-            updateWeights(e * batchCount + b + 1);
+            
+            // Almacenar el batch actual en las variables internas del MLP
+            _trainData   = currentBatchData;
+            _trainLabels = currentBatchLabels;
+            
+            // Calcular el "globalStep" (por ejemplo, para actualizar gradientes)
+            int globalStep = epoch * numBatches + batch + 1;
+            
+            // Actualizar pesos usando los datos acumulados del batch
+            updateWeights(globalStep);
         }
     }
 }
 
+
 // =================================================
 // MLP: Predicción
 // =================================================
-std::vector<int> MLP::predict(const std::vector<vector> &testData)
-{
+std::vector<int> MLP::predict(const std::vector<vector> &testData) {
     std::vector<int> predictions;
     vector netOutput;
 
@@ -87,8 +90,7 @@ std::vector<int> MLP::predict(const std::vector<vector> &testData)
 // =================================================
 // MLP: Añadir capa
 // =================================================
-void MLP::addLayer(int outDim, ActivationType actFunc)
-{
+void MLP::addLayer(int outDim, ActivationType actFunc) {
     int inDim;
     if (_layerStack.empty()) {
         inDim = _inputSize;  // antes _inputDimension
@@ -101,8 +103,7 @@ void MLP::addLayer(int outDim, ActivationType actFunc)
 // =================================================
 // MLP: Retropropagación
 // =================================================
-void MLP::backPropagate(size_t labelIdx)
-{
+void MLP::backPropagate(size_t labelIdx) {
     // 1) Capa de salida (one-hot)
     Layer &lastLayer = _layerStack.back();
     for (size_t i = 0; i < lastLayer.size(); ++i) {
@@ -188,8 +189,7 @@ void MLP::updateWeights(int step)
 // =================================================
 // MLP: Forward Pass
 // =================================================
-void MLP::feedForward(const vector &inputVec)
-{
+void MLP::feedForward(const vector &inputVec) {
     vector rawZ;
     for (size_t i = 0; i < _layerStack.size(); ++i) {
         Layer &layer = _layerStack[i];
@@ -212,16 +212,14 @@ void MLP::feedForward(const vector &inputVec)
 // =================================================
 // MLP: Obtener salida final de la red
 // =================================================
-vector MLP::getMLPOutput()
-{
+vector MLP::getMLPOutput() {
     return _layerStack.back()._outputs;
 }
 
 // =================================================
 // Adam en Pesos
 // =================================================
-void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const
-{
+void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const {
     valueType beta1    = 0.9;
     valueType beta2    = 0.999;
     valueType eps      = 1e-8;
@@ -249,8 +247,7 @@ void MLP::updateWeightAdam(int row, int col, int step, Layer &layer) const
 // =================================================
 // Adam en Bias
 // =================================================
-void MLP::updateBiasAdam(int idx, int step, Layer &layer) const
-{
+void MLP::updateBiasAdam(int idx, int step, Layer &layer) const {
     valueType beta1 = 0.9;
     valueType beta2 = 0.999;
     valueType eps   = 1e-8;
@@ -313,8 +310,7 @@ void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
 // =================================================
 // Layer: Usar Función de Activación
 // =================================================
-vector Layer::applyActivation(const vector &zVec)
-{
+vector Layer::applyActivation(const vector &zVec) {
     switch (_actType) {
         case ActivationType::LeakyReLU:
             return leakyReLu(zVec, _leakyAlpha);
@@ -328,8 +324,7 @@ vector Layer::applyActivation(const vector &zVec)
 // =================================================
 // Layer: Usar Derivada de la Activación
 // =================================================
-vector Layer::applyActivationDeriv(const vector &zVec)
-{
+vector Layer::applyActivationDeriv(const vector &zVec) {
     switch (_actType) {
         case ActivationType::LeakyReLU:
             return leakyReLuDerivative(zVec, _leakyAlpha);
@@ -343,8 +338,7 @@ vector Layer::applyActivationDeriv(const vector &zVec)
 // =================================================
 // MLP: Ajustar la alpha de LeakyReLU
 // =================================================
-void MLP::setLeakyReLUAlpha(valueType alpha)
-{
+void MLP::setLeakyReLUAlpha(valueType alpha) {
     for (auto &layer : _layerStack) {
         layer._leakyAlpha = alpha;
     }
@@ -353,8 +347,7 @@ void MLP::setLeakyReLUAlpha(valueType alpha)
 // =================================================
 // getWeightInitByActivation + initWeights + initBias
 // =================================================
-WeightInitType getWeightInitByActivation(ActivationType actFunc)
-{
+WeightInitType getWeightInitByActivation(ActivationType actFunc) {
     switch (actFunc) {
         case ActivationType::LeakyReLU:
             return WeightInitType::He;
@@ -364,8 +357,7 @@ WeightInitType getWeightInitByActivation(ActivationType actFunc)
     }
 }
 
-matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist)
-{
+matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist) {
     matrix w(inDim, outDim);
     WeightInitType winit = getWeightInitByActivation(actFunc);
 
@@ -393,8 +385,7 @@ matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDi
     return w;
 }
 
-vector initBias(int dim)
-{
+vector initBias(int dim) {
     // Inicializamos en 0
     vector b(dim);
     return b;
