@@ -163,60 +163,60 @@ void MLP::backPropagate(size_t targetLabel) {
 // MLP: Actualizar pesos
 // =================================================
 void MLP::updateWeights(int globalStep) {
-    // Bloque 1: Acumular gradientes de cada muestra en el batch
+    // Phase 1: Accumulate gradients over each sample in the mini-batch.
     for (size_t sampleIdx = 0; sampleIdx < _trainData.size(); ++sampleIdx) {
-        auto &sampleInput = _trainData[sampleIdx];
-        auto  sampleLabel = _trainLabels[sampleIdx];
+        // Retrieve the current input sample and its label.
+        const Vector &currentSample = _trainData[sampleIdx];
+        int currentLabel = _trainLabels[sampleIdx];
 
-        // Realizar propagación hacia adelante y calcular el error
-        feedForward(sampleInput);
-        backPropagate(sampleLabel);
+        // Perform a forward pass and then backpropagate the error for the sample.
+        feedForward(currentSample);
+        backPropagate(currentLabel);
 
-        // Propagar y acumular gradientes en cada capa
+        // For each layer, accumulate gradients.
         for (size_t layerIdx = 0; layerIdx < _layerStack.size(); ++layerIdx) {
-            Layer &currentLayer = _layerStack[layerIdx];
+            Layer &layer = _layerStack[layerIdx];
 
-            // Si es la primera capa, la entrada es la muestra; 
-            // en caso contrario, se usa la salida de la capa anterior.
-            const Vector &inputForLayer = (layerIdx == 0)
-                                          ? sampleInput
-                                          : _layerStack[layerIdx - 1]._outputs;
+            // Determine the input to the layer:
+            // For the first layer, the input is the sample; otherwise, use the previous layer's output.
+            const Vector &layerInput = (layerIdx == 0)
+                                         ? currentSample
+                                         : _layerStack[layerIdx - 1]._outputs;
 
-            // Acumular gradientes para los pesos
-            for (int i = 0; i < currentLayer._weights.rows(); ++i) {
-                for (int j = 0; j < currentLayer._weights.cols(); ++j) {
-                    currentLayer._grads[i][j] += currentLayer._deltas[j] * inputForLayer[i];
+            // Accumulate weight gradients: gradient_ij += delta_j * input_i
+            for (int i = 0; i < layer._weights.rows(); ++i) {
+                for (int j = 0; j < layer._weights.cols(); ++j) {
+                    layer._grads[i][j] += layer._deltas[j] * layerInput[i];
                 }
             }
-            // Acumular gradientes para los biases
-            for (size_t j = 0; j < currentLayer.size(); ++j) {
-                currentLayer._biasGrads[j] += currentLayer._deltas[j];
+            // Accumulate bias gradients: biasGradient_j += delta_j
+            for (int j = 0; j < layer.size(); ++j) {
+                layer._biasGrads[j] += layer._deltas[j];
             }
         }
     }
 
-    // Bloque 2: Actualizar parámetros (pesos y biases) de cada capa
+    // Phase 2: Update the parameters (weights and biases) for each layer.
     for (auto &layer : _layerStack) {
-        // Actualizar pesos
+        // Update weights.
         #pragma omp parallel for num_threads(16)
         for (int i = 0; i < layer._weights.rows(); ++i) {
             for (int j = 0; j < layer._weights.cols(); ++j) {
-                // Añadir regularización L2: gradiente += regLambda * peso
+                // Incorporate L2 regularization: add regLambda * weight to the gradient.
                 layer._grads[i][j] += regLambda * layer._weights[i][j];
-
-                // Actualizar el peso usando SGD con momentum (o Adam, según el método seleccionado)
-                // Aquí se usa la función updateWeightSGD (o Adam, comentada) con la versión reordenada.
-                //updateWeightSGD(i, j, globalStep, layer);
-				updateWeightAdam(i, j, globalStep, layer);
-                // Reiniciar el gradiente acumulado
+                
+                // Update the weight using the Adam update (or, alternativamente, SGD update).
+                // Aquí se llama a 'updateWeightAdam'; para usar SGD, se cambiaría a 'updateWeightSGD'.
+                updateWeightAdam(i, j, globalStep, layer);
+                
+                // Reset the gradient for this parameter.
                 layer._grads[i][j] = 0;
             }
         }
-
-        // Actualizar biases (usualmente sin regularización)
+        
+        // Update biases (typically biases are not regularized).
         for (int i = 0; i < layer._bias.size(); ++i) {
-            //updateBiasSGD(i, globalStep, layer);
-			updateBiasAdam(i, globalStep, layer);
+            updateBiasAdam(i, globalStep, layer);
             layer._biasGrads[i] = 0;
         }
     }
