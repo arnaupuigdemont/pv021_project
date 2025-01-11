@@ -139,83 +139,90 @@ void MLP::backPropagate(size_t targetLabel) {
 // =================================================
 // MLP: Actualizar pesos
 // =================================================
-void MLP::updateWeights(int step)
-{
-    // 1) Para cada muestra en el batch => forward + backward
-    for (size_t k = 0; k < _trainData.size(); ++k) {
-        auto &sample = _trainData[k];
-        auto  label  = _trainLabels[k];
+void MLP::updateWeights(int globalStep) {
+    // Bloque 1: Acumular gradientes de cada muestra en el batch
+    for (size_t sampleIdx = 0; sampleIdx < _trainData.size(); ++sampleIdx) {
+        auto &sampleInput = _trainData[sampleIdx];
+        auto  sampleLabel = _trainLabels[sampleIdx];
 
-        feedForward(sample);
-        backPropagate(label);
+        // Realizar propagación hacia adelante y calcular el error
+        feedForward(sampleInput);
+        backPropagate(sampleLabel);
 
-        // Acumular gradientes (sin actualizar aún)
-        for (size_t l = 0; l < _layerStack.size(); ++l) {
-            Layer &layer = _layerStack[l];
+        // Propagar y acumular gradientes en cada capa
+        for (size_t layerIdx = 0; layerIdx < _layerStack.size(); ++layerIdx) {
+            Layer &currentLayer = _layerStack[layerIdx];
 
-            const vector &belowOutputs = (l == 0)
-                                         ? sample
-                                         : _layerStack[l - 1]._outputs;
+            // Si es la primera capa, la entrada es la muestra; 
+            // en caso contrario, se usa la salida de la capa anterior.
+            const vector &inputForLayer = (layerIdx == 0)
+                                          ? sampleInput
+                                          : _layerStack[layerIdx - 1]._outputs;
 
-            for (int i = 0; i < layer._weights.rows(); ++i) {
-                for (int j = 0; j < layer._weights.cols(); ++j) {
-                    layer._grads[i][j] += layer._deltas[j] * belowOutputs[i];
+            // Acumular gradientes para los pesos
+            for (int i = 0; i < currentLayer._weights.rows(); ++i) {
+                for (int j = 0; j < currentLayer._weights.cols(); ++j) {
+                    currentLayer._grads[i][j] += currentLayer._deltas[j] * inputForLayer[i];
                 }
             }
-            for (size_t j = 0; j < layer.size(); ++j) {
-                layer._biasGrads[j] += layer._deltas[j];
+            // Acumular gradientes para los biases
+            for (size_t j = 0; j < currentLayer.size(); ++j) {
+                currentLayer._biasGrads[j] += currentLayer._deltas[j];
             }
         }
     }
 
-    // 2) Aplicar Adam + limpiar gradientes
+    // Bloque 2: Actualizar parámetros (pesos y biases) de cada capa
     for (auto &layer : _layerStack) {
-
-		#pragma omp parallel for num_threads(16)
+        // Actualizar pesos
+        #pragma omp parallel for num_threads(16)
         for (int i = 0; i < layer._weights.rows(); ++i) {
             for (int j = 0; j < layer._weights.cols(); ++j) {
-                // L2 regularization
+                // Añadir regularización L2: gradiente += regLambda * peso
                 layer._grads[i][j] += regLambda * layer._weights[i][j];
 
-                // Actualizar con Adam
-                updateWeightAdam(i, j, step, layer);
-				//updateWeightSGD(i, j, step, layer);
-                // Limpiar grad acumulado
+                // Actualizar el peso usando SGD con momentum (o Adam, según el método seleccionado)
+                // Aquí se usa la función updateWeightSGD (o Adam, comentada) con la versión reordenada.
+                //updateWeightSGD(i, j, globalStep, layer);
+				updateWeightAdam(i, j, globalStep, layer);
+                // Reiniciar el gradiente acumulado
                 layer._grads[i][j] = 0;
             }
         }
 
-        // Bias (normalmente sin regularizar)
+        // Actualizar biases (usualmente sin regularización)
         for (size_t i = 0; i < layer._bias.size(); ++i) {
-            updateBiasAdam(i, step, layer);
-			//updateBiasSGD(i, step, layer);
+            updateBiasSGD(i, globalStep, layer);
             layer._biasGrads[i] = 0;
         }
     }
 }
 
+
 // =================================================
 // MLP: Forward Pass
 // =================================================
 void MLP::feedForward(const vector &inputVec) {
-    vector rawZ;
-    for (size_t i = 0; i < _layerStack.size(); ++i) {
-        Layer &layer = _layerStack[i];
+    vector preActivation;  // 'rawZ': salida de la operación lineal
 
-        if (i == 0) {
-            // Primera capa
-            rawZ = (inputVec * layer._weights) + layer._bias;
+    // Recorrer cada capa en el stack
+    for (size_t layerIndex = 0; layerIndex < _layerStack.size(); ++layerIndex) {
+        Layer &currentLayer = _layerStack[layerIndex];
+
+        // Calcular la preactivación: z = X * W + b
+        if (layerIndex == 0) {
+            preActivation = (inputVec * currentLayer._weights) + currentLayer._bias;
         } else {
-            Layer &prevLayer = _layerStack[i - 1];
-            rawZ = (prevLayer._outputs * layer._weights) + layer._bias;
+            Layer &prevLayer = _layerStack[layerIndex - 1];
+            preActivation = (prevLayer._outputs * currentLayer._weights) + currentLayer._bias;
         }
 
-        // Aplicar activación
-        layer._outputs    = layer.applyActivation(rawZ);
-        // Guardar derivadas para backprop
-        layer._valDerivs  = layer.applyActivationDeriv(rawZ);
+        // Aplicar la activación y guardar resultados
+        currentLayer._outputs   = currentLayer.applyActivation(preActivation);
+        currentLayer._valDerivs = currentLayer.applyActivationDeriv(preActivation);
     }
 }
+
 
 // =================================================
 // MLP: Obtener salida final de la red
