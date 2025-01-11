@@ -107,30 +107,34 @@ void MLP::addLayer(int outDim, ActivationType actFunc) {
 // =================================================
 // MLP: Retropropagación
 // =================================================
-void MLP::backPropagate(size_t labelIdx) {
-    // 1) Capa de salida (one-hot)
-    Layer &lastLayer = _layerStack.back();
-    for (size_t i = 0; i < lastLayer.size(); ++i) {
-
-        valueType labelOneHot = (labelIdx == i) ? 1.0 : 0.0;
-        lastLayer._deltas[i]  = lastLayer._outputs[i] - labelOneHot;
+void MLP::backPropagate(size_t targetLabel) {
+    // Paso 1: Calcular el error en la capa de salida (codificación one‑hot)
+    Layer &outputLayer = _layerStack.back();
+    for (size_t i = 0; i < outputLayer.size(); ++i) {
+        // Si el índice coincide con targetLabel, se espera 1.0; en caso contrario, 0.0.
+        valueType expected = (targetLabel == i) ? 1.0 : 0.0;
+        // La delta es la diferencia entre la salida real y la esperada.
+        outputLayer._deltas[i] = outputLayer._outputs[i] - expected;
     }
 
-    // 2) Capas intermedias (propagar deltas hacia atrás)
+    // Paso 2: Retropropagar el error a través de las capas ocultas
+    // Se recorre desde la penúltima capa hasta la primera (en orden inverso)
     for (int l = static_cast<int>(_layerStack.size()) - 2; l >= 0; --l) {
-        Layer &curLayer  = _layerStack[l];
-        Layer &nextLayer = _layerStack[l + 1];
+        Layer &currentLayer = _layerStack[l];
+        Layer &nextLayer    = _layerStack[l + 1];
 
-        for (size_t i = 0; i < curLayer.size(); ++i) {
-            valueType sumDeltas = 0.0;
+        for (size_t i = 0; i < currentLayer.size(); ++i) {
+            valueType deltaSum = 0.0;
+            // Sumar la contribución de los deltas de la siguiente capa ponderados por sus pesos
             for (size_t j = 0; j < nextLayer.size(); ++j) {
-                sumDeltas += nextLayer._deltas[j] * nextLayer._weights[i][j];
+                deltaSum += nextLayer._deltas[j] * nextLayer._weights[i][j];
             }
-            // Multiplicar por la derivada de la activación
-            curLayer._deltas[i] = sumDeltas * curLayer._valDerivs[i];
+            // Multiplicar la suma de deltas por la derivada de la activación de la neurona actual
+            currentLayer._deltas[i] = deltaSum * currentLayer._valDerivs[i];
         }
     }
 }
+
 
 // =================================================
 // MLP: Actualizar pesos
