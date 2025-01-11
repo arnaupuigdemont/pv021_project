@@ -1,26 +1,27 @@
 #include "layer.hpp"
+#include "activationFunction.hpp" // Incluir el archivo de cabecera adecuado
 #include <random>
 
 // =================================================
-// Layer: Usar Función de Activación
+// Layer: Apply Activation Function
 // =================================================
 Vector Layer::applyActivation(const Vector &zVec) {
-    return leakyReLu(zVec, _leakyAlpha);
+    return activationFunction::leakyReLu(zVec, _leakyAlpha);
 }
 
 Vector Layer::applyActivationOutput(const Vector &zVec) {
-    return softmax(zVec);
+    return activationFunction::softmax(zVec);
 }
 
 // =================================================
-// Layer: Usar Derivada de la Activación
+// Layer: Apply Activation Derivative
 // =================================================
 Vector Layer::applyActivationDeriv(const Vector &zVec) {
-    return leakyReLuDerivative(zVec, _leakyAlpha);
+    return activationFunction::leakyReLuDerivative(zVec, _leakyAlpha);
 }
 
 Vector Layer::applyActivationDerivOutput(const Vector &zVec) {
-    return softmaxDerivative(zVec);
+    return activationFunction::softmaxDerivative(zVec);
 }
 
 Matrix initWeights(int inDim, int outDim, bool output, bool uniformDist) {
@@ -35,17 +36,16 @@ Matrix initWeights(int inDim, int outDim, bool output, bool uniformDist) {
         bound = std::sqrt(scaleFactor * 2.0 / inDim);
     }
 
-    valueType minVal = -bound;
-    valueType maxVal = bound;
-
-    std::mt19937 gen(0);
-    std::uniform_real_distribution<valueType> dist(minVal, maxVal);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<valueType> dist(-bound, bound);
 
     for (int i = 0; i < inDim; ++i) {
         for (int j = 0; j < outDim; ++j) {
             weights[i][j] = dist(gen);
         }
     }
+
     return weights;
 }
 
