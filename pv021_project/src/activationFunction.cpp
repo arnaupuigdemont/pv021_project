@@ -3,16 +3,8 @@
 #include <cmath>
 #include <numeric>
 
-// ====================================================================
-// Activation Functions
-// ====================================================================
-
 /**
  * @brief Leaky ReLU applied on a single value.
- *
- * @param x Input value.
- * @param alpha Slope for negative values.
- * @return valueType Activated value.
  */
 valueType activationFunction::leakyReLu(valueType x, float alpha) {
     return (x < 0) ? (x * alpha) : x;
@@ -20,10 +12,6 @@ valueType activationFunction::leakyReLu(valueType x, float alpha) {
 
 /**
  * @brief Applies Leaky ReLU element-wise on a vector.
- *
- * @param inputVector Vector of input values.
- * @param alpha Slope for negative values.
- * @return Vector Activated vector.
  */
 Vector activationFunction::leakyReLu(const Vector &inputVector, float alpha) {
     int dim = inputVector.size();
@@ -36,10 +24,6 @@ Vector activationFunction::leakyReLu(const Vector &inputVector, float alpha) {
 
 /**
  * @brief Applies the derivative of Leaky ReLU element-wise on a vector.
- *
- * @param inputVector Vector of input values.
- * @param alpha Slope for negative values.
- * @return Vector Derivative vector.
  */
 Vector activationFunction::leakyReLuDerivative(const Vector &inputVector, float alpha) {
     std::vector<valueType> data = inputVector.getData();
@@ -50,9 +34,6 @@ Vector activationFunction::leakyReLuDerivative(const Vector &inputVector, float 
 
 /**
  * @brief Applies softmax function on a vector.
- *
- * @param inputVector Vector of input values.
- * @return Vector Softmax activated vector.
  */
 Vector activationFunction::softmax(const Vector &inputVector) {
     std::vector<valueType> data = inputVector.getData();
@@ -73,9 +54,6 @@ Vector activationFunction::softmax(const Vector &inputVector) {
 
 /**
  * @brief Applies the derivative of softmax function on a vector.
- *
- * @param inputVector Vector of input values.
- * @return Vector Derivative vector.
  */
 Vector activationFunction::softmaxDerivative(const Vector &inputVector) {
     std::vector<valueType> data = inputVector.getData();
