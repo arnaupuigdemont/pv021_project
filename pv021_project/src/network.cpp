@@ -10,7 +10,7 @@
 // =================================================
 // MLP: Entrenamiento
 // =================================================
-void MLP::train(const std::vector<vector> &trainData,
+void MLP::train(const std::vector<Vector> &trainData,
                 const std::vector<int>    &trainLabels,
                 valueType lr,
                 int epochs,
@@ -38,7 +38,7 @@ void MLP::train(const std::vector<vector> &trainData,
         // Procesar cada mini-batch
         for (int batch = 0; batch < numBatches; ++batch) {
             // Crear mini-batch para datos y etiquetas
-            std::vector<vector> currentBatchData(batchSize);
+            std::vector<Vector> currentBatchData(batchSize);
             std::vector<int>    currentBatchLabels(batchSize);
             
             for (int i = 0; i < batchSize; ++i) {
@@ -64,7 +64,7 @@ void MLP::train(const std::vector<vector> &trainData,
 // =================================================
 // MLP: Predicción
 // =================================================
-std::vector<int> MLP::predict(const std::vector<vector> &testData) {
+std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
     std::vector<int> predictedLabels;
 
     // Para cada muestra en el conjunto de test
@@ -73,7 +73,7 @@ std::vector<int> MLP::predict(const std::vector<vector> &testData) {
         feedForward(sample);
 
         // Recupera la salida final de la red
-        vector outputVector = getMLPOutput();
+        Vector outputVector = getMLPOutput();
 
         // Buscar el índice del elemento de mayor valor (argmax)
         valueType currentMax = -1e9;
@@ -155,7 +155,7 @@ void MLP::updateWeights(int globalStep) {
 
             // Si es la primera capa, la entrada es la muestra; 
             // en caso contrario, se usa la salida de la capa anterior.
-            const vector &inputForLayer = (layerIdx == 0)
+            const Vector &inputForLayer = (layerIdx == 0)
                                           ? sampleInput
                                           : _layerStack[layerIdx - 1]._outputs;
 
@@ -203,8 +203,8 @@ void MLP::updateWeights(int globalStep) {
 // =================================================
 // MLP: Forward Pass
 // =================================================
-void MLP::feedForward(const vector &inputVec) {
-    vector preActivation;  // 'rawZ': salida de la operación lineal
+void MLP::feedForward(const Vector &inputVec) {
+    Vector preActivation;  // 'rawZ': salida de la operación lineal
 
     // Recorrer cada capa en el stack
     for (size_t layerIndex = 0; layerIndex < _layerStack.size(); ++layerIndex) {
@@ -228,7 +228,7 @@ void MLP::feedForward(const vector &inputVec) {
 // =================================================
 // MLP: Obtener salida final de la red
 // =================================================
-vector MLP::getMLPOutput() {
+Vector MLP::getMLPOutput() {
     return _layerStack.back()._outputs;
 }
 
@@ -331,28 +331,28 @@ void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
 // =================================================
 // Layer: Usar Función de Activación
 // =================================================
-vector Layer::applyActivation(const vector &zVec) {
+Vector Layer::applyActivation(const Vector &zVec) {
     switch (_actType) {
         case ActivationType::LeakyReLU:
             return leakyReLu(zVec, _leakyAlpha);
         case ActivationType::Softmax:
             return softmax(zVec);
         default:
-            return vector(zVec.size());
+            return Vector(zVec.size());
     }
 }
 
 // =================================================
 // Layer: Usar Derivada de la Activación
 // =================================================
-vector Layer::applyActivationDeriv(const vector &zVec) {
+Vector Layer::applyActivationDeriv(const Vector &zVec) {
     switch (_actType) {
         case ActivationType::LeakyReLU:
             return leakyReLuDerivative(zVec, _leakyAlpha);
         case ActivationType::Softmax:
             return softmaxDerivative(_outputs);
         default:
-            return vector(zVec.size());
+            return Vector(zVec.size());
     }
 }
 
@@ -378,8 +378,8 @@ WeightInitType getWeightInitByActivation(ActivationType actFunc) {
     }
 }
 
-matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true) {
-    matrix weights(inDim, outDim);
+Matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true) {
+    Matrix weights(inDim, outDim);
     WeightInitType initType = getWeightInitByActivation(actFunc);
 
     valueType scaleFactor = (uniformDist) ? 3.0 : 1.0;
@@ -407,8 +407,8 @@ matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDi
 }
 
 
-vector initBias(int dim) {
+Vector initBias(int dim) {
     // Inicializamos en 0
-    vector b(dim);
+    Vector b(dim);
     return b;
 }

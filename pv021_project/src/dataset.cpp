@@ -57,9 +57,9 @@ std::vector<int> dataset::readLabels(const std::string &filepath) {
     return values;
 }
 
-std::vector<vector> dataset::readValues(const std::string &filepath) 
+std::vector<Vector> dataset::readValues(const std::string &filepath) 
 {
-    std::vector<vector> values;
+    std::vector<Vector> values;
     std::ifstream is(filepath);
     std::string line;
 
@@ -83,7 +83,7 @@ std::vector<vector> dataset::readValues(const std::string &filepath)
     return values;
 }
 
-void dataset::normalizeValues(std::vector<vector> &values) const {
+void dataset::normalizeValues(std::vector<Vector> &values) const {
     if (values.empty()) return; 
 
     size_t rows = values.size();

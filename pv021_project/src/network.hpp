@@ -14,10 +14,10 @@ enum class WeightInitType { He, Glorot };
 WeightInitType getWeightInitByActivation(ActivationType actFunc);
 
 // Renombramos la función 'initializeWeights' a 'initWeights'
-matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true);
+Matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true);
 
 // Renombramos la función 'initializeBias' a 'initBias'
-vector initBias(int dimension);
+Vector initBias(int dimension);
 
 /* 
  * Clase que representa una "Capa" (Layer).
@@ -30,24 +30,24 @@ class Layer {
     friend class MLP; // MLP puede acceder a sus miembros privados
 
 private:
-    vector _outputs;           // antes _values
-    vector _valDerivs;         // antes _valuesDerivatives
+    Vector _outputs;           // antes _values
+    Vector _valDerivs;         // antes _valuesDerivatives
 
-    matrix _weights;
-    vector _bias;
+    Matrix _weights;
+    Vector _bias;
 
-    matrix _grads;             // antes _gradients
-    vector _biasGrads;         // antes _biasGradients
+    Matrix _grads;             // antes _gradients
+    Vector _biasGrads;         // antes _biasGradients
 
-    vector _deltas;
+    Vector _deltas;
 
-    matrix _adamFirstMoment;
-    matrix _adamSecondMoment;
-    vector _adamBiasFirstMom;
-    vector _adamBiasSecondMom;
+    Matrix _adamFirstMoment;
+    Matrix _adamSecondMoment;
+    Vector _adamBiasFirstMom;
+    Vector _adamBiasSecondMom;
 
-	matrix _sgdVelocity;
-	vector _sgdBiasVelocity;
+	Matrix _sgdVelocity;
+	Vector _sgdBiasVelocity;
 
     int    _dimension;
     ActivationType _actType;   // antes _activationFunction
@@ -56,8 +56,8 @@ private:
 
     // Renombramos 'useActivationFunction' y 'useDerivedActivationFunction'
     // a algo más directo: 'applyActivation' y 'applyActivationDeriv'
-    vector applyActivation(const vector &inputVec);
-    vector applyActivationDeriv(const vector &inputVec);
+    Vector applyActivation(const Vector &inputVec);
+    Vector applyActivationDeriv(const Vector &inputVec);
 
 public:
     Layer(int inDim, int outDim, ActivationType actFunc)
@@ -78,9 +78,9 @@ public:
         _actType(actFunc),
         _leakyAlpha(0.01) {}
 
-    const matrix& getWeights() const { return _weights; }
-    const vector& getBias()    const { return _bias; }
-    const vector& getOutputs() const { return _outputs; }
+    const Matrix& getWeights() const { return _weights; }
+    const Vector& getBias()    const { return _bias; }
+    const Vector& getOutputs() const { return _outputs; }
 
     int getDimension() const { return _dimension; }
     size_t size()      const { return static_cast<size_t>(_dimension); }
@@ -100,7 +100,7 @@ class MLP {
 private:
     const double regLambda = 0.1;  // antes lambda
 
-    std::vector<vector> _trainData;
+    std::vector<Vector> _trainData;
     std::vector<int>    _trainLabels;
 
     std::vector<Layer>  _layerStack;
@@ -115,7 +115,7 @@ private:
     // 4) setLeakyReLUAlpha
     // 5) (Luego las que actualizan pesos con Adam, etc.)
 
-    void feedForward(const vector &singleInput);
+    void feedForward(const Vector &singleInput);
     void backPropagate(size_t labelIndex);
     void updateWeights(int globalStep);
 
@@ -130,7 +130,7 @@ private:
 	void updateBiasSGD(int idx, int step, Layer &layer) const;
 
     // Para recuperar la salida final del MLP en feed-forward
-    vector getMLPOutput();
+    Vector getMLPOutput();
 
 public:
     // Constructor
@@ -146,13 +146,13 @@ public:
     const std::vector<Layer>& getLayers() { return _layerStack; }
 
     // Entrenar y predecir
-    void train(const std::vector<vector> &data,
+    void train(const std::vector<Vector> &data,
                const std::vector<int> &labels,
                valueType learningRate,
                int epochs,
                int batchSize);
 
-    std::vector<int> predict(const std::vector<vector> &testData);  
+    std::vector<int> predict(const std::vector<Vector> &testData);  
 };
 
 // Renombramos "shuffleIndexes" => "shuffleIndices" (opcional)
