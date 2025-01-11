@@ -6,8 +6,7 @@
 #include <string>
 
 class dataset {
-		
-	char _sep;
+		;
     int readRowLabels(const std::string &line) const;
 
 	void normalizeValues(std::vector<Vector> &values) const;
@@ -15,7 +14,7 @@ class dataset {
 
 public:
 
-	dataset(char sep = ',') : _sep(sep) {}	
+	dataset(){}	
 	
 	std::vector<Vector> readValues(const std::string &filepath);
     std::vector<int> readLabels(const std::string &filepath);
