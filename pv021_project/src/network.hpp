@@ -5,22 +5,6 @@
 #include "matrix.hpp"
 #include <vector>
 
-// Renombramos 'activations' a 'ActivationType'
-enum class ActivationType { LeakyReLU, Softmax };
-
-// Renombramos 'initialization' a 'WeightInitType'
-enum class WeightInitType { He, Glorot };
-
-// Renombramos la función 'getInitializationByActivation' a 'getWeightInitByActivation'
-WeightInitType getWeightInitByActivation(ActivationType actFunc);
-
-// Renombramos la función 'initializeWeights' a 'initWeights'
-Matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true);
-
-// Renombramos la función 'initializeBias' a 'initBias'
-Vector initBias(int dimension);
-
-
 /* 
  * Clase principal "MLP". 
  * - lambda -> regLambda
