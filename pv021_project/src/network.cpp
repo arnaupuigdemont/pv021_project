@@ -67,26 +67,25 @@ void MLP::train(const std::vector<Vector> &trainData,
 std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
     std::vector<int> predictedLabels;
 
-    // Para cada muestra en el conjunto de test
+    // For each sample in the test set:
     for (const auto &sample : testData) {
-        // Realiza el forward pass con la muestra
+        // Perform forward pass with the sample.
         feedForward(sample);
 
-        // Recupera la salida final de la red
+        // Retrieve the final output of the network.
         Vector outputVector = getMLPOutput();
+        const std::vector<valueType>& outputData = outputVector.getData();
 
-        // Buscar el índice del elemento de mayor valor (argmax)
-        valueType currentMax = -1e9;
-        int predictedIndex = 0;
-        for (int i = 0; i < outputVector.size(); ++i) {
-            if (outputVector[i] > currentMax) {
-                currentMax = outputVector[i];
-                predictedIndex = static_cast<int>(i);
-            }
-        }
+        // Find the index of the maximum element using std::max_element.
+        // We use a lambda to compare elements.
+        auto maxIt = std::max_element(outputData.begin(), outputData.end());
+        
+        // Calculate the index as the distance from the beginning.
+        int predictedIndex = static_cast<int>(std::distance(outputData.begin(), maxIt));
+
         predictedLabels.push_back(predictedIndex);
     }
-    
+
     return predictedLabels;
 }
 
