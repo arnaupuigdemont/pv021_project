@@ -24,8 +24,21 @@ int main() {
     auto testValues = reader.readCSVValues("data/fashion_mnist_test_vectors.csv");
     auto predictedTestLabels = network.predict(testValues);   
     auto predictedTrainLabels = network.predict(trainValues);
-	reader.exportResults("../test_predictions.csv", predictedTestLabels);
-    reader.exportResults("../train_predictions.csv", predictedTrainLabels);
+	reader.exportResults("test_predictions.csv", predictedTestLabels);
+    reader.exportResults("train_predictions.csv", predictedTrainLabels);
+
+    std::cout << "Calculating accuracy..." << std::endl;
+    auto testLabels = reader.readCSVLabels("data/fashion_mnist_test_labels.csv");
+
+    int correctPredictions = 0;
+    for (size_t i = 0; i < testLabels.size(); ++i) {
+        if (testLabels[i] == predictedTestLabels[i]) {
+            ++correctPredictions;
+        }
+    }
+
+    double accuracy = static_cast<double>(correctPredictions) / testLabels.size();
+    std::cout << "Accuracy: " << accuracy * 100 << "%" << std::endl;
 
     return 0;
 }

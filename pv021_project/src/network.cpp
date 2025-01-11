@@ -25,7 +25,6 @@ void MLP::train(const std::vector<vector> &inputValues, const std::vector<int> &
 
     for (int i = 0; i < epochs; ++i) {
 
-		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 		std::cout << "Epoch " << i + 1 << " / " << epochs << std::endl;
 
         shuffleIndexes(indexes);        
@@ -43,9 +42,6 @@ void MLP::train(const std::vector<vector> &inputValues, const std::vector<int> &
 
 			updateWeights(i * batchCount + j + 1);
 		}
-
-		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-		std::cout << "Epoch " << i + 1 << " took " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << " seconds." << std::endl;
 	}
 }
 
@@ -78,7 +74,6 @@ std::vector<int> MLP::predict(const std::vector<vector> &testValues) {
 void shuffleIndexes(std::vector<int> &indexes) {
 
 	std::random_device rd;
-	// std::mt19937 generator(rd());
 	std::mt19937 generator(0);
 	std::shuffle(indexes.begin(), indexes.end(), generator);
 }
@@ -106,7 +101,6 @@ void MLP::addLayer(int dimension, activations activationFunction) {
 
 void MLP::backPropagate(size_t inputLabel) {
 
-	// compute for the output layer
     for (size_t i = 0; i < _layers.back().size(); ++i) {
 		
 		valueType inputLabelHotEncoded;

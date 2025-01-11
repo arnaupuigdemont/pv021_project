@@ -1,16 +1,10 @@
 #ifndef MATRIX_HH
 #define MATRIX_HH
 
-/* the linear algebra classes (vector and matrix), and activation functions used in the network */
-
 #include <vector>
-#include <cstdint> // INT32_MAX
+#include <cstdint> 
 
-// used across whole implementation, should be float or double
 using valueType = float;
-
-
-// ---------------------------[ VECTOR ]--------------------------------
 
 class vector {
 
@@ -45,10 +39,6 @@ public:
 	const std::vector<valueType>& getValues() const { return _values; } 
 	
 };
-
-
-
-// ----------------------------[ MATRIX ]-------------------------------
 
 class matrix {
 	
@@ -86,9 +76,6 @@ public:
 
 vector plusMinusVectors( const vector &a, const vector &b, int sign );
 
-
-// ------------------------[ MATH FUNCTIONS ]---------------------------
-
 valueType leakyReLu(valueType x, float alpha);
 
 vector leakyReLu(const vector &inputVector, float alpha);
@@ -96,9 +83,5 @@ vector softmax(const vector &inputVector);
 
 vector leakyReLuDerivative(const vector &inputVector, float alpha);
 vector softmaxDerivative(const vector &inputVector);
-
-void printVector(const vector &v);
-void printMatrix(const matrix &m);
-
 
 #endif

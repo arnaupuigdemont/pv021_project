@@ -1,12 +1,7 @@
-/* implementation of methods for matrix and vector */
 #include <cmath>
 #include <iostream>
 #include "matrix.hpp"
 
-
-// ----------------------------[ vector ]-------------------------------
-
-// a and b are expected to have the same dimension
 vector plusMinusVectors( const vector &a, const vector &b, int sign ) {
 	int dimension = a.dimension();
 	std::vector<valueType> newValues(dimension);
@@ -45,8 +40,6 @@ vector operator*( valueType scalar, const vector &a ) {
 	return a * scalar;
 }
 
-
-// a and b are expected to have the same dimension
 valueType operator*( const vector &a, const vector &b ) {
 	int dimension = a.dimension();
 	valueType dotProduct = 0;
@@ -58,11 +51,6 @@ valueType operator*( const vector &a, const vector &b ) {
 	return dotProduct;
 }
 
-
-// ---------------------------- MATRIX -----------------------------------------------------
-
-
-// a and b are expected to have the same dimensions
 matrix operator+( const matrix &a, const matrix &b ) {
 	
 	int rows = a.rows();
@@ -115,12 +103,6 @@ vector matrix::col( int n ) const {
 	return newColumn;
 }
 
-
-// ================[ activation functions and their derivatives ]================
-
-// ----------------------------[ leakyReLU ]---------------------------------
-
-
 valueType leakyReLu(valueType x, float alpha) {
     if (x < 0) {
         return x * alpha;
@@ -154,11 +136,6 @@ vector leakyReLuDerivative(const vector &inputVector, float alpha) {
     return vector(result);
 }
 
-
-
-// ----------------------------[ softmax ]-------------------------------
-
-/* Implementation of a numerically stable softmax */
 vector softmax(const vector &inputVector) {
 
     valueType maxValue = -INFINITY;
@@ -199,21 +176,4 @@ vector softmaxDerivative(const vector &inputVector) {
     }
 
     return vector(numberVector);
-}
-
-
-// -----------------------[ other functions ]---------------------------
-
-void printVector(const vector &vec) {
-    for (int i = 0; i < vec.dimension(); ++i) {
-        std::cout << vec[i] << " ";
-    }
-    std::cout << std::endl;
-}
-
-
-void printMatrix(const matrix &m) {
-	for (int i = 0; i < m.rows(); ++i) {
-		printVector(m[i]);
-	}
 }

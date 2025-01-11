@@ -1,12 +1,10 @@
 #include "dataset.hpp"
-#include <fstream>  // ifstream, ofstream
-#include <string>   // stoi
+#include <fstream> 
+#include <string>   
 #include <iostream>
 #include <cmath>
 
 
-/* Generic function for transforming a single row/line into
- * a vector of given type. */
 template <typename T>
 std::vector<T> readRow(const std::string &line, char sep) {
 	
@@ -43,8 +41,6 @@ std::vector<T> readRow(const std::string &line, char sep) {
     return row;
 }
 
-/* Generic function for retrieving maximum value
- * of a given type from a vector. */
 template <typename T>
 T getMaxValue(const std::vector<T> &v) {
 	
@@ -59,9 +55,6 @@ T getMaxValue(const std::vector<T> &v) {
 	return max;
 }
 
-
-/* Generic function for retrieving minimum value
- * of a given type from a vector. */
 template <typename T>
 T getMinValue(const std::vector<T> &v) {
 	
@@ -76,10 +69,6 @@ T getMinValue(const std::vector<T> &v) {
 	return min;
 }
 
-
-// -----------------------------------[ labels ]----------------------------------------
-
-/* Can be easily adjusted to parse different datasets */
 int dataset::readRowLabels(const std::string &line) const {
 	
 	std::vector<int> row = readRow<int>(line, _sep);	
@@ -99,10 +88,6 @@ std::vector<int> dataset::readCSVLabels(const std::string &filepath) {
     is.close();
     return values;
 }
-
-
-
-// ------------------------------[ values ]---------------------------------------
 
 vector dataset::readRowValues(const std::string &line) const {
 	
@@ -126,9 +111,6 @@ std::vector<vector> dataset::readCSVValues(const std::string &filepath) {
 		
 	return values;
 }
-
-
-// ---------------------------------[ normalization, scaling ]---------------------------------------
 
 void dataset::normalizeValues(std::vector<vector> &values) const {
 		
@@ -155,41 +137,10 @@ void dataset::normalizeValues(std::vector<vector> &values) const {
 	}
 }
 
-
-// -----------------------------[ other functions / methods ]-----------------------------------
-
-/* Used to export predictions/labels */
 void dataset::exportResults(const std::string &filepath, const std::vector<int> &results) {
 	std::ofstream os(filepath);
 	for (const auto &value : results) {
 		os << value << std::endl;
 	}
 	os.close();
-}
-
-
-/* Can be used 'internally' to display model accuracy by comparing expected labels
- * and actual labels, similarly to python_evaluator. */
-void displayAccuracy(const std::string &expectedValuesPath, const std::string &actualValuesPath) {
-	
-	dataset reader;	
-	auto expectedLabels = reader.readCSVLabels(expectedValuesPath);
-	auto actualLabels = reader.readCSVLabels(actualValuesPath);
-	
-	if (expectedLabels.size() != actualLabels.size()) {
-		std::cout << "Files specified by filepaths have different size." << std::endl;
-		return;
-	}
-	
-	size_t size = expectedLabels.size();
-	int correct = 0;
-	
-	for (size_t i = 0; i < size; ++i) {
-		if (expectedLabels[i] == actualLabels[i]) {
-			++correct;
-		}
-	}
-	
-	double acc = (double)correct / size * 100;
-	printf("Accuracy of the model is: %d / %ld = %.2f %%\n", correct, size, acc);	
 }
