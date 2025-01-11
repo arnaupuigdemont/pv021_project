@@ -70,10 +70,10 @@ std::vector<int> MLP::predict(const std::vector<Vector> &testData) {
     // For each sample in the test set:
     for (const auto &sample : testData) {
         // Perform forward pass with the sample.
-        feedForward(sample);
+        feedForward(sample); 
 
         // Retrieve the final output of the network.
-        Vector outputVector = getMLPOutput();
+        Vector outputVector = _layerStack.back()._outputs;
         const std::vector<valueType>& outputData = outputVector.getData();
 
         // Find the index of the maximum element using std::max_element.
@@ -255,13 +255,6 @@ void MLP::feedForward(const Vector &inputVec) {
 		currentLayer._valDerivs = currentLayer.applyActivationDerivOutput(preActivation);
 		}
     }
-}
-
-/**
- * @brief get the output of the network
- */
-Vector MLP::getMLPOutput() {
-    return _layerStack.back()._outputs;
 }
 
 /**
