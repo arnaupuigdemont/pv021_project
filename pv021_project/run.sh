@@ -13,4 +13,4 @@ echo "#################"
 echo "     RUNNING     "
 echo "#################"
 
-nice -n 19 ./network
+./network

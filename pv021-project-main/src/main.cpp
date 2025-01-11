@@ -4,7 +4,8 @@
 
 int main() {
 
-    CSVReader reader;
+    std::cout << "Starting..." << std::endl;
+    dataset reader;
     std::cout << "Reading data..." << std::endl;
     auto trainValues = reader.readCSVValues("../data/fashion_mnist_train_vectors.csv");
     std::cout << "Reading labels..." << std::endl;
