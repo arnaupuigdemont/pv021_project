@@ -1,4 +1,5 @@
 #include "vector.hpp"
+#include <algorithm>
 
 Vector operator+(const Vector &a, const Vector &b) {
     return plusMinusVectors(a, b, 1);
@@ -34,8 +35,13 @@ valueType operator*(const Vector &a, const Vector &b) {
 Vector plusMinusVectors(const Vector &a, const Vector &b, int sign) {
     int dim = a.size();
     std::vector<valueType> result(dim);
-    for (int i = 0; i < dim; ++i) {
-        result[i] = a[i] + (b[i] * sign);
-    }
+    
+    const std::vector<valueType>& aData = a.getData();
+    const std::vector<valueType>& bData = b.getData();
+    
+    std::transform(aData.begin(), aData.end(), bData.begin(), result.begin(),
+                   [sign](valueType aElem, valueType bElem) {
+                       return aElem + sign * bElem;
+                   });
     return Vector(result);
 }
