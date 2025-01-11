@@ -46,6 +46,9 @@ private:
     vector _adamBiasFirstMom;
     vector _adamBiasSecondMom;
 
+	matrix _sgdVelocity;
+	vector _sgdBiasVelocity;
+
     int    _dimension;
     ActivationType _actType;   // antes _activationFunction
 
@@ -69,6 +72,8 @@ public:
         _adamSecondMoment(inDim, outDim),
         _adamBiasFirstMom(outDim),
         _adamBiasSecondMom(outDim),
+		_sgdVelocity(inDim, outDim),
+		_sgdBiasVelocity(outDim),
         _dimension(outDim),
         _actType(actFunc),
         _leakyAlpha(0.01) {}
@@ -119,6 +124,10 @@ private:
     // Actualizaciones concretas para Adam (privadas):
     void updateWeightAdam(int row, int col, int step, Layer &layer) const;
     void updateBiasAdam(int idx, int step, Layer &layer) const;
+
+	// Actualizaciones concretas para SGD (privadas):
+	void updateWeightSGD(int row, int col, int step, Layer &layer) const;
+	void updateBiasSGD(int idx, int step, Layer &layer) const;
 
     // Para recuperar la salida final del MLP en feed-forward
     vector getMLPOutput();

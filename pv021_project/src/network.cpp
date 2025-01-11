@@ -162,7 +162,7 @@ void MLP::updateWeights(int step)
     // 2) Aplicar Adam + limpiar gradientes
     for (auto &layer : _layerStack) {
 
-#pragma omp parallel for num_threads(16)
+		#pragma omp parallel for num_threads(16)
         for (int i = 0; i < layer._weights.rows(); ++i) {
             for (int j = 0; j < layer._weights.cols(); ++j) {
                 // L2 regularization
@@ -170,7 +170,7 @@ void MLP::updateWeights(int step)
 
                 // Actualizar con Adam
                 updateWeightAdam(i, j, step, layer);
-
+				//updateWeightSGD(i, j, step, layer);
                 // Limpiar grad acumulado
                 layer._grads[i][j] = 0;
             }
@@ -179,6 +179,7 @@ void MLP::updateWeights(int step)
         // Bias (normalmente sin regularizar)
         for (size_t i = 0; i < layer._bias.size(); ++i) {
             updateBiasAdam(i, step, layer);
+			//updateBiasSGD(i, step, layer);
             layer._biasGrads[i] = 0;
         }
     }
@@ -270,6 +271,44 @@ void MLP::updateBiasAdam(int idx, int step, Layer &layer) const
 
     layer._bias[idx] -= _lr * mHat / (std::sqrt(vHat) + eps);
 }
+
+// =================================================
+// MLP: Actualizar Pesos con SGD
+// =================================================
+void MLP::updateWeightSGD(int row, int col, int step, Layer &layer) const {
+    // Constante de momentum (puedes definirla globalmente o como atributo)
+    const valueType momentum = 0.9;
+
+    // Se asume que la regularización L2 ya se agregó al gradiente antes de llamar a esta función:
+    // Es decir, el gradiente es: grad + λ * weight
+
+    // Obtener el gradiente actual para el peso en (row, col)
+    valueType grad = layer._grads[row][col];
+
+    // Actualizar la velocidad:
+    // v = momentum * v - lr * grad
+    layer._sgdVelocity[row][col] = momentum * layer._sgdVelocity[row][col] - _lr * grad;
+
+    // Actualizar el peso usando la velocidad:
+    // weight = weight + v
+    layer._weights[row][col] += layer._sgdVelocity[row][col];
+}
+
+void MLP::updateBiasSGD(int idx, int step, Layer &layer) const {
+    const valueType momentum = 0.9;
+
+    // Obtiene el gradiente del bias en la posición idx
+    valueType grad = layer._biasGrads[idx];
+
+    // Actualizar la velocidad del bias:
+    // v_bias = momentum * v_bias - lr * grad
+    layer._sgdBiasVelocity[idx] = momentum * layer._sgdBiasVelocity[idx] - _lr * grad;
+
+    // Actualizar el bias:
+    // bias = bias + v_bias
+    layer._bias[idx] += layer._sgdBiasVelocity[idx];
+}
+
 
 // =================================================
 // Layer: Usar Función de Activación
