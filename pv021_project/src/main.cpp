@@ -7,13 +7,13 @@ int main() {
  
     // read and normalize data
     std::cout << "Starting..." << std::endl;
-    dataset reader;
+    dataset ds;
     std::cout << "Reading data..." << std::endl;
-    auto trainValues = reader.readValues("data/fashion_mnist_train_vectors.csv");
-    auto testValues = reader.readValues("data/fashion_mnist_test_vectors.csv");
+    auto trainValues = ds.readValues("data/fashion_mnist_train_vectors.csv");
+    auto testValues = ds.readValues("data/fashion_mnist_test_vectors.csv");
     std::cout << "Reading labels..." << std::endl;
-    auto trainLabels = reader.readLabels("data/fashion_mnist_train_labels.csv");  
-    auto testLabels = reader.readLabels("data/fashion_mnist_test_labels.csv");
+    auto trainLabels = ds.readLabels("data/fashion_mnist_train_labels.csv");  
+    auto testLabels = ds.readLabels("data/fashion_mnist_test_labels.csv");
     
     // create and train network
     MLP network(784);
@@ -28,8 +28,8 @@ int main() {
     std::cout << "Predicting..." << std::endl;
     auto predictedTestLabels = network.predict(testValues);   
     auto predictedTrainLabels = network.predict(trainValues);
-	reader.writeResults("test_predictions.csv", predictedTestLabels);
-    reader.writeResults("train_predictions.csv", predictedTrainLabels);
+	ds.writeResults("test_predictions.csv", predictedTestLabels);
+    ds.writeResults("train_predictions.csv", predictedTrainLabels);
 
     std::cout << "Calculating accuracy..." << std::endl;
 
