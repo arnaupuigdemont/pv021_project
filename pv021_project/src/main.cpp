@@ -46,18 +46,12 @@ int main() {
         test_data.normalize();
 
     //CREATE LAYERS
-    cout << "Creating layers..." << endl;
-        Layer input_layer(784, 512);
-        BatchNorm batch_norm(512);
-
-        Layer hidden_layer1(512, 128);
-        BatchNorm batch_norm1(128);
-
-        Layer hidden_layer2(128, 64);
-        BatchNorm batch_norm2(64);
-
+        cout << "Creating layers..." << endl;
+        Layer input_layer(784, 1024);
+        Layer hidden_layer1(1024, 256);
+        Layer hidden_layer2(256, 64);
         Layer output_layer(64, 10);
-cout << "Layers created" << endl;
+
     //TRAINING 
         double learning_rate = initial_rate;
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
