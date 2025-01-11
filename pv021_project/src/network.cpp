@@ -378,33 +378,34 @@ WeightInitType getWeightInitByActivation(ActivationType actFunc) {
     }
 }
 
-matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist) {
-    matrix w(inDim, outDim);
-    WeightInitType winit = getWeightInitByActivation(actFunc);
+matrix initWeights(int inDim, int outDim, ActivationType actFunc, bool uniformDist = true) {
+    matrix weights(inDim, outDim);
+    WeightInitType initType = getWeightInitByActivation(actFunc);
 
-    valueType factor = (uniformDist) ? 3.0 : 1.0;
+    valueType scaleFactor = (uniformDist) ? 3.0 : 1.0;
     valueType bound;
-    switch (winit) {
+    switch (initType) {
         case WeightInitType::Glorot:
-            bound = std::sqrt(factor * 2.0 / (inDim + outDim));
+            bound = std::sqrt(scaleFactor * 2.0 / (inDim + outDim));
             break;
         case WeightInitType::He:
-            bound = std::sqrt(factor * 2.0 / inDim);
+            bound = std::sqrt(scaleFactor * 2.0 / inDim);
             break;
     }
     valueType minVal = -bound;
-    valueType maxVal =  bound;
+    valueType maxVal = bound;
 
     std::mt19937 gen(0);
     std::uniform_real_distribution<valueType> dist(minVal, maxVal);
 
     for (int i = 0; i < inDim; ++i) {
         for (int j = 0; j < outDim; ++j) {
-            w[i][j] = dist(gen);
+            weights[i][j] = dist(gen);
         }
     }
-    return w;
+    return weights;
 }
+
 
 vector initBias(int dim) {
     // Inicializamos en 0
