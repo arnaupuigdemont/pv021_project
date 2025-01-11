@@ -11,14 +11,15 @@
 #include "matrix.hh"
 #include "dataset.hh"
 #include "layer.hh"
+#include "batchNorm.hh"
 
 using namespace std;
 
 const int OUTPUT_SIZE = 10;
 const int EPOCHS = 10; 
-double initial_rate = 0.01; 
+double initial_rate = 0.0001; 
 double decay_rate = 0.2; 
-const int BATCH_SIZE = 256; 
+const int BATCH_SIZE = 128; 
 int lambda = 0.0;
 
 Matrix to_one_hot(int label, int num_classes) {
@@ -46,9 +47,14 @@ int main() {
 
     //CREATE LAYERS
         Layer input_layer(784, 256);
+        BatchNorm batch_norm(256);
+
         Layer hidden_layer1(256, 128);
+        BatchNorm batch_norm1(128);
+
         Layer hidden_layer2(128, 64);
-        //Layer hiddden_layer3(128, 64);
+        BatchNorm batch_norm2(64);
+
         Layer output_layer(64, 10);
 
     //TRAINING 
@@ -82,11 +88,31 @@ int main() {
                     batch_labels.data[i] = to_one_hot(train_labels.data[data_index][0], OUTPUT_SIZE).data[0];
                 }
 
-                Matrix input = input_layer.forward_leaky_relu(batch_inputs);
-                Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
-                Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
-               // Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
-                Matrix output = output_layer.forward_softmax(hidden2);
+                //Matrix input = input_layer.forward_leaky_relu(batch_inputs);
+                //Matrix hidden1 = hidden_layer1.forward_leaky_relu(input);
+                //Matrix hidden2 = hidden_layer2.forward_leaky_relu(hidden1);
+                //Matrix hidden3 = hiddden_layer3.forward_leaky_relu(hidden2);
+                //Matrix output = output_layer.forward_softmax(hidden2);
+
+                //BATCHNORM
+                // 1) Input layer: (batch_size x 784) -> (batch_size x 256)
+                Matrix z_inp   = input_layer.forward(batch_inputs);       // z_inp = XW + b
+                Matrix bn_inp  = batch_norm.forward(z_inp, true);         // BN sobre z_inp
+                Matrix a_inp   = input_layer.leaky_relu(bn_inp);                     // activación LeakyReLU
+
+                // 2) Hidden layer 1: (256 -> 128)
+                Matrix z_h1    = hidden_layer1.forward(a_inp);            // z_h1 = a_inp * W1 + b1
+                Matrix bn_h1   = batch_norm1.forward(z_h1, true);         // BN
+                Matrix a_h1    = hidden_layer1.leaky_relu(bn_h1);
+
+                // 3) Hidden layer 2: (128 -> 64)
+                Matrix z_h2    = hidden_layer2.forward(a_h1);
+                Matrix bn_h2   = batch_norm2.forward(z_h2, true);
+                Matrix a_h2    = hidden_layer2.leaky_relu(bn_h2);
+
+                // 4) Output layer: (64 -> 10)
+                Matrix logits  = output_layer.forward(a_h2);              // z_out = a_h2 * W_out + b_out
+                Matrix output   = output_layer.softmax(logits);                         // softmax para obtener probas
 
                 // Loss
                 double batch_loss = output.cross_entropy_loss(output, batch_labels);
@@ -129,11 +155,29 @@ int main() {
                 //grad = input_layer.backward_ADAM(grad, learning_rate, lambda);
 
                 //SGD with momentum
-                Matrix grad = output_layer.backward_SGD_momentum_output(grad_output, learning_rate, lambda);
+                //Matrix grad = output_layer.backward_SGD_momentum_output(grad_output, learning_rate, lambda);
                 //grad = hiddden_layer3.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-                grad = hidden_layer2.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-                grad = hidden_layer1.backward_SGD_momentum_relu(grad, learning_rate, lambda);
-                grad = input_layer.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+                //grad = hidden_layer2.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+                //grad = hidden_layer1.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+                //grad = input_layer.backward_SGD_momentum_relu(grad, learning_rate, lambda);
+            
+                //BATCHNORM 
+                Matrix grad_out = output_layer.backward_ADAM_output(grad_output, learning_rate, lambda);
+                // 5) batch_norm2 backward
+                Matrix grad_bn2 = batch_norm2.backward(grad_out, learning_rate);
+                Matrix grad_h2 = hidden_layer2.leaky_relu_backward(grad_bn2, bn_h2, 0.01); 
+                Matrix grad_a_h1 = hidden_layer2.backward_ADAM(grad_h2, learning_rate, lambda);
+
+                // 6) batch_norm1 backward
+                Matrix grad_bn1 = batch_norm1.backward(grad_a_h1, learning_rate);
+                Matrix grad_h1 = hidden_layer1.leaky_relu_backward(grad_bn1, bn_h1, 0.01);
+                Matrix grad_a_inp = hidden_layer1.backward_ADAM(grad_h1, learning_rate, lambda);
+           
+                // 9) batch_norm backward
+                Matrix grad_bn_inp = batch_norm.backward(grad_a_inp, learning_rate);
+                Matrix grad_z_inp = input_layer.leaky_relu_backward(grad_bn_inp, bn_inp, 0.01);
+                Matrix grad_in = input_layer.backward_ADAM(grad_z_inp, learning_rate, lambda);
+            
             }
 
             auto epoch_end = std::chrono::high_resolution_clock::now();
