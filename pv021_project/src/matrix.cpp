@@ -197,7 +197,7 @@
                 }
             }
 
-            return loss / output.getRows(); // Promedio por el tamaño del batch
+            return loss; // Promedio por el tamaño del batch
         }
 
         Matrix Matrix::hadamard(const Matrix &other) const {
