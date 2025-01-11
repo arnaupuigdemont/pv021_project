@@ -14,7 +14,6 @@ vector initializeBias(int dimension);
 class Layer {
 
 	friend class MLP; 
-	friend class Tester;
 	
 	vector _values;
 	vector _valuesDerivatives;
@@ -66,7 +65,7 @@ public:
 
 class MLP {
 
-	friend class Tester;
+	const double lambda = 0.001;
 
 	std::vector<vector> _inputValues;
 	std::vector<int> _inputLabels;

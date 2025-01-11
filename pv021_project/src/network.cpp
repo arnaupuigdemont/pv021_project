@@ -155,6 +155,9 @@ void MLP::updateWeights(int step) {
 		#pragma omp parallel for num_threads(16)
 		for (int i = 0; i < layer._weights.rows(); ++i) {
 			for (int j = 0; j < layer._weights.cols(); ++j) {
+
+				layer._gradients[i][j] += lambda * layer._weights[i][j];
+				
 				updateWeightAdam(i, j, step, layer);
 				layer._gradients[i][j] = 0;
 			}
