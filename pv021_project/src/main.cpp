@@ -46,6 +46,7 @@ int main() {
         test_data.normalize();
 
     //CREATE LAYERS
+    cout << "Creating layers..." << endl;
         Layer input_layer(784, 512);
         BatchNorm batch_norm(512);
 
@@ -56,7 +57,7 @@ int main() {
         BatchNorm batch_norm2(64);
 
         Layer output_layer(64, 10);
-
+cout << "Layers created" << endl;
     //TRAINING 
         //double learning_rate = initial_rate;
         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
@@ -95,8 +96,11 @@ int main() {
 
                 //BATCHNORM
                 // 1) Input layer: (batch_size x 784) -> (batch_size x 256)
+                cout << "Forward pass" << endl;
                 Matrix z_inp   = input_layer.forward(batch_inputs);       // z_inp = XW + b
+                cout << "Batch norm" << endl;
                 Matrix bn_inp  = batch_norm.forward(z_inp, true);         // BN sobre z_inp
+                cout << "Leaky relu" << endl;
                 Matrix a_inp   = input_layer.leaky_relu(bn_inp);                     // activación LeakyReLU
 
                 // 2) Hidden layer 1: (256 -> 128)
@@ -161,10 +165,14 @@ int main() {
                 //grad = input_layer.backward_SGD_momentum_relu(grad, learning_rate, lambda);
             
                 //BATCHNORM 
+                cout << "Backward pass" << endl;
                 Matrix grad_out = output_layer.backward_ADAM_output(grad_output, initial_rate, lambda);
                 // 5) batch_norm2 backward
+                cout << "Batch norm backward" << endl;
                 Matrix grad_bn2 = batch_norm2.backward(grad_out, initial_rate);
+                cout << "Leaky relu backward" << endl;
                 Matrix grad_h2 = hidden_layer2.leaky_relu_backward(grad_bn2, bn_h2, 0.01); 
+                cout << "ADAM backward" << endl;
                 Matrix grad_a_h1 = hidden_layer2.backward_ADAM(grad_h2, initial_rate, lambda);
 
                 // 6) batch_norm1 backward
