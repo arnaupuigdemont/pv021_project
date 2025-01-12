@@ -51,7 +51,6 @@ void Network::train(const std::vector<Vector> &trainData,
             _trainData   = currentBatchData;
             _trainLabels = currentBatchLabels;
             
-            // Calcular el "globalStep" (por ejemplo, para actualizar gradientes)
             _globalStep++;
             updateWeights(_globalStep);
         }
@@ -94,9 +93,9 @@ std::vector<int> Network::predict(const std::vector<Vector> &testData) {
 void Network::addLayer(int outDim) {
     int inDim;
     if (_layerStack.empty()) {
-        inDim = _inputSize;  // antes _inputDimension
+        inDim = _inputSize; 
     } else {
-        inDim = _layerStack.back().getDimension();
+        inDim = _layerStack.back().getSize();
     }
     _layerStack.emplace_back(inDim, outDim, false);
 }
@@ -107,9 +106,9 @@ void Network::addLayer(int outDim) {
 void Network::addOutputLayer(int outDim) {
 	int inDim;
 	if (_layerStack.empty()) {
-		inDim = _inputSize;  // antes _inputDimension
+		inDim = _inputSize; 
 	} else {
-		inDim = _layerStack.back().getDimension();
+		inDim = _layerStack.back().getSize();
 	}
 	_layerStack.emplace_back(inDim, outDim, true);
 }
@@ -208,9 +207,8 @@ void Network::updateWeights(int globalStep) {
                 // Incorporate L2 regularization: add regLambda * weight to the gradient.
                 layer._grads[i][j] += regLambda * layer._weights[i][j];
                 
-                // Update the weight using the Adam update (or, alternativamente, SGD update).
-                // Aquí se llama a 'updateWeightAdam'; para usar SGD, se cambiaría a 'updateWeightSGD'.
                 updateWeightAdam(i, j, globalStep, layer);
+                //updateWeightSGD(i, j, globalStep, layer);
                 
                 // Reset the gradient for this parameter.
                 layer._grads[i][j] = 0;
@@ -220,6 +218,7 @@ void Network::updateWeights(int globalStep) {
         // Update biases (typically biases are not regularized).
         for (int i = 0; i < layer._bias.size(); ++i) {
             updateBiasAdam(i, globalStep, layer);
+            //updateBiasSGD(i, globalStep, layer);
             layer._biasGrads[i] = 0;
         }
     }

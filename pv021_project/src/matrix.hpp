@@ -21,6 +21,18 @@ public:
     explicit Matrix(const std::vector<Vector> &rowsData)
         : _rows(rowsData.size()), _cols(rowsData[0].size()), _rowsData(rowsData) {}
 
+    // Constructs a matrix from a vector of vectors.
+    explicit Matrix(const std::vector<std::vector<valueType>> &data)
+    : _rows(data.size()), _cols(data[0].size()), _rowsData(data.size()) {
+        for (int i = 0; i < _rows; ++i) {
+            _rowsData[i] = Vector(data[i]);
+        }
+    }
+
+    // Constructs a matrix from a single vector.
+    explicit Matrix(const Vector &v)
+    : _rows(v.size()), _cols(1), _rowsData(1, v) {}
+
     // Overloaded operators for matrix arithmetic.
     friend Matrix operator+(const Matrix &a, const Matrix &b);
     friend Vector operator*(const Matrix &m, const Vector &v);
@@ -32,7 +44,6 @@ public:
     // Access operators.
     const Vector& operator[](int i) const { return _rowsData[i]; }
     Vector& operator[](int i) { return _rowsData[i]; }
-
 
     // Get a specific row.
     Vector row(int index) const;

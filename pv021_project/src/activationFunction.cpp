@@ -64,3 +64,91 @@ Vector activationFunction::softmaxDerivative(const Vector &inputVector) {
 
     return Vector(result);
 }
+
+/**
+ * @brief Sigmoid function applied on a single value.
+ */
+valueType activationFunction::sigmoid(valueType x) {
+    return 1 / (1 + std::exp(-x));
+}
+
+/**
+ * @brief Applies sigmoid function element-wise on a vector.
+ */
+Vector activationFunction::sigmoid(const Vector &inputVector) {
+    int dim = inputVector.size();
+    std::vector<valueType> activated(dim);
+    for (int i = 0; i < dim; ++i) {
+        activated[i] = sigmoid(inputVector[i]);
+    }
+    return Vector(activated);
+}
+
+/**
+ * @brief Applies the derivative of sigmoid function element-wise on a vector.
+ */
+Vector activationFunction::sigmoidDerivative(const Vector &inputVector) {
+    std::vector<valueType> data = inputVector.getData();
+    std::transform(data.begin(), data.end(), data.begin(),
+                   [](valueType x) { return x * (1 - x); });
+    return Vector(data);
+}
+
+/**
+ * @brief Hyperbolic tangent function applied on a single value.
+ */
+valueType activationFunction::tanh(valueType x) {
+    return std::tanh(x);
+}
+
+/**
+ * @brief Applies hyperbolic tangent function element-wise on a vector.
+ */
+Vector activationFunction::tanh(const Vector &inputVector) {
+    int dim = inputVector.size();
+    std::vector<valueType> activated(dim);
+    for (int i = 0; i < dim; ++i) {
+        activated[i] = tanh(inputVector[i]);
+    }
+    return Vector(activated);
+}
+
+/**
+ * @brief Applies the derivative of hyperbolic tangent function element-wise on a vector.
+ */
+Vector activationFunction::tanhDerivative(const Vector &inputVector) {
+    std::vector<valueType> data = inputVector.getData();
+    std::transform(data.begin(), data.end(), data.begin(),
+                   [](valueType x) { return 1 - x * x; });
+    return Vector(data);
+}
+
+/**
+ * @brief ReLU function applied on a single value.
+ */
+valueType activationFunction::relu(valueType x) {
+    return (x < 0) ? 0 : x;
+}
+
+/**
+ * @brief Applies ReLU function element-wise on a vector.
+ */
+Vector activationFunction::relu(const Vector &inputVector) {
+    int dim = inputVector.size();
+    std::vector<valueType> activated(dim);
+    for (int i = 0; i < dim; ++i) {
+        activated[i] = relu(inputVector[i]);
+    }
+    return Vector(activated);
+}
+
+/**
+ * @brief Applies the derivative of ReLU function element-wise on a vector.
+ */
+Vector activationFunction::reluDerivative(const Vector &inputVector) {
+    std::vector<valueType> data = inputVector.getData();
+    std::transform(data.begin(), data.end(), data.begin(),
+                   [](valueType x) { return (x < 0) ? 0 : 1; });
+    return Vector(data);
+}
+

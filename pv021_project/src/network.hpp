@@ -44,7 +44,7 @@ class Network {
             _inputSize(inputSize),
             _lr(0.01) {}
 
-        // Add layer
+        // Add layers
         void addLayer(int outDim);
         void addOutputLayer(int outDim);
 
