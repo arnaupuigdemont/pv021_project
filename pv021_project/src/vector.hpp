@@ -39,8 +39,12 @@ public:
     void pop_back() { _data.pop_back(); }
     valueType back() const { return _data.back(); }
     void emplace_back(valueType value) { _data.emplace_back(value); }
+    void resize(int size) { _size = size; _data.resize(size); }
+    void clear() { _data.clear(); }
     const std::vector<valueType>& getData() const { return _data; }
+    std::vector<valueType>& getData() { return _data; }
+    void setData(const std::vector<valueType> &data) { _data = data; }
+    void setData(std::vector<valueType> &&data) { _data = std::move(data); }
+    
 };
-Vector plusMinusVectors(const Vector &a, const Vector &b, int sign);
-
 #endif

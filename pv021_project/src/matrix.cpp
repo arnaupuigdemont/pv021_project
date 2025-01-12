@@ -47,6 +47,39 @@ Vector operator*(const Vector &v, const Matrix &m) {
     return result;
 }
 
+/**
+ * @brief operator* matrix-matrix multiplication
+ */
+Matrix operator*(const Matrix &A, const Matrix &B) {
+    Matrix result(A.rows(), B.cols());
+    for (int i = 0; i < A.rows(); ++i) {
+        for (int j = 0; j < B.cols(); ++j) {
+            result[i][j] = A.row(i) * B.col(j);
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief operator* matrix-scalar multiplication
+ */
+Matrix operator*(const Matrix &m, valueType scalar) {
+    Matrix result(m.rows(), m.cols());
+    for (int i = 0; i < m.rows(); ++i) {
+        for (int j = 0; j < m.cols(); ++j) {
+            result[i][j] = m[i][j] * scalar;
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief operator* scalar-matrix multiplication
+ */
+Matrix operator*(valueType scalar, const Matrix &m) {
+    return m * scalar;
+}
+
 Vector Matrix::row(int i) const {
     Vector r(cols());
     for (int j = 0; j < cols(); ++j) {

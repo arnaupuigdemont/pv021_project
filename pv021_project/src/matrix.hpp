@@ -25,10 +25,14 @@ public:
     friend Matrix operator+(const Matrix &a, const Matrix &b);
     friend Vector operator*(const Matrix &m, const Vector &v);
     friend Vector operator*(const Vector &v, const Matrix &m);
+    friend Matrix operator*(const Matrix &a, const Matrix &b);
+    friend Matrix operator*(const Matrix &a, valueType scalar);
+    friend Matrix operator*(valueType scalar, const Matrix &a);
 
     // Access operators.
     const Vector& operator[](int i) const { return _rowsData[i]; }
     Vector& operator[](int i) { return _rowsData[i]; }
+
 
     // Get a specific row.
     Vector row(int index) const;
