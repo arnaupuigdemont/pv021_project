@@ -20,13 +20,13 @@ int main() {
     Network nn(784);
     nn.addLayer(256);
     nn.addLayer(128);
-    //nn.addLayer(64);
+    nn.addLayer(64);
     nn.addOutputLayer(10);
 
     auto start = std::chrono::high_resolution_clock::now();
 
     std::cout << "Training..." << std::endl;
-    nn.train(trainValues, trainLabels, 0.001, 7, 32);
+    nn.train(trainValues, trainLabels, 0.001, 8, 32);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
