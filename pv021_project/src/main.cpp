@@ -1,6 +1,7 @@
 #include "dataset.hpp"
 #include "network.hpp"
 #include <iostream>
+#include <chrono>
 
 int main() {
 
@@ -22,8 +23,14 @@ int main() {
     nn.addLayer(64);
     nn.addOutputLayer(10);
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     std::cout << "Training..." << std::endl;
-    nn.train(trainValues, trainLabels, 0.001, 6, 32);
+    nn.train(trainValues, trainLabels, 0.001, 7, 32);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Training completed in " << duration.count() << " seconds" << std::endl;
 
     // predict and calculate accuracy
     std::cout << "Predicting..." << std::endl;
