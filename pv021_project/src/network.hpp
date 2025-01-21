@@ -9,7 +9,7 @@
 class Network {
 
     private:
-        const double regLambda = 0.05;  
+        const double regLambda = 0.005;  
 
         std::vector<Vector> _trainData;
         std::vector<int>    _trainLabels;
