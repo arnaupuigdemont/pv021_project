@@ -17,7 +17,7 @@ int main() {
     
     // create and train network
     Network nn(784);
-    nn.addLayer(128);
+    nn.addLayer(256);
     nn.addLayer(64);
     nn.addOutputLayer(10);
 
