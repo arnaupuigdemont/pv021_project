@@ -23,7 +23,7 @@ int main() {
     nn.addOutputLayer(10);
 
     std::cout << "Training..." << std::endl;
-    nn.train(trainValues, trainLabels, 0.001, 3, 128);
+    nn.train(trainValues, trainLabels, 0.001, 2, 128);
 
     // predict and calculate accuracy
     std::cout << "Predicting..." << std::endl;
