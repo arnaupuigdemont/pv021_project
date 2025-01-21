@@ -20,7 +20,7 @@ int main() {
     Network nn(784);
     nn.addLayer(256);
     nn.addLayer(128);
-    nn.addLayer(64);
+    //nn.addLayer(64);
     nn.addOutputLayer(10);
 
     auto start = std::chrono::high_resolution_clock::now();
