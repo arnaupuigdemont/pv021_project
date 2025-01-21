@@ -26,7 +26,7 @@ int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
     std::cout << "Training..." << std::endl;
-    nn.train(trainValues, trainLabels, 0.001, 4, 128);
+    nn.train(trainValues, trainLabels, 0.001, 3, 128);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
